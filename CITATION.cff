@@ -1,0 +1,25 @@
+cff-version: 1.2.0
+message: "If you use Rheo in your research or applications, please cite it as below."
+authors:
+  - family-names: "MasterZ1311"
+    given-names: "Thenappan"
+    email: "thenappanmasterz1311@gmail.com"
+    alias: "MasterZ1311"
+    affiliation: "Independent Researcher & Engineer"
+title: "Rheo: Sovereign Local-First AI Voice Studio, Zero-Shot Neural Cloning, and Zero-Latency Dictation"
+version: 0.5.0
+date-released: 2026-09-07
+url: "https://github.com/MasterZ1311/Rheo"
+repository-code: "https://github.com/MasterZ1311/Rheo"
+license: "AGPL-3.0-or-later"
+keywords:
+  - text-to-speech
+  - voice-cloning
+  - speech-synthesis
+  - local-ai
+  - whisper
+  - mcp-server
+  - tts
+  - tauri
+  - cuda
+  - rocm

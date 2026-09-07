@@ -12,14 +12,20 @@
 
 <p align="center">
   <a href="https://github.com/MasterZ1311/Rheo/releases">
-    <img src="https://img.shields.io/github/v/release/MasterZ1311/Rheo?style=flat" alt="Release" />
+    <img src="https://img.shields.io/github/v/release/MasterZ1311/Rheo?style=flat-square&color=black" alt="Release" />
+  </a>
+  <a href="https://github.com/MasterZ1311/Rheo/actions/workflows/ci.yml">
+    <img src="https://img.shields.io/github/actions/workflow/status/MasterZ1311/Rheo/ci.yml?branch=MZ-Main&style=flat-square&color=black&label=CI" alt="CI Build" />
   </a>
   <a href="https://github.com/MasterZ1311/Rheo/blob/main/LICENSE">
-    <img src="https://img.shields.io/badge/License-AGPL--3.0-blue.svg" alt="License" />
+    <img src="https://img.shields.io/badge/License-AGPL--3.0-black.svg?style=flat-square" alt="License" />
   </a>
   <a href="https://github.com/MasterZ1311">
-    <img src="https://img.shields.io/badge/Author-MasterZ1311-black.svg" alt="Author" />
+    <img src="https://img.shields.io/badge/Author-MasterZ1311-black.svg?style=flat-square" alt="Author" />
   </a>
+  <img src="https://img.shields.io/badge/Python-3.11%20%7C%203.12%20%7C%203.13-black?style=flat-square&logo=python&logoColor=white" alt="Python" />
+  <img src="https://img.shields.io/badge/Tauri-v2.0-black?style=flat-square&logo=tauri&logoColor=white" alt="Tauri" />
+  <img src="https://img.shields.io/badge/Hardware-CUDA%20%7C%20ROCm%20%7C%20Metal-black?style=flat-square" alt="Hardware" />
 </p>
 
 <p align="center">
