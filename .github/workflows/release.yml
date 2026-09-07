@@ -322,7 +322,7 @@ jobs:
 
       - name: Upload archives to GitHub Release
         if: startsWith(github.ref, 'refs/tags/')
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: |
             release-assets/rheo-server-cuda.tar.gz
@@ -383,7 +383,7 @@ jobs:
 
       - name: Upload archives to GitHub Release
         if: startsWith(github.ref, 'refs/tags/')
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: |
             release-assets/rheo-server-rocm.tar.gz
