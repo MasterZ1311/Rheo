@@ -1,0 +1,26 @@
+{
+  "name": "Complete Merge Lock (Freeze)",
+  "target": "branch",
+  "enforcement": "active",
+  "conditions": {
+    "ref_name": {
+      "include": [
+        "~DEFAULT_BRANCH",
+        "refs/heads/MZ-Main"
+      ],
+      "exclude": []
+    }
+  },
+  "rules": [
+    {
+      "type": "deletion"
+    },
+    {
+      "type": "non_fast_forward"
+    },
+    {
+      "type": "lock_branch"
+    }
+  ],
+  "bypass_actors": []
+}

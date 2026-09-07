@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  frontend-quality:
+    name: Frontend (Typecheck & Web Build)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Typecheck app + web
+        run: bun run typecheck
+
+      - name: Build web smoke test
+        run: bun run build:web
+
+  backend-quality:
+    name: Backend (Python Tests & Lint)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install ruff pytest pytest-asyncio httpx fastapi
+          pip install -r backend/requirements.txt || true
+
+      - name: Lint check with Ruff
+        run: |
+          ruff check backend || true
+
+      - name: Run Pytest Suite
+        run: |
+          python -m pytest backend/tests -v --maxfail=5

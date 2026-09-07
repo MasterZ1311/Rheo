@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "rheo": {
+      "type": "http",
+      "url": "http://127.0.0.1:17493/mcp",
+      "headers": {
+        "X-Rheo-Client-Id": "claude-code"
+      }
+    }
+  }
+}

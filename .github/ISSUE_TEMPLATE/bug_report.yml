@@ -1,0 +1,84 @@
+﻿name: 🐛 Bug Report
+description: Report an issue, crash, or unexpected behavior in Rheo
+title: "[Bug]: "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report an issue! Please ensure you are testing against the latest release before opening a bug.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: A clear and concise description of what happened.
+      placeholder: Describe what went wrong...
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      description: How can the maintainers or contributors reproduce this issue?
+      placeholder: |
+        1. Open Rheo
+        2. Go to '...'
+        3. Click on '....'
+        4. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What did you expect to happen?
+      placeholder: Expected the speech generation / dictation to...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating System
+      options:
+        - macOS (Apple Silicon M1/M2/M3/M4)
+        - macOS (Intel x86_64)
+        - Windows 11 / 10 (NVIDIA CUDA)
+        - Windows 11 / 10 (AMD ROCm)
+        - Windows 11 / 10 (CPU Only)
+        - Linux (Ubuntu / Debian / Fedora / Arch)
+        - Docker Container
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Rheo Version
+      description: Which version or commit of Rheo are you using?
+      placeholder: e.g. v0.5.0
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs & Console Output
+      description: Paste any relevant terminal logs or DevTools console errors.
+      render: shell
+      placeholder: Paste logs here...
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Verification
+      options:
+        - label: I have searched existing issues and verified this is not a duplicate.
+          required: true
+        - label: I have checked the Troubleshooting guide for known resolutions.
+          required: true
