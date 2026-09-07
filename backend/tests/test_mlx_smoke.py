@@ -5,7 +5,7 @@ Guards the `--no-deps` install of mlx-audio/mlx-lm done by `just setup-python`
 and release.yml: those packages skip their declared dependencies (transformers
 >=5.x conflict), so a missing transitive dep only surfaces at import time.
 This test fails fast if the MLX STT/TTS entry points the backend uses stop
-importing (e.g. the `miniaudio` regression from issue #505).
+importing (e.g. any missing miniaudio dependency).
 
 Usage:
     python -m pytest backend/tests/test_mlx_smoke.py -v
@@ -39,8 +39,8 @@ def test_mlx_audio_tts_entry_point():
 def test_mlx_audio_stt_entry_point():
     """`from mlx_audio.stt import load` — used by the Whisper MLX STT path.
 
-    Importing mlx_audio.stt also pulls in miniaudio, so this catches the
-    ModuleNotFoundError from issue #505 on fresh installs.
+    Importing mlx_audio.stt also pulls in miniaudio, so this catches any
+    ModuleNotFoundError on fresh installs.
     """
     from mlx_audio.stt import load
 

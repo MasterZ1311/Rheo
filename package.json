@@ -1,8 +1,8 @@
 {
   "name": "rheo",
-  "version": "0.5.0",
+  "version": "0.1.0",
   "description": "Rheo — Sovereign AI voice studio, neural speech cloning, and zero-latency dictation",
-  "author": "MasterZ1311",
+  "author": "MasterZ1311 <thenappanmasterz1311@gmail.com>",
   "license": "AGPL-3.0-or-later",
   "homepage": "https://github.com/MasterZ1311/Rheo",
   "repository": {

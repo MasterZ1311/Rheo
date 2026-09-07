@@ -242,7 +242,7 @@ Get GPU acceleration status, VRAM allocation, and model cache status.
 ```json
 {
   "status": "ok",
-  "version": "0.5.0",
+  "version": "0.1.0",
   "gpu": "CUDA (NVIDIA GeForce RTX 4090)",
   "vram_used_mb": 2450.5,
   "vram_total_mb": 24576.0,
@@ -267,7 +267,7 @@ Rheo hosts a Streamable HTTP Model Context Protocol endpoint at `/mcp`.
 claude mcp add rheo \
   --transport http \
   --url http://127.0.0.1:17493/mcp \
-  --header "X-Rheo-Client-Id (or legacy X-Rheo-Client-Id): claude-code"
+  --header "X-Rheo-Client-Id: claude-code"
 ```
 
 #### Cursor / Windsurf / VS Code (`mcpServers` config):
@@ -277,7 +277,7 @@ claude mcp add rheo \
     "rheo": {
       "url": "http://127.0.0.1:17493/mcp",
       "headers": {
-        "X-Rheo-Client-Id (or legacy X-Rheo-Client-Id)": "cursor"
+        "X-Rheo-Client-Id": "cursor"
       }
     }
   }
@@ -286,13 +286,17 @@ claude mcp add rheo \
 
 ### Available MCP Tools
 
-1. `rheo.speak / rheo.speak`
+1. `rheo.speak`
    - Arguments: `text` (*string*), `profile` (*optional string*), `personality` (*optional boolean*), `model_size` (*optional string*).
    - Causes the host machine to speak in the chosen cloned voice with an on-screen visual indicator.
-2. `rheo.transcribe / rheo.transcribe`
+2. `rheo.transcribe`
    - Arguments: `audio_data` (*optional base64*) or `audio_path` (*optional local file path, loopback only*), `model` (*optional string*).
    - Transcribes audio into text.
 3. `rheo.list_profiles`
    - Returns all available voices.
 4. `rheo.list_captures`
    - Returns recent dictation and microphone captures with transcripts.
+
+---
+
+© 2026 MasterZ1311 · Rheo — Sovereign Local-First AI Voice Studio

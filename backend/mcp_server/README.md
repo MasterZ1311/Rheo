@@ -101,3 +101,7 @@ backend/mcp_shim/    # stdio ↔ Streamable-HTTP proxy (see its README)
 
 The package is **`mcp_server`**, not `mcp`, to avoid shadowing the
 installed `mcp` PyPI package that FastMCP imports internally.
+
+---
+
+© 2026 MasterZ1311 · Rheo — Sovereign Local-First AI Voice Studio

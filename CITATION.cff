@@ -7,7 +7,7 @@ authors:
     alias: "MasterZ1311"
     affiliation: "Independent Researcher & Engineer"
 title: "Rheo: Sovereign Local-First AI Voice Studio, Zero-Shot Neural Cloning, and Zero-Latency Dictation"
-version: 0.5.0
+version: 0.1.0
 date-released: 2026-09-07
 url: "https://github.com/MasterZ1311/Rheo"
 repository-code: "https://github.com/MasterZ1311/Rheo"

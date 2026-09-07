@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 			"End-to-end encrypted backup and sync across desktop and mobile. The server is blind — only your devices can decrypt.",
 		type: "website",
 		url: "https://rheo.sh/cloud",
-		images: [{url: "/og.webp", width: 1200, height: 630}],
+		images: [{url: "/rheo-logo.png", width: 1024, height: 1024}],
 	},
 };
 

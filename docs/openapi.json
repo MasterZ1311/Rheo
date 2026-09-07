@@ -3,7 +3,7 @@
   "info": {
     "title": "Rheo API",
     "description": "Rheo Sovereign AI Voice Studio & Neural Speech Synthesis Engine \u2014 Architected by masterz1311",
-    "version": "0.5.0"
+    "version": "0.1.0"
   },
   "paths": {
     "/": {

@@ -1,8 +1,8 @@
 {
   "name": "@rheo/landing",
-  "version": "0.5.0",
+  "version": "0.1.0",
   "description": "Landing page for Rheo — The Sovereign AI Voice Studio",
-  "author": "MasterZ1311",
+  "author": "MasterZ1311 <thenappanmasterz1311@gmail.com>",
   "license": "AGPL-3.0-or-later",
   "scripts": {
     "dev": "next dev --turbo",

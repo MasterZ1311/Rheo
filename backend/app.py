@@ -1,3 +1,4 @@
+# Project: Rheo | Maintained by MasterZ1311 (https://github.com/MasterZ1311)
 """FastAPI application factory, middleware, and lifecycle events."""
 
 import asyncio

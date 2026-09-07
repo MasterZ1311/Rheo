@@ -217,10 +217,7 @@ class MLXTTSBackend:
                 ref_audio = None
 
             # Inference runs with the process's default HF_HUB_OFFLINE
-            # state. Forcing offline here (previously used to avoid lazy
-            # mlx_audio lookups hanging when the network drops mid-inference,
-            # issue #462) regressed online users because libraries make
-            # legitimate metadata calls during generation.
+            # state without forcing offline mode.
             try:
                 if ref_audio:
                     # Check if generate accepts ref_audio parameter
@@ -353,8 +350,7 @@ class MLXSTTBackend:
                 decode_options["task"] = task
 
             # Inference runs with the process's default HF_HUB_OFFLINE
-            # state — see the comment in MLXTTSBackend.generate for the
-            # regression this revert fixes (issue #462).
+            # state without forcing offline mode.
             result = self.model.generate(str(audio_path), **decode_options)
 
             # Extract text from result

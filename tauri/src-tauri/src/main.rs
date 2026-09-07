@@ -1,3 +1,4 @@
+// Project: Rheo | Maintained by MasterZ1311 (https://github.com/MasterZ1311)
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Copyright (C) 2026 MasterZ1311
 
@@ -131,8 +132,8 @@ pub(crate) const SERVER_PORT: u16 = 17493;
 /// Uses PowerShell `Get-NetTCPConnection` to look up the PID owning the port,
 /// then verifies via `tasklist` that it's a rheo process. The caller is
 /// responsible for checking port occupancy first (e.g. `TcpStream::connect_timeout`).
-/// Replaces the previous `netstat -ano` approach which failed on systems with
-/// corrupted system DLLs (see #277).
+/// Replaces the previous `netstat -ano` approach which could fail on systems with
+/// corrupted system DLLs.
 #[cfg(windows)]
 fn find_rheo_pid_on_port(port: u16) -> Option<u32> {
     use std::process::Command;

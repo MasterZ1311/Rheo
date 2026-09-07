@@ -61,13 +61,15 @@ export default function OgPreview() {
           </div>
         </div>
 
-        {/* App screenshot — right, overflowing */}
+        {/* Logo preview right */}
         <img
-          src="/assets/app-screenshot-1.webp"
+          src="/rheo-logo.png"
           alt=""
-          className="pointer-events-none absolute top-1/2 -translate-y-1/2 z-10"
+          className="pointer-events-none absolute top-1/2 -translate-y-1/2 z-10 opacity-40"
           style={{
-            right: -300,
+            right: 40,
+            width: 320,
+            height: 320,
             width: 900,
           }}
           draggable={false}

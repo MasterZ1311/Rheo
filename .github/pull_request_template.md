@@ -1,4 +1,4 @@
-﻿## Description
+## Description
 <!-- Provide a clear, brief summary of what this PR introduces, fixes, or improves. -->
 
 Fixes #(issue number)
@@ -21,9 +21,9 @@ Fixes #(issue number)
 ## Verification & Testing
 <!-- Describe the tests you ran to verify your changes. Include commands and platform details. -->
 - Platform tested: [e.g. macOS Apple Silicon, Windows 11 CUDA, Ubuntu Linux]
-- [ ] Backend test suite passes (just test or python -m pytest backend/tests)
-- [ ] Frontend typechecks cleanly (un run typecheck)
-- [ ] Linters pass without warnings (just check-python, un run lint)
+- [ ] Backend test suite passes (`pytest backend/tests`)
+- [ ] Frontend typechecks cleanly (`bun run typecheck`)
+- [ ] Linters pass without warnings (`bun run lint`)
 - [ ] Manual verification performed
 
 ## Checklist
@@ -31,3 +31,7 @@ Fixes #(issue number)
 - [ ] I have self-reviewed my own code.
 - [ ] I have updated corresponding documentation if relevant.
 - [ ] My changes introduce no new lint or type errors.
+
+---
+
+© 2026 MasterZ1311 · Rheo — Sovereign Local-First AI Voice Studio

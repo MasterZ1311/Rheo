@@ -27,7 +27,7 @@ export const metadata: Metadata = {
 		description: `The official community token for Rheo. Optional, just for fun — Rheo stays free and open source.`,
 		type: "website",
 		url: "https://rheo.sh/token",
-		images: [{url: "/og.webp", width: 1200, height: 630}],
+		images: [{url: "/rheo-logo.png", width: 1024, height: 1024}],
 	},
 };
 

@@ -21,7 +21,7 @@ This skill pairs with `draft-release-notes` and `release-bump`: triage first, th
 
 - `gh` CLI authenticated against the repo
 - A dedicated worktree for PR review (avoid contaminating `main` with checkouts of contributor branches)
-- Clarity on the target version — the triage doc is named after it (e.g. `0.4.0_PR_TRIAGE.md`)
+- Clarity on the target version — the triage doc is named after it (e.g. `0.2.0_PR_TRIAGE.md`)
 
 ## Workflow
 

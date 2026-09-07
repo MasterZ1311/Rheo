@@ -1,7 +1,7 @@
 [project]
 name = "rheo-backend"
-version = "0.5.0"
-authors = [{ name = "MasterZ1311" }]
+version = "0.1.0"
+authors = [{ name = "MasterZ1311", email = "thenappanmasterz1311@gmail.com" }]
 license = { text = "AGPL-3.0-or-later" }
 requires-python = ">=3.12"
 

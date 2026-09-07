@@ -276,7 +276,7 @@ async def delete_failed_generations(db: Session) -> int:
 
     Used by the "Clear failed" action in the UI so users can tidy up
     history after the model wasn't loaded, the app was closed mid-run,
-    or a generation otherwise errored out (see issue #410).
+    or a generation otherwise errored out.
 
     Returns:
         Number of generations deleted.

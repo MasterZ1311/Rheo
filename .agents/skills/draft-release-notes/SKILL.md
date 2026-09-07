@@ -80,8 +80,7 @@ Tie it to concrete shipped changes. No vague hype.>
 - **Narrative over list.** Lead with paragraphs that tell the story, then support with bullets.
 - **Group by theme, not by commit.** Cluster related changes under descriptive headings.
 - **Reference PRs** where they exist, but don't fabricate them.
-- **Skip trivial chores** (typo fixes, CI tweaks) unless they're the bulk of the release.
-- **Match the voice of existing releases** — look at the v0.2.1 and v0.2.3 entries in CHANGELOG.md for tone reference.
+- **Match the voice of existing releases** — maintain a clear, professional tone for release notes.
 
 ## When There Are No Changes
 

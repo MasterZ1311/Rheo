@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 			"The app is free forever. Cloud backup & sync is an optional add-on — free for $RHEO holders.",
 		type: "website",
 		url: "https://rheo.sh/pricing",
-		images: [{url: "/og.webp", width: 1200, height: 630}],
+		images: [{url: "/rheo-logo.png", width: 1024, height: 1024}],
 	},
 };
 

@@ -56,3 +56,7 @@ These are manual test scripts, not automated unit tests. They're designed for:
 - Validating SSE event streams
 - Monitoring real-time download behavior
 - Inspecting internal state during development
+
+---
+
+© 2026 MasterZ1311 · Rheo — Sovereign Local-First AI Voice Studio

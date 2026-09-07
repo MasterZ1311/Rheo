@@ -242,7 +242,7 @@ async def get_model_status():
 
     # Pending only — an errored task stays in the active list for the
     # error/retry UI, but reporting it as "downloading" here would mask
-    # the model's real cache state until the app restarts (issue #925).
+    # the model's real cache state until the app restarts.
     active_download_names = {task.model_name for task in task_manager.get_pending_downloads()}
 
     try:

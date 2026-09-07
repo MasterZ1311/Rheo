@@ -244,7 +244,7 @@ async def download_rocm_binary(version: Optional[str] = None):
     - ROCm libs: only if missing or version mismatch
 
     Args:
-        version: Version tag (e.g. "v0.3.0"). Defaults to current app version.
+        version: Version tag (e.g. "v0.1.0"). Defaults to current app version.
     """
     if _download_lock.locked():
         logger.info("ROCm download already in progress, skipping duplicate request")

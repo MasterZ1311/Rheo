@@ -1,8 +1,8 @@
 {
   "name": "@rheo/web",
   "private": true,
-  "version": "0.5.0",
-  "author": "MasterZ1311",
+  "version": "0.1.0",
+  "author": "MasterZ1311 <thenappanmasterz1311@gmail.com>",
   "license": "AGPL-3.0-or-later",
   "type": "module",
   "scripts": {

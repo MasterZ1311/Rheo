@@ -402,3 +402,7 @@ ruff format backend/
 ```
 
 Introduce ruff fixes file-by-file as you touch them. Don't run `--fix` across the entire codebase in one shot -- that creates unreviewable diffs.
+
+---
+
+© 2026 MasterZ1311 · Rheo — Sovereign Local-First AI Voice Studio

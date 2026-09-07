@@ -7,7 +7,7 @@ description: "How to add new text-to-speech engines to Rheo"
 
 Adding an engine touches ~10 files across 4 layers. The backend protocol work is straightforward — the real time sink is dependency hell, upstream library bugs, and PyInstaller bundling.
 
-**Do not start writing code until you complete Phase 0.** The v0.2.3 release was three patch releases of PyInstaller fixes because dependency research was skipped. Every issue — `inspect.getsource()` failures, missing native data files, metadata lookups, dtype mismatches — was discoverable by reading the model library's source code before integration began.
+**Do not start writing code until you complete Phase 0.** Bundling issues compound rapidly if dependency research is skipped. Every issue — `inspect.getsource()` failures, missing native data files, metadata lookups, dtype mismatches — is discoverable by reading the model library's source code before integration begins.
 
 ## Architecture Overview
 
@@ -388,7 +388,7 @@ Dependencies must be added in multiple places:
 
 ## Phase 5: PyInstaller Bundling (`build_binary.py`)
 
-This is where most of the pain lives. **The v0.2.3 release was entirely dedicated to fixing bundling issues** — every new engine that shipped in v0.2.1 (LuxTTS, Chatterbox, Chatterbox Turbo) worked in dev but failed in production builds. Don't skip this phase.
+This is where most of the pain lives. **Bundling requires rigorous validation** — newly added engines (LuxTTS, Chatterbox, Chatterbox Turbo) may work in dev but fail in production builds if PyInstaller directives are missing. Don't skip this phase.
 
 ### 5.1 Register Your Engine in `build_binary.py`
 
@@ -418,9 +418,9 @@ Every new engine needs entries in `backend/build_binary.py`. This file drives Py
 "some_dependency_that_checks_its_own_version",
 ```
 
-### 5.2 Lessons from v0.2.3 — Real Failures and Their Fixes
+### 5.2 Production Bundling Failures and Fixes
 
-These are actual production failures from shipping new engines. Every one of these passed `python -m uvicorn` in dev:
+These are actual production failures encountered when shipping engines. Every one of these passed `python -m uvicorn` in dev:
 
 | Engine | Failure | Root Cause | Fix |
 |--------|---------|-----------|-----|
@@ -474,7 +474,7 @@ Apple Silicon builds conditionally include MLX hidden imports and `--collect-all
 
 ### 5.6 Testing Frozen Builds
 
-You can't skip this. Models that work in `python -m uvicorn` will break in the PyInstaller binary. The v0.2.3 release required **three patch releases** (v0.2.1 → v0.2.2 → v0.2.3) to get all engines working in production.
+You can't skip this. Models that work in `python -m uvicorn` will break in the PyInstaller binary if runtime assumptions fail. Rigorous local testing is required before tagging a release:
 
 1. Build: `just build`
 2. Launch the binary directly (not via `python -m`)

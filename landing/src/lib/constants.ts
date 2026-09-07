@@ -1,6 +1,6 @@
 // Download links for Rheo releases
 // These are fallback values - link to releases page if API fails
-export const LATEST_VERSION = 'v0.5.0';
+export const LATEST_VERSION = 'v0.1.0';
 
 export const GITHUB_REPO = 'https://github.com/masterz1311/Rheo';
 export const GITHUB_RELEASES_PAGE = `${GITHUB_REPO}/releases`;

@@ -94,7 +94,7 @@ def resolve_storage_path(path: str | Path | None) -> Path | None:
 
         return stored_path
 
-    # 0.3.0 records sometimes stored relative paths with the data-dir name
+    # Legacy records sometimes stored relative paths with the data-dir name
     # baked in (e.g. "data/profiles/..."). Joining those directly with
     # _data_dir produces a spurious "<data_dir>/data/profiles/..." nest.
     if stored_path.parts and stored_path.parts[0] == "data":

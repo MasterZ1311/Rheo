@@ -251,7 +251,7 @@ class HumeTadaBackend:
             # Encode with forced alignment.
             # Must run under inference_mode: encoder params still require
             # grad by default, and an autograd graph across the DAC/Snake
-            # stack can balloon VRAM far past the model footprint (#890).
+            # stack can balloon VRAM far past the model footprint.
             text_arg = [reference_text] if reference_text else None
             with torch.inference_mode():
                 prompt = self.encoder(audio, text=text_arg, sample_rate=sr)

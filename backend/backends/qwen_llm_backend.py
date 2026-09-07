@@ -105,8 +105,7 @@ class PyTorchQwenLLMBackend:
             # Loads run with the process's default HF_HUB_OFFLINE state.
             # Forcing offline for cached models flips process-global state
             # and silently switches every concurrent download/load on other
-            # threads to offline mode (issue #841) — the same regression
-            # removed app-wide in #524/#530.
+            # threads to offline mode.
             self.tokenizer = AutoTokenizer.from_pretrained(repo)
             dtype = torch.float16 if self.device in ("cuda", "mps") else torch.float32
             self.model = AutoModelForCausalLM.from_pretrained(
@@ -226,7 +225,7 @@ class MLXQwenLLMBackend:
 
         with model_load_progress(progress_model_name, is_cached):
             logger.info("Loading Qwen3 %s via MLX...", model_size)
-            # See the PyTorch loader comment — no offline forcing (issue #841).
+            # See the PyTorch loader comment — keep default offline state.
             loaded = mlx_load(repo)
 
         # mlx_lm.load returns (model, tokenizer) by default and

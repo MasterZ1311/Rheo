@@ -146,7 +146,7 @@ def _migrate_profiles(engine, inspector, tables: set[str]) -> None:
         _add_column(engine, "profiles", "avatar_path VARCHAR", "avatar_path")
     if "effects_chain" not in columns:
         _add_column(engine, "profiles", "effects_chain TEXT", "effects_chain")
-    # Voice type system — v0.3.x
+    # Voice type system
     if "voice_type" not in columns:
         _add_column(engine, "profiles", "voice_type VARCHAR DEFAULT 'cloned'", "voice_type")
     if "preset_engine" not in columns:

@@ -14,37 +14,37 @@ const TUTORIALS: (Tutorial | null)[] = [
 		id: "sisnzgc73zc",
 		title: "Free AI Voice Generator on Your PC (Clones Any Voice)",
 		author: "Kevin Stratvert",
-		thumbnail: "/tutorials/sisnzgc73zc.jpg",
+		thumbnail: "/rheo-logo.png",
 	},
 	{
 		id: "woQe90k7g3c",
 		title: "NEW Rheo DESTROYS ElevenLabs?",
 		author: "Julian Goldie SEO",
-		thumbnail: "/tutorials/woQe90k7g3c.jpg",
+		thumbnail: "/rheo-logo.png",
 	},
 	{
 		id: "kqxqjRsdD5E",
 		title: "This Open-Source TTS App Sounds Scary Good (And It's Free)",
 		author: "Dave Swift",
-		thumbnail: "/tutorials/kqxqjRsdD5E.jpg",
+		thumbnail: "/rheo-logo.png",
 	},
 	{
 		id: "05YBqrWTLQ0",
 		title: "2026年最好的声音克隆工具？Rheo完整测评：从下载到API调用，附速度对比",
 		author: "Tech指南",
-		thumbnail: "/tutorials/05YBqrWTLQ0.jpg",
+		thumbnail: "/rheo-logo.png",
 	},
 	{
 		id: "RRRBxNXgeKQ",
 		title: "Get Started with Rheo: Open-Source Alternative to ElevenLabs Tutorial",
 		author: "StinkyScrublet",
-		thumbnail: "/tutorials/RRRBxNXgeKQ.jpg",
+		thumbnail: "/rheo-logo.png",
 	},
 	{
 		id: "PyMx4L9mky4",
 		title: "Free AI Voice Generator (Clones Any Voice)",
 		author: "mikbes",
-		thumbnail: "/tutorials/PyMx4L9mky4.jpg",
+		thumbnail: "/rheo-logo.png",
 	},
 ];
 

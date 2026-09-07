@@ -60,7 +60,7 @@ export default function Home() {
 							{/* Origin & Provenance Pill */}
 							<div className="inline-flex items-center gap-2 rounded-full border border-cyan-500/30 bg-cyan-950/30 backdrop-blur-md px-3.5 py-1.5 text-xs font-semibold tracking-wide text-cyan-300 mb-6 shadow-[0_0_20px_rgba(6,182,212,0.15)]">
 								<span className="flex h-2 w-2 rounded-full bg-cyan-400 animate-ping" />
-								<span>RHEO v0.5 &middot; BY MASTERZ1311 &middot; APACHE 2.0</span>
+								<span>RHEO v0.1.0 &middot; BY MASTERZ1311 &middot; APACHE 2.0</span>
 							</div>
 
 							{/* High-Impact Headline */}
@@ -110,7 +110,7 @@ export default function Home() {
 
 							{/* OS & Version Metadata */}
 							<div className="mt-6 flex items-center gap-3 text-xs text-muted-foreground/70">
-								<span className="font-mono text-cyan-400/80">{version ?? "v0.5.0"}</span>
+								<span className="font-mono text-cyan-400/80">{version ?? "v0.1.0"}</span>
 								<span>&middot;</span>
 								<span>macOS (Apple Silicon/Intel)</span>
 								<span>&middot;</span>

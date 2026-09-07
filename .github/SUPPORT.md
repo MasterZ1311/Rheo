@@ -1,4 +1,4 @@
-﻿# Getting Support for Rheo
+# Getting Support for Rheo
 
 Welcome to Rheo! We are dedicated to providing support to our community and users.
 
@@ -28,3 +28,7 @@ Please reserve GitHub Issues for actionable bugs and verified feature requests:
 ## 4. Security Inquiries
 
 For security vulnerabilities or private security concerns, please refer to our [Security Policy](.github/SECURITY.md) and do not post publicly on GitHub.
+
+---
+
+© 2026 MasterZ1311 · Rheo — Sovereign Local-First AI Voice Studio

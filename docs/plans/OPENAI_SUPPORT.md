@@ -1,8 +1,6 @@
 # OpenAI API Compatibility
 
-**Status:** Planned for v0.2.0
-
-**Issue:** [#10 OpenAI API compatibility](https://github.com/MasterZ1311/Rheo/issues/10)
+**Status:** Planned Feature Specification
 
 ## Overview
 

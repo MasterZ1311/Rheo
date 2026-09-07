@@ -49,25 +49,25 @@ The `latest.json` file defines available updates per platform:
 
 ```json
 {
-  "version": "0.2.0",
-  "notes": "Bug fixes and improvements",
-  "pub_date": "2026-01-25T12:00:00Z",
+  "version": "0.1.0",
+  "notes": "Initial release",
+  "pub_date": "2026-09-07T12:00:00Z",
   "platforms": {
     "darwin-aarch64": {
       "signature": "base64_encoded_signature",
-      "url": "https://github.com/MasterZ1311/Rheo/releases/download/v0.2.0/rheo_0.2.0_aarch64.app.tar.gz"
+      "url": "https://github.com/MasterZ1311/Rheo/releases/download/v0.1.0/rheo_0.1.0_aarch64.app.tar.gz"
     },
     "darwin-x86_64": {
       "signature": "base64_encoded_signature",
-      "url": "https://github.com/MasterZ1311/Rheo/releases/download/v0.2.0/rheo_0.2.0_x64.app.tar.gz"
+      "url": "https://github.com/MasterZ1311/Rheo/releases/download/v0.1.0/rheo_0.1.0_x64.app.tar.gz"
     },
     "linux-x86_64": {
       "signature": "base64_encoded_signature",
-      "url": "https://github.com/MasterZ1311/Rheo/releases/download/v0.2.0/rheo_0.2.0_amd64.AppImage"
+      "url": "https://github.com/MasterZ1311/Rheo/releases/download/v0.1.0/rheo_0.1.0_amd64.AppImage"
     },
     "windows-x86_64": {
       "signature": "base64_encoded_signature",
-      "url": "https://github.com/MasterZ1311/Rheo/releases/download/v0.2.0/rheo_0.2.0_x64_en-US.msi"
+      "url": "https://github.com/MasterZ1311/Rheo/releases/download/v0.1.0/rheo_0.1.0_x64_en-US.msi"
     }
   }
 }
@@ -103,7 +103,7 @@ The release workflow (`.github/workflows/release.yml`) automatically:
 Triggered by pushing a git tag:
 
 ```bash
-git tag v0.2.0 && git push --tags
+git tag v0.1.0 && git push --tags
 ```
 
 ## Environment Variables
@@ -154,7 +154,7 @@ The CUDA-enabled backend is distributed separately from the main app because bun
 
 ### Two-archive split
 
-Since v0.4, the CUDA binary is packaged as **two archives** instead of one:
+The CUDA binary is packaged as **two archives** instead of one:
 
 - **Server core** (`rheo-server-cuda.tar.gz`) — the Python server + PyTorch code, changes every release.
 - **CUDA libs** (`cuda-libs-cu128-v1.tar.gz`) — the heavy NVIDIA CUDA/cuDNN DLLs, only re-downloaded when the CUDA toolkit major version changes.

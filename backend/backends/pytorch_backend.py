@@ -173,9 +173,7 @@ class PyTorchTTSBackend:
         def _create_prompt_sync():
             """Run synchronous voice prompt creation in thread pool."""
             # Inference runs with the process's default HF_HUB_OFFLINE
-            # state. Forcing offline here (issue #462) regressed online
-            # users whose libraries issue legitimate metadata lookups
-            # during voice-prompt creation.
+            # state without forcing offline mode.
             return self.model.create_voice_clone_prompt(
                 ref_audio=str(audio_path),
                 ref_text=reference_text,
@@ -230,7 +228,7 @@ class PyTorchTTSBackend:
                 manual_seed(seed, self.device)
 
             # See _create_prompt_sync comment — inference runs with the
-            # process's default HF_HUB_OFFLINE state (issue #462).
+            # process's default HF_HUB_OFFLINE state.
             wavs, sample_rate = self.model.generate_voice_clone(
                 text=text,
                 voice_clone_prompt=voice_prompt,
@@ -340,10 +338,7 @@ class PyTorchSTTBackend:
             # Load audio
             audio, _sr = load_audio(audio_path, sample_rate=16000)
 
-            # Inference runs with the process's default HF_HUB_OFFLINE
-            # state — forcing offline here (issue #462) broke online users
-            # whose `get_decoder_prompt_ids` / tokenizer calls issue
-            # legitimate metadata lookups.
+            # Inference runs with the process's default HF_HUB_OFFLINE state.
             # Process audio
             inputs = self.processor(
                 audio,

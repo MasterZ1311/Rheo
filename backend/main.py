@@ -1,3 +1,4 @@
+# Project: Rheo | Maintained by MasterZ1311 (https://github.com/MasterZ1311)
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # Copyright (C) 2026 MasterZ1311
 

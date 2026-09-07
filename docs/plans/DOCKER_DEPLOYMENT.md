@@ -1,7 +1,6 @@
 # Docker Deployment Guide
 
-**Status:** In Development for v0.2.0
-**Requested By:** Reddit community ([thread](https://reddit.com/r/LocalLLaMA/...))
+**Status:** Specification
 
 ## Overview
 

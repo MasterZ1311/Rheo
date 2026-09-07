@@ -1,4 +1,4 @@
-"""Ensure TADA voice-prompt encoding disables autograd (#890)."""
+"""Ensure TADA voice-prompt encoding disables autograd."""
 
 from __future__ import annotations
 

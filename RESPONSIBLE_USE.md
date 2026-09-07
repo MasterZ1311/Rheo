@@ -25,3 +25,7 @@ Rheo does not and cannot independently verify who owns a voice sample. You are r
 If you publish or distribute synthetic audio, disclose that it is AI-generated where required by law, platform policy, or audience expectations. Developers building products on top of Rheo should treat consent records, disclosure, and jurisdiction-specific requirements as part of their own application design.
 
 Rheo runs locally to protect user privacy. That privacy model does not remove your responsibility to respect other people's voices.
+
+---
+
+© 2026 MasterZ1311 · Rheo — Sovereign Local-First AI Voice Studio

@@ -1,5 +1,5 @@
 """
-Regression tests for issue #852: audioop removed from Python 3.13 stdlib.
+Tests for audioop compatibility after removal from Python 3.13 stdlib.
 
 Voice sample validation imports audioop transitively (librosa → audioread).
 The audioop-lts backport must be declared in requirements and bundled in

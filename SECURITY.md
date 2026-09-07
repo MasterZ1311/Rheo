@@ -1,92 +1,45 @@
-# Security Policy
+# Security Policy for Rheo
 
-## Supported Versions
-
-We release patches for security vulnerabilities. Which versions are eligible for receiving such patches depends on the CVSS v3.0 Rating:
-
-| Version | Supported          |
-| ------- | ------------------ |
-| 0.3.x   | :white_check_mark: |
-| < 0.3   | :x:                |
-
-## Reporting a Vulnerability
-
-If you discover a security vulnerability, please report it responsibly:
-
-1. **Do not** open a public GitHub issue
-2. Email security details to: [thenappanmasterz1311@gmail.com](mailto:thenappanmasterz1311@gmail.com)
-3. Include:
-   - Description of the vulnerability
-   - Steps to reproduce
-   - Potential impact
-   - Suggested fix (if any)
-
-We will:
-- Acknowledge receipt within 48 hours
-- Provide a timeline for addressing the issue
-- Keep you informed of progress
-- Credit you in the security advisory (if desired)
-
-## Security Best Practices
-
-### For Users
-
-- **Keep Rheo updated** - Updates include security patches
-- **Verify downloads** - Only download from official releases
-- **Local processing** - Voice data stays on your machine
-- **Network security** - Use HTTPS when connecting to remote servers
-
-### For Developers
-
-- **Dependencies** - Keep all dependencies up to date
-- **Code review** - All PRs require review before merging
-- **Secrets** - Never commit API keys or signing keys
-- **Signing** - All releases are cryptographically signed
-
-## Known Security Considerations
-
-### Local Processing
-
-Rheo processes all audio locally by default. Your voice data never leaves your machine unless you explicitly enable remote server mode.
-
-### Remote Server Mode
-
-When connecting to a remote server:
-- Ensure the server is on a trusted network
-- Use HTTPS for remote connections
-- Verify server identity before connecting
-
-### Auto-Updates
-
-- Updates are cryptographically signed
-- Signature verification happens before installation
-- Only HTTPS endpoints are allowed
-
-### Python Server
-
-The embedded Python server:
-- Runs locally by default (localhost only)
-- Can be configured for remote access
-- Uses standard FastAPI security practices
-
-## Disclosure Timeline
-
-- **Day 0**: Vulnerability reported
-- **Day 1-2**: Initial assessment and acknowledgment
-- **Day 3-7**: Investigation and fix development
-- **Day 8-14**: Testing and release preparation
-- **Day 15+**: Public disclosure (if applicable)
-
-Timeline may vary based on severity and complexity.
-
-## Security Updates
-
-Security updates will be:
-- Released as patch versions (e.g., 0.3.2)
-- Documented in CHANGELOG.md
-- Announced via GitHub releases
-- Automatically delivered via auto-updater
+Security and privacy are fundamental pillars of **Rheo**. Because Rheo executes deep learning models directly on user workstations, we maintain rigorous security practices regarding process isolation, local networking, and dependency integrity.
 
 ---
 
-Thank you for helping keep Rheo secure! 🔒
+## Supported Versions
+
+Security updates and critical vulnerability patches are actively maintained for the current release series:
+
+| Version | Supported |
+| :--- | :--- |
+| **0.1.x** | :white_check_mark: Active Support |
+
+---
+
+## Reporting a Vulnerability
+
+If you identify a security vulnerability in Rheo, please disclose it responsibly. **Do not create public GitHub issues for sensitive security vulnerabilities.**
+
+### Reporting Process
+1. Contact the maintainer directly by emailing: **[thenappanmasterz1311@gmail.com](mailto:thenappanmasterz1311@gmail.com)**.
+2. Alternatively, submit a private disclosure through GitHub Security Advisories at [MasterZ1311/Rheo/security/advisories](https://github.com/MasterZ1311/Rheo/security/advisories).
+3. Please include:
+   - A description of the vulnerability and attack vector.
+   - Exact steps or proof-of-concept code to reproduce the issue.
+   - The operating system, runtime environment, and Rheo version tested.
+   - Any potential mitigations or remediation strategies.
+
+### Response Commitment
+- **Initial Response:** Within 48 hours of receipt.
+- **Triage & Assessment:** Regular updates on validation and patch development.
+- **Public Disclosure:** Coordinated public advisory once an update has been released.
+
+---
+
+## Architecture & Security Principles
+
+- **Zero Data Ingestion:** Rheo does not transmit audio recordings, synthetic generations, or user transcripts to any external servers.
+- **Localhost Binding:** Backend HTTP, WebSocket, and MCP endpoints bind to loopback addresses (`127.0.0.1`) by default with strict CORS and origin verification.
+- **Model Integrity:** Weight downloads verify HuggingFace checksums and hashes before loading tensors into host memory.
+
+---
+
+© 2026 MasterZ1311 · Rheo — Sovereign Local-First AI Voice Studio

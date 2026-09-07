@@ -10,14 +10,8 @@ a chord, talk, release — Rheo transcribes what you said with Whisper,
 optionally cleans it up with a local LLM, and pastes the result into the text
 field you had focused when you started.
 
-Everything happens on your hardware. No cloud, no accounts, no audio leaving
-the machine.
-
-<Callout type="info">
-  Dictation was introduced in **0.5.0** alongside the Captures tab and the
-  per-profile personality modes. It's the "input" half of Rheo's voice I/O
-  loop — cloning and TTS are still the "output" half.
-</Callout>
+Everything runs locally on your hardware. Dictation is designed to be invisible: it runs in the background, waits for
+the chord, pastes the text, and leaves you where you were.
 
 ## The flow
 
@@ -178,7 +172,7 @@ LLM in the app, not two. See [Voice Personalities](/overview/voice-personalities
 ### Linux
 
 - **Not yet in this release.** The Rust shim ships the macOS and Windows
-  paths in 0.5.0. Linux `uinput` / AT-SPI support and the Wayland paste
+  paths in this release. Linux `uinput` / AT-SPI support and the Wayland paste
   story are tracked in `docs/plans/VOICE_IO.md`.
 
 ## When auto-paste skips itself

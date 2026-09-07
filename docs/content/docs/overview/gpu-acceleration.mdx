@@ -21,7 +21,7 @@ This page is for the cases where it doesn't:
 | **macOS Apple Silicon**     | MLX (Metal)               | 4-5x faster than PyTorch via Apple Neural Engine     |
 | **macOS Intel**             | PyTorch CPU               | No GPU acceleration available; PyTorch ≥ 2.2 only    |
 | **Windows + NVIDIA**        | PyTorch CUDA (cu128)      | Auto-downloads the CUDA backend binary on first use  |
-| **Windows + Intel Arc**     | PyTorch XPU (IPEX)        | New in 0.4 — works with Arc A-series and B-series    |
+| **Windows + Intel Arc**     | PyTorch XPU (IPEX)        | Works with Arc A-series and B-series                 |
 | **Windows generic GPU**     | DirectML                  | Universal Windows GPU support; slower than CUDA      |
 | **Linux + NVIDIA**          | PyTorch CUDA (cu128)      | Use a local/remote Python backend with CUDA PyTorch  |
 | **Linux + AMD**             | PyTorch ROCm              | Auto-configures `HSA_OVERRIDE_GFX_VERSION`           |
@@ -44,7 +44,7 @@ On M-series Macs, Rheo ships an MLX-optimized backend that uses the Apple Neural
 | Qwen CustomVoice     | PyTorch MPS |                                             |
 | Whisper (transcribe) | ✅ Native   | MLX-Whisper is the default on Apple Silicon |
 
-The Whisper Turbo + MLX combo dropped transcription latency from ~20s to ~2-3s on M-series chips (see CHANGELOG entry for v0.1.10).
+The Whisper Turbo + MLX combo drops transcription latency from ~20s to ~2-3s on M-series chips.
 
 ## Windows + NVIDIA — The CUDA Backend Swap
 
@@ -65,7 +65,7 @@ Rheo doesn't bundle CUDA into the main installer (it would balloon downloads to 
 </Steps>
 
 <Callout type="info">
-  The split-archive design (added in v0.4) means most Rheo upgrades only redownload the small server-core archive. The 4 GB libs archive is only refreshed when the underlying CUDA toolkit or torch major version changes.
+  The split-archive design means most Rheo upgrades only redownload the small server-core archive. The 4 GB libs archive is only refreshed when the underlying CUDA toolkit or torch major version changes.
 </Callout>
 
 ### Auto-update
@@ -74,20 +74,20 @@ When a new Rheo release ships, the GPU panel checks if the bundled server-core m
 
 ## RTX 50-series / Blackwell
 
-Rheo 0.4 added explicit RTX 50-series support:
+Rheo provides explicit RTX 50-series support:
 
 - CUDA toolkit upgraded to **cu128** (previous releases used cu126 which lacks Blackwell kernels)
 - Build pinned with `TORCH_CUDA_ARCH_LIST=...12.0+PTX` for forward-compatibility
 
 If you're on an RTX 5070 / 5080 / 5090 and you see "no kernel image is available" errors:
 
-1. Make sure you're on Rheo **≥ 0.4.0** (Settings → About)
+1. Make sure you're on Rheo **≥ 0.1.0** (Settings → About)
 2. Reinstall the CUDA backend (Settings → GPU → Reinstall CUDA backend) — older installs may have stale cu126 libs
 3. If errors persist, see the GPU compatibility warnings section below
 
 ## Intel Arc (XPU)
 
-New in 0.4. Works with both Arc A-series (Alchemist: A380, A580, A750, A770) and B-series (Battlemage).
+Works with both Arc A-series (Alchemist: A380, A580, A750, A770) and B-series (Battlemage).
 
 ### Setup
 
@@ -194,7 +194,7 @@ Three places to check that the right backend is being used:
   <Accordion title="'no kernel image is available' / 'CUDA error'">
     Almost always means the bundled PyTorch doesn't have kernels for your GPU's compute capability.
 
-    1. Update to Rheo ≥ 0.4.0 (Blackwell support added there)
+    1. Ensure you are running Rheo ≥ 0.1.0
     2. Reinstall the CUDA backend
     3. If still broken, install PyTorch nightly via Remote Mode
   </Accordion>

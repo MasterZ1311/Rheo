@@ -16,10 +16,8 @@ pill surfaces the voice name for the whole duration so you always see what's
 coming out of your machine.
 
 <Callout type="info">
-  MCP shipped in **0.5.0** alongside [Dictation](/overview/dictation) and
-  [Voice Personalities](/overview/voice-personalities). The design goal is
-  "local voice layer for every agent on your machine" — the same app that
-  captures your voice can generate a response in any voice profile you've
+  The design goal of Rheo MCP is "a local voice layer for every agent on your machine" —
+  the same app that captures your voice can generate a response in any voice profile you've
   cloned.
 </Callout>
 
@@ -254,7 +252,7 @@ generation land in the Captures tab.
 
 - **Localhost only.** The server binds to `127.0.0.1`. If you ever point
   Rheo at a non-loopback interface (e.g. remote-mode over a trusted
-  network), add a bearer token — it's on the roadmap but not in 0.5.0.
+  network), add a bearer token — it's on the roadmap for future releases.
 - **No auth today.** Any process that can connect to your loopback can
   call MCP. That's the same trust boundary as the rest of Rheo's REST
   API and is appropriate for a single-user local tool.

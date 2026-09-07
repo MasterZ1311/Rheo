@@ -64,7 +64,7 @@ async def import_generation(
 
 @router.delete("/history/failed")
 async def clear_failed_generations(db: Session = Depends(get_db)):
-    """Delete every generation with status='failed'. Used by the UI's 'Clear failed' button (#410)."""
+    """Delete every generation with status='failed'. Used by the UI's 'Clear failed' button."""
     count = await history.delete_failed_generations(db)
     return {"deleted": count}
 

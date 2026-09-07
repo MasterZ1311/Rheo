@@ -1,42 +1,45 @@
-﻿# Security Policy
+# Security Policy for Rheo
 
-The Rheo team takes the security of our local-first AI software and our users' privacy very seriously. We appreciate your efforts to responsibly disclose any vulnerabilities.
+Security and privacy are fundamental pillars of **Rheo**. Because Rheo executes deep learning models directly on user workstations, we maintain rigorous security practices regarding process isolation, local networking, and dependency integrity.
+
+---
 
 ## Supported Versions
 
-| Version | Supported          | Security Patches |
-| ------- | ------------------ | ---------------- |
-| 0.5.x   | :white_check_mark: | Active           |
-| 0.4.x   | :warning:          | Critical Only    |
-| < 0.4.0 | :x:                | End of Life      |
+Security updates and critical vulnerability patches are actively maintained for the current release series:
+
+| Version | Supported |
+| :--- | :--- |
+| **0.1.x** | :white_check_mark: Active Support |
+
+---
 
 ## Reporting a Vulnerability
 
-**Please do not report security vulnerabilities through public GitHub issues.**
+If you identify a security vulnerability in Rheo, please disclose it responsibly. **Do not create public GitHub issues for sensitive security vulnerabilities.**
 
-If you believe you have discovered a security vulnerability in Rheo:
+### Reporting Process
+1. Contact the maintainer directly by emailing: **[thenappanmasterz1311@gmail.com](mailto:thenappanmasterz1311@gmail.com)**.
+2. Alternatively, submit a private disclosure through GitHub Security Advisories at [MasterZ1311/Rheo/security/advisories](https://github.com/MasterZ1311/Rheo/security/advisories).
+3. Please include:
+   - A description of the vulnerability and attack vector.
+   - Exact steps or proof-of-concept code to reproduce the issue.
+   - The operating system, runtime environment, and Rheo version tested.
+   - Any potential mitigations or remediation strategies.
 
-1. **GitHub Security Advisory (Preferred)**: Submit a confidential report via [GitHub Security Advisories](https://github.com/MasterZ1311/Rheo/security/advisories/new).
-2. **Direct Email**: Send details to **contact@rheo.sh** with the subject line [SECURITY] Vulnerability Report - Rheo.
+### Response Commitment
+- **Initial Response:** Within 48 hours of receipt.
+- **Triage & Assessment:** Regular updates on validation and patch development.
+- **Public Disclosure:** Coordinated public advisory once an update has been released.
 
-### Information to Include
+---
 
-Please provide:
-- A clear description of the vulnerability and its potential impact.
-- Step-by-step reproduction instructions or a minimal proof of concept (PoC).
-- Affected platform(s) (macOS, Windows, Linux, Docker) and Rheo version.
-- Any suggested mitigations or patches if available.
+## Architecture & Security Principles
 
-### What to Expect
+- **Zero Data Ingestion:** Rheo does not transmit audio recordings, synthetic generations, or user transcripts to any external servers.
+- **Localhost Binding:** Backend HTTP, WebSocket, and MCP endpoints bind to loopback addresses (`127.0.0.1`) by default with strict CORS and origin verification.
+- **Model Integrity:** Weight downloads verify HuggingFace checksums and hashes before loading tensors into host memory.
 
-- **Acknowledgment**: We aim to acknowledge reports within **48 hours**.
-- **Assessment**: We will confirm the vulnerability and determine its severity rating (CVSS).
-- **Remediation**: Fixes will be prepared in private and coordinated with a scheduled release.
-- **Credit**: We will gladly credit your responsible disclosure in our release notes and Security Advisories.
+---
 
-## Security Design Principles in Rheo
-
-Rheo is architected around **Sovereign Computing**:
-- **Loopback Enforcement**: Sensitive file read operations (e.g. /transcribe) are restricted strictly to loopback interfaces (127.0.0.1, ::1).
-- **Zero Remote Telemetry**: Voice clones, microphone captures, and text prompts never leave your local hardware unless you explicitly configure third-party cloud integrations.
-- **Cross-Origin Protection**: Strict CORS and Host Header validation prevents browser drive-by attacks from manipulating the local API server.
+© 2026 MasterZ1311 · Rheo — Sovereign Local-First AI Voice Studio

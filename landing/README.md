@@ -98,3 +98,7 @@ landing/
 - Feature showcase
 - Platform highlights
 - GitHub integration
+
+---
+
+© 2026 MasterZ1311 · Rheo — Sovereign Local-First AI Voice Studio

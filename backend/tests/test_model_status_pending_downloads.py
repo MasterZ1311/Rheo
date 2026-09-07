@@ -5,7 +5,7 @@ A failed download intentionally stays in the TaskManager with
 UI — but ``/models/status`` derives its ``downloading`` flag from the
 same list. Without a status filter, one failed download shows the model
 as "downloading" forever and masks its real cache state until the app
-restarts (issue #925, symptom reports like #181).
+restarts.
 """
 
 from backend.utils.tasks import TaskManager

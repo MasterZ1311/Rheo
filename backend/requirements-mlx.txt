@@ -6,7 +6,7 @@ mlx>=0.30.0
 # miniaudio is a runtime dep of mlx-audio's STT path (mlx_audio.stt).
 # mlx-audio itself is installed --no-deps (see comment below), so we
 # must list miniaudio explicitly here or transcription fails on fresh
-# M1 installs with `ModuleNotFoundError: miniaudio` (issue #505).
+# M1 installs with `ModuleNotFoundError: miniaudio`.
 miniaudio>=1.59
 
 # NOTE: mlx-audio is intentionally not listed here. From 0.3.1 onward it

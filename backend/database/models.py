@@ -32,7 +32,7 @@ class VoiceProfile(Base):
     avatar_path = Column(String, nullable=True)
     effects_chain = Column(Text, nullable=True)
 
-    # Voice type system — added v0.3.x
+    # Voice type system
     voice_type = Column(String, default="cloned")  # "cloned" | "preset" | "designed"
     preset_engine = Column(String, nullable=True)   # e.g. "kokoro" — only for preset
     preset_voice_id = Column(String, nullable=True)  # e.g. "am_adam" — only for preset

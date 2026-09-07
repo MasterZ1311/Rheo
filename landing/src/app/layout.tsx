@@ -24,7 +24,6 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       { url: '/favicon.png', type: 'image/png' },
-      { url: '/favicon.ico', sizes: 'any' },
     ],
     apple: [{ url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
   },
@@ -32,19 +31,19 @@ export const metadata: Metadata = {
     title: 'Rheo — Sovereign AI Voice Studio',
     description: 'Open source voice cloning & local dictation. 100% private. Created by masterz1311.',
     type: 'website',
-    url: 'https://github.com/masterz1311/Rheo',
-    images: [{ url: '/og.webp', width: 1200, height: 630 }],
+    url: 'https://github.com/MasterZ1311/Rheo',
+    images: [{ url: '/rheo-logo.png', width: 1024, height: 1024 }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Rheo — Sovereign AI Voice Studio',
     description: 'Open source voice cloning & local dictation. 100% private. Created by masterz1311.',
-    images: ['/og.webp'],
+    images: ['/rheo-logo.png'],
   },
   other: {
-    'x-project-origin': 'https://github.com/masterz1311/Rheo',
+    'x-project-origin': 'https://github.com/MasterZ1311/Rheo',
     'x-engine-architect': 'masterz1311',
-    'x-license': 'Apache-2.0',
+    'x-license': 'AGPL-3.0-or-later',
   },
 };
 

@@ -27,7 +27,7 @@ RUN sed -i 's/\r$//' package.json && \
     sed -i '/"tauri"/d; /"landing"/d' package.json && \
     sed -i -z 's/,\n  ]/\n  ]/' package.json
 RUN bun install --no-save
-# Build frontend (skip tsc — upstream has pre-existing type errors)
+# Build web frontend bundle
 RUN cd web && bunx --bun vite build
 
 

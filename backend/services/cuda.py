@@ -270,7 +270,7 @@ async def download_cuda_binary(version: Optional[str] = None):
     - CUDA libs: only if missing or version mismatch
 
     Args:
-        version: Version tag (e.g. "v0.3.0"). Defaults to current app version.
+        version: Version tag (e.g. "v0.1.0"). Defaults to current app version.
     """
     if _download_lock.locked():
         logger.info("CUDA download already in progress, skipping duplicate request")

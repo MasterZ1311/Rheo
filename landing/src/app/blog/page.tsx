@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 		description: "Notes from building Rheo — the open-source AI voice studio.",
 		type: "website",
 		url: "https://rheo.sh/blog",
-		images: [{url: "/og.webp", width: 1200, height: 630}],
+		images: [{url: "/rheo-logo.png", width: 1024, height: 1024}],
 	},
 };
 

@@ -29,4 +29,4 @@ async def test_cuda_download_rejects_linux_before_network(monkeypatch, tmp_path)
     monkeypatch.setitem(py_sys.modules, "httpx", types.SimpleNamespace(AsyncClient=UnexpectedClient))
 
     with pytest.raises(RuntimeError, match="currently only published for Windows"):
-        await cuda._download_cuda_binary_locked("v0.5.0")
+        await cuda._download_cuda_binary_locked("v0.1.0")

@@ -31,7 +31,7 @@ The full phased guide lives at `docs/content/docs/developer/tts-engines.mdx`. **
 cat docs/content/docs/developer/tts-engines.mdx
 ```
 
-Internalize all phases, especially Phase 0 and Phase 5. The v0.2.3 release was three patch releases because Phase 0 was skipped.
+Internalize all phases, especially Phase 0 and Phase 5 to ensure frozen build reliability.
 
 ### 2. Dependency research (Phase 0)
 
@@ -97,7 +97,7 @@ Test the full chain: model download → load → generate → voice cloning.
 
 Walk through the Implementation Checklist at the bottom of `tts-engines.mdx`. Every item must be checked before handing the build to the user.
 
-## Key Lessons (from v0.2.3)
+## Key Lessons & Common Failure Modes
 
 These are the most common failure modes. Phase 0 research catches all of them:
 
