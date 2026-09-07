@@ -17,10 +17,16 @@ export function Footer() {
           {/* Brand */}
           <div className="md:col-span-1">
             <div className="flex items-center gap-2.5 mb-4">
-              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-cyan-500/30 to-purple-500/30 border border-white/10">
-                <span className="font-mono font-bold text-xs text-cyan-400">R</span>
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/[0.08] border border-white/15 p-0.5 shadow-sm">
+                <Image
+                  src="/rheo-logo-white.png"
+                  alt="Rheo"
+                  width={22}
+                  height={22}
+                  className="object-contain"
+                />
               </div>
-              <span className="text-base font-bold tracking-tight">Rheo</span>
+              <span className="text-base font-bold tracking-tight text-white">Rheo</span>
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed mb-4">
               Sovereign voice studio & local neural speech synthesis. 100% private, free forever.
@@ -29,7 +35,7 @@ export function Footer() {
               href={GITHUB_REPO}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-lg border border-border/60 bg-card/60 px-3 py-2 text-sm text-muted-foreground transition-colors hover:text-foreground hover:border-cyan-500/40"
+              className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-zinc-400 transition-colors hover:text-white hover:border-white/30"
               aria-label="Star on GitHub"
             >
               <span className="text-[13px] font-medium">GitHub Repository</span>

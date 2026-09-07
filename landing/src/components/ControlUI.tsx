@@ -733,15 +733,15 @@ export function ControlUI() {
             {/* Logo */}
             <div className="mb-1">
               <div
-                className="w-9 h-9 rounded-lg overflow-hidden"
+                className="w-9 h-9 rounded-lg overflow-hidden flex items-center justify-center"
                 style={{
                   filter:
-                    'drop-shadow(0 0 6px hsl(43 50% 45% / 0.5)) drop-shadow(0 0 14px hsl(43 50% 45% / 0.35))',
+                    'drop-shadow(0 0 6px rgba(255, 255, 255, 0.35)) drop-shadow(0 0 12px rgba(255, 255, 255, 0.2))',
                 }}
               >
                 <img
-                  src="/rheo-logo.png"
-                  alt=""
+                  src="/rheo-logo-white.png"
+                  alt="Rheo"
                   className="w-full h-full object-contain"
                 />
               </div>

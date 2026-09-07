@@ -19,7 +19,7 @@ export function generateStaticParams() {
 
 // 8-bit PNG decodes reliably in Satori; the 1024px logos are 16-bit and don't.
 const logo = `data:image/png;base64,${readFileSync(
-	join(process.cwd(), "public/apple-touch-icon.png"),
+	join(process.cwd(), "public/rheo-logo-white.png"),
 ).toString("base64")}`;
 
 function titleFontSize(title: string): number {
@@ -51,7 +51,7 @@ export default async function OgImage({
 					justifyContent: "space-between",
 					padding: 80,
 					background:
-						"radial-gradient(ellipse 80% 70% at 30% 30%, hsla(43,60%,50%,0.14) 0%, hsla(43,60%,50%,0.04) 40%, transparent 70%), linear-gradient(180deg, hsl(30,4%,6%) 0%, hsl(30,4%,4%) 100%)",
+						"radial-gradient(ellipse 80% 70% at 30% 30%, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 40%, transparent 70%), linear-gradient(180deg, #0a0a0a 0%, #000000 100%)",
 				}}
 			>
 				{/* Top: logo + eyebrow */}
@@ -65,7 +65,7 @@ export default async function OgImage({
 							letterSpacing: 6,
 							fontWeight: 600,
 							textTransform: "uppercase",
-							color: "hsl(43, 60%, 58%)",
+							color: "#d4d4d8",
 						}}
 					>
 						Rheo Blog
@@ -80,7 +80,7 @@ export default async function OgImage({
 						lineHeight: 1.1,
 						fontWeight: 700,
 						letterSpacing: -1,
-						color: "hsl(30, 10%, 94%)",
+						color: "#ffffff",
 						maxWidth: 1000,
 					}}
 				>
@@ -92,7 +92,7 @@ export default async function OgImage({
 					style={{
 						display: "flex",
 						fontSize: 28,
-						color: "hsl(30, 5%, 55%)",
+						color: "#71717a",
 					}}
 				>
 					{meta}

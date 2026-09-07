@@ -25,12 +25,12 @@ export default function OgPreview() {
               top: '50%',
               left: 0,
               transform: 'translateY(-50%)',
-              background: 'hsla(43, 60%, 50%, 0.15)',
+              background: 'rgba(255, 255, 255, 0.08)',
             }}
           />
           <img
-            src="/rheo-logo.png"
-            alt=""
+            src="/rheo-logo-white.png"
+            alt="Rheo"
             className="relative shrink-0 object-contain"
             style={{ width: 260, height: 260 }}
             draggable={false}
@@ -41,7 +41,7 @@ export default function OgPreview() {
               style={{
                 fontSize: 72,
                 lineHeight: 1,
-                color: 'hsl(30, 10%, 94%)',
+                color: '#ffffff',
               }}
             >
               Rheo
@@ -51,7 +51,7 @@ export default function OgPreview() {
                 fontSize: 24,
                 lineHeight: 1.4,
                 marginTop: 16,
-                color: 'hsl(30, 5%, 55%)',
+                color: '#a1a1aa',
               }}
             >
               Open source voice cloning.
@@ -63,14 +63,13 @@ export default function OgPreview() {
 
         {/* Logo preview right */}
         <img
-          src="/rheo-logo.png"
+          src="/rheo-logo-white.png"
           alt=""
-          className="pointer-events-none absolute top-1/2 -translate-y-1/2 z-10 opacity-40"
+          className="pointer-events-none absolute top-1/2 -translate-y-1/2 z-10 opacity-30 object-contain"
           style={{
             right: 40,
             width: 320,
             height: 320,
-            width: 900,
           }}
           draggable={false}
         />

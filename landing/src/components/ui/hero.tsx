@@ -21,11 +21,11 @@ export function Hero({ title, description, actions, className, showLogo = true }
           {showLogo && (
             <div className="flex lg:justify-start justify-center mb-6">
               <Image
-                src="/rheo-logo.png"
+                src="/rheo-logo-white.png"
                 alt="Rheo Logo"
                 width={1024}
                 height={1024}
-                className="w-32 sm:w-40 md:w-48 h-auto"
+                className="w-32 sm:w-40 md:w-48 h-auto object-contain"
                 priority
               />
             </div>

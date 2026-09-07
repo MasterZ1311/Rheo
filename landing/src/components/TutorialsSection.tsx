@@ -14,37 +14,37 @@ const TUTORIALS: (Tutorial | null)[] = [
 		id: "sisnzgc73zc",
 		title: "Free AI Voice Generator on Your PC (Clones Any Voice)",
 		author: "Kevin Stratvert",
-		thumbnail: "/rheo-logo.png",
+		thumbnail: "/rheo-logo-white.png",
 	},
 	{
 		id: "woQe90k7g3c",
 		title: "NEW Rheo DESTROYS ElevenLabs?",
 		author: "Julian Goldie SEO",
-		thumbnail: "/rheo-logo.png",
+		thumbnail: "/rheo-logo-white.png",
 	},
 	{
 		id: "kqxqjRsdD5E",
 		title: "This Open-Source TTS App Sounds Scary Good (And It's Free)",
 		author: "Dave Swift",
-		thumbnail: "/rheo-logo.png",
+		thumbnail: "/rheo-logo-white.png",
 	},
 	{
 		id: "05YBqrWTLQ0",
 		title: "2026年最好的声音克隆工具？Rheo完整测评：从下载到API调用，附速度对比",
 		author: "Tech指南",
-		thumbnail: "/rheo-logo.png",
+		thumbnail: "/rheo-logo-white.png",
 	},
 	{
 		id: "RRRBxNXgeKQ",
 		title: "Get Started with Rheo: Open-Source Alternative to ElevenLabs Tutorial",
 		author: "StinkyScrublet",
-		thumbnail: "/rheo-logo.png",
+		thumbnail: "/rheo-logo-white.png",
 	},
 	{
 		id: "PyMx4L9mky4",
 		title: "Free AI Voice Generator (Clones Any Voice)",
 		author: "mikbes",
-		thumbnail: "/rheo-logo.png",
+		thumbnail: "/rheo-logo-white.png",
 	},
 ];
 
@@ -54,21 +54,19 @@ function TutorialCard({tutorial}: {tutorial: Tutorial}) {
 			href={`https://www.youtube.com/watch?v=${tutorial.id}`}
 			target="_blank"
 			rel="noopener noreferrer"
-			className="group rounded-xl border border-border bg-card/60 backdrop-blur-sm overflow-hidden transition-all hover:border-accent/30 hover:bg-card"
+			className="group rounded-xl border border-white/10 bg-white/[0.03] backdrop-blur-sm overflow-hidden transition-all hover:border-white/30 hover:bg-white/[0.06]"
 		>
-			<div className="relative aspect-video overflow-hidden bg-muted">
+			<div className="relative aspect-video overflow-hidden bg-black p-6 flex items-center justify-center">
 				{/* eslint-disable-next-line @next/next/no-img-element */}
 				<img
 					src={tutorial.thumbnail}
 					alt={tutorial.title}
-					className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+					className="h-20 w-20 object-contain transition-transform duration-500 group-hover:scale-110 opacity-80 group-hover:opacity-100"
 				/>
-				{/* Gradient overlay */}
-				<div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/0" />
 				{/* Play button overlay */}
 				<div className="absolute inset-0 flex items-center justify-center">
-					<div className="flex h-14 w-14 items-center justify-center rounded-full bg-black/50 backdrop-blur-md border border-white/20 transition-all group-hover:scale-110 group-hover:bg-accent/90 group-hover:border-accent">
-						<Play className="h-5 w-5 text-white fill-white ml-0.5" />
+					<div className="flex h-12 w-12 items-center justify-center rounded-full bg-black/60 backdrop-blur-md border border-white/20 transition-all group-hover:scale-110 group-hover:bg-white group-hover:text-black">
+						<Play className="h-4 w-4 text-white group-hover:text-black fill-current ml-0.5" />
 					</div>
 				</div>
 				{/* YouTube badge */}

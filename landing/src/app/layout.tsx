@@ -32,13 +32,13 @@ export const metadata: Metadata = {
     description: 'Open source voice cloning & local dictation. 100% private. Created by masterz1311.',
     type: 'website',
     url: 'https://github.com/MasterZ1311/Rheo',
-    images: [{ url: '/rheo-logo.png', width: 1024, height: 1024 }],
+    images: [{ url: '/rheo-logo-white.png', width: 1024, height: 1024 }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Rheo — Sovereign AI Voice Studio',
     description: 'Open source voice cloning & local dictation. 100% private. Created by masterz1311.',
-    images: ['/rheo-logo.png'],
+    images: ['/rheo-logo-white.png'],
   },
   other: {
     'x-project-origin': 'https://github.com/MasterZ1311/Rheo',

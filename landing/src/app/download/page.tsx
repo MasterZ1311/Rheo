@@ -124,17 +124,17 @@ export default function DownloadPage() {
         <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
           <Link href="/" className="flex items-center gap-2.5">
             <Image
-              src="/rheo-logo.png"
+              src="/rheo-logo-white.png"
               alt="Rheo"
               width={28}
               height={28}
-              className="h-7 w-7"
+              className="h-7 w-7 object-contain"
             />
-            <span className="text-[15px] font-semibold text-foreground">Rheo</span>
+            <span className="text-[15px] font-semibold text-white">Rheo</span>
           </Link>
           <Link
             href="/"
-            className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            className="flex items-center gap-1.5 text-sm text-zinc-400 hover:text-white transition-colors"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             Back to rheo.sh
@@ -146,12 +146,12 @@ export default function DownloadPage() {
         {/* Hero */}
         <div className="flex flex-col md:flex-row md:items-center gap-10 md:gap-14">
           <Image
-            src="/rheo-logo.png"
+            src="/rheo-logo-white.png"
             alt="Rheo"
             width={200}
             height={200}
             priority
-            className="h-32 w-32 md:h-44 md:w-44 shrink-0 drop-shadow-2xl"
+            className="h-32 w-32 md:h-44 md:w-44 shrink-0 object-contain drop-shadow-[0_0_25px_rgba(255,255,255,0.15)]"
           />
           <div className="flex-1 min-w-0 text-center md:text-left">
             {triggered ? (

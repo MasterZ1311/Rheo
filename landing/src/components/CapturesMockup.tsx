@@ -38,16 +38,16 @@ function Sidebar() {
       {/* Logo */}
       <div className="mb-1">
         <div
-          className="w-9 h-9 rounded-lg overflow-hidden"
+          className="w-9 h-9 rounded-lg overflow-hidden flex items-center justify-center"
           style={{
             filter:
-              'drop-shadow(0 0 6px hsl(43 50% 45% / 0.5)) drop-shadow(0 0 14px hsl(43 50% 45% / 0.35))',
+              'drop-shadow(0 0 6px rgba(255, 255, 255, 0.35)) drop-shadow(0 0 12px rgba(255, 255, 255, 0.2))',
           }}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/rheo-logo.png"
-            alt=""
+            src="/rheo-logo-white.png"
+            alt="Rheo"
             className="w-full h-full object-contain"
           />
         </div>
@@ -191,9 +191,9 @@ const CAPTURES: Capture[] = [
 ];
 
 const PROFILES = [
-  { id: 'p1', name: 'Morgan', description: 'Warm, measured', gradient: 'from-blue-400 to-indigo-500' },
-  { id: 'p2', name: 'Scarlett', description: 'Bright, conversational', gradient: 'from-emerald-400 to-teal-500' },
-  { id: 'p3', name: 'Jarvis', description: 'Dry, composed', gradient: 'from-purple-500 to-fuchsia-500' },
+  { id: 'p1', name: 'Morgan', description: 'Warm, measured', gradient: 'from-zinc-200 to-zinc-400' },
+  { id: 'p2', name: 'Scarlett', description: 'Bright, conversational', gradient: 'from-zinc-400 to-zinc-600' },
+  { id: 'p3', name: 'Jarvis', description: 'Dry, composed', gradient: 'from-zinc-300 to-zinc-500' },
 ];
 
 function formatDuration(ms: number): string {

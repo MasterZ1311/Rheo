@@ -16,9 +16,9 @@
     --secondary-foreground: 0 0% 0%;
     --muted: 0 0% 96%;
     --muted-foreground: 0 0% 45%;
-    --accent: 43 50% 50%;
-    --accent-foreground: 0 0% 0%;
-    --destructive: 0 0% 0%;
+    --accent: 0 0% 10%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 62% 50%;
     --destructive-foreground: 0 0% 100%;
     --border: 0 0% 90%;
     --input: 0 0% 90%;
@@ -27,52 +27,52 @@
   }
 
   .dark {
-    /* Surfaces -- slightly warm-tinted darks */
-    --background: 30 4% 4%;
-    --foreground: 30 10% 94%;
-    --card: 30 4% 7%;
-    --card-foreground: 30 10% 94%;
-    --popover: 30 4% 7%;
-    --popover-foreground: 30 10% 94%;
-    --primary: 30 10% 94%;
-    --primary-foreground: 30 4% 7%;
-    --secondary: 30 4% 10%;
-    --secondary-foreground: 30 10% 94%;
-    --muted: 30 3% 12%;
-    --muted-foreground: 30 5% 55%;
-    --accent: 43 50% 45%;
-    --accent-foreground: 30 10% 94%;
+    /* Surfaces -- sleek obsidian monochrome */
+    --background: 0 0% 0%;
+    --foreground: 0 0% 100%;
+    --card: 0 0% 4%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 4%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 100%;
+    --primary-foreground: 0 0% 0%;
+    --secondary: 0 0% 8%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 0 0% 8%;
+    --muted-foreground: 0 0% 55%;
+    --accent: 0 0% 100%;
+    --accent-foreground: 0 0% 0%;
     --destructive: 0 62% 50%;
-    --destructive-foreground: 30 10% 94%;
-    --border: 30 4% 13%;
-    --input: 30 4% 13%;
-    --ring: 30 10% 94% / 0.2;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 14%;
+    --input: 0 0% 14%;
+    --ring: 0 0% 100% / 0.25;
     --radius: 0.75rem;
 
     /* App-specific surface tokens */
-    --app: 30 4% 4%;
-    --app-box: 30 4% 7%;
-    --app-dark-box: 30 4% 5%;
-    --app-darker-box: 30 4% 3%;
-    --app-light-box: 30 4% 14%;
-    --app-line: 30 4% 13%;
-    --app-button: 30 4% 11%;
-    --app-hover: 30 4% 15%;
-    --app-selected: 30 4% 17%;
+    --app: 0 0% 2%;
+    --app-box: 0 0% 5%;
+    --app-dark-box: 0 0% 3%;
+    --app-darker-box: 0 0% 1%;
+    --app-light-box: 0 0% 11%;
+    --app-line: 0 0% 12%;
+    --app-button: 0 0% 8%;
+    --app-hover: 0 0% 14%;
+    --app-selected: 0 0% 18%;
 
     /* Text hierarchy */
-    --ink: 30 10% 94%;
-    --ink-dull: 30 5% 55%;
-    --ink-faint: 30 3% 38%;
+    --ink: 0 0% 98%;
+    --ink-dull: 0 0% 55%;
+    --ink-faint: 0 0% 35%;
 
-    /* Accent shades */
-    --accent-faint: 43 45% 55%;
-    --accent-deep: 43 55% 35%;
-    --accent-glow: 43 60% 50%;
+    /* Accent shades (clean monochrome) */
+    --accent-faint: 0 0% 80%;
+    --accent-deep: 0 0% 40%;
+    --accent-glow: 0 0% 100%;
 
     /* Sidebar */
-    --sidebar: 30 4% 3%;
-    --sidebar-line: 30 4% 10%;
+    --sidebar: 0 0% 2%;
+    --sidebar-line: 0 0% 10%;
   }
 }
 

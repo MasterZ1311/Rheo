@@ -1,5 +1,9 @@
 <p align="center">
-  <img src="Rheo Logo.png" alt="Rheo Logo" width="140" height="140" />
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="Rheo%20Logo%20White.png">
+    <source media="(prefers-color-scheme: light)" srcset="Rheo%20Logo.png">
+    <img src="Rheo%20Logo%20White.png" alt="Rheo Logo" width="140" height="140" />
+  </picture>
 </p>
 
 <h1 align="center">Rheo</h1>

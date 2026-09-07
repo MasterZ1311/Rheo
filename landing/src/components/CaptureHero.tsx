@@ -53,7 +53,7 @@ export function CaptureHero({
         >
           <a
             href="/download"
-            className="rounded-full bg-accent px-8 py-3.5 text-sm font-semibold uppercase tracking-wider text-white shadow-[0_4px_20px_hsl(43_60%_50%/0.3),inset_0_2px_0_rgba(255,255,255,0.2),inset_0_-2px_0_rgba(0,0,0,0.1)] transition-all hover:bg-accent-faint active:shadow-[0_2px_10px_hsl(43_60%_50%/0.3),inset_0_4px_8px_rgba(0,0,0,0.3)]"
+            className="rounded-full bg-white px-8 py-3.5 text-sm font-semibold uppercase tracking-wider text-black shadow-[0_0_25px_rgba(255,255,255,0.2)] transition-all hover:bg-zinc-200 active:scale-[0.98]"
           >
             Download
           </a>
