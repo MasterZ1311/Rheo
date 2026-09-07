@@ -68,7 +68,7 @@ jobs:
           echo "LLVM_CONFIG=$(brew --prefix llvm@20)/bin/llvm-config" >> $GITHUB_ENV
 
       - name: Setup Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python-version }}
           cache: "pip"
@@ -278,7 +278,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Setup Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: "3.12"
           cache: "pip"
@@ -350,7 +350,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Setup Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           # ROCm wheels are cp312-cp312-specific — build_binary.py --rocm enforces this.
           python-version: "3.12"
