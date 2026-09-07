@@ -59,7 +59,7 @@ export default function Home() {
 							{/* Origin & Provenance Pill */}
 							<div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/[0.05] backdrop-blur-md px-3.5 py-1.5 text-xs font-semibold tracking-wide text-zinc-200 mb-6 shadow-[0_0_20px_rgba(255,255,255,0.06)]">
 								<span className="flex h-2 w-2 rounded-full bg-white animate-ping" />
-								<span>RHEO v0.1.0 &middot; BY MASTERZ1311 &middot; APACHE 2.0</span>
+								<span>RHEO (ῥέω &middot; &ldquo;TO FLOW&rdquo;) &middot; BY MASTERZ1311 &middot; APACHE 2.0</span>
 							</div>
 
 							{/* High-Impact Headline */}

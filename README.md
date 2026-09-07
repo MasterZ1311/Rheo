@@ -32,6 +32,8 @@
 </p>
 
 <p align="center">
+  <a href="#the-name--rheo-ῥέω">Origin</a> •
+  <a href="#overview">Overview</a> •
   <a href="#key-capabilities">Capabilities</a> •
   <a href="#supported-engines">Engines</a> •
   <a href="#quickstart">Quickstart</a> •
@@ -39,6 +41,16 @@
   <a href="#architecture">Architecture</a> •
   <a href="#license">License</a>
 </p>
+
+---
+
+## The Name — *Rheo* (ῥέω)
+
+> *"Everything flows, nothing stands still."* — Heraclitus
+
+**Rheo** is derived from the ancient Greek verb **ῥέω** (*rhéō*), meaning **"to flow"**, **"to stream"**, or **"current"** — the root of *rheology* and immortalized in the philosophy of *panta rhei* (πάντα ῥεῖ, *"everything flows"*).
+
+In speech synthesis and vocal interaction, voice is never static; it is a continuous, living acoustic stream. The project was christened **Rheo** to capture this fluid essence: the frictionless flow of human thought into synthetic voice, and spoken word into zero-latency dictation. Rheo embodies an uninterrupted, private stream of vocal intelligence running entirely under your own sovereignty.
 
 ---
 
