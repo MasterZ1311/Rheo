@@ -47,8 +47,12 @@ export function Sidebar({ isMacOS }: SidebarProps) {
     >
       {/* Rheo Sovereign Mark */}
       <Link to="/" className="mb-1 group cursor-pointer" title="Rheo · Sovereign AI Voice Studio">
-        <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-foreground/10 border border-foreground/20 p-2 shadow-sm group-hover:scale-105 transition-transform overflow-hidden">
-          <img src={rheoLogo} alt="Rheo" className="h-full w-full object-contain" />
+        <div className="relative flex h-10 w-10 items-center justify-center group-hover:scale-105 transition-transform">
+          <img
+            src={rheoLogo}
+            alt="Rheo"
+            className="h-9 w-9 object-contain rounded-full shadow-md"
+          />
         </div>
       </Link>
 

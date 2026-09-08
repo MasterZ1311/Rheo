@@ -14,9 +14,11 @@ export function RheoStudioBar() {
       {/* Brand Identity & Engine Status */}
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-2.5">
-          <div className="h-6 w-6 rounded-md bg-foreground/10 border border-foreground/20 flex items-center justify-center shadow-xs overflow-hidden p-1">
-            <img src={rheoLogo} alt="Rheo" className="h-full w-full object-contain" />
-          </div>
+          <img
+            src={rheoLogo}
+            alt="Rheo"
+            className="h-6 w-6 object-contain rounded-full shadow-xs shrink-0"
+          />
           <span className="text-xs font-semibold tracking-tight text-foreground">
             Rheo Studio
           </span>

@@ -262,7 +262,7 @@ export function OnboardingTour() {
         {/* Top Header Banner */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-border/40 bg-muted/20">
           <div className="flex items-center gap-2.5">
-            <img src={rheoLogo} alt="Rheo" className="h-5 w-5 object-contain" />
+            <img src={rheoLogo} alt="Rheo" className="h-5 w-5 object-contain rounded-full shadow-xs" />
             <span className="text-xs font-semibold tracking-wider uppercase text-foreground/80">
               Rheo Quick Guide
             </span>
@@ -287,7 +287,7 @@ export function OnboardingTour() {
           <div className="flex items-start gap-4">
             <div className="relative shrink-0 flex items-center justify-center h-14 w-14 rounded-2xl bg-foreground/10 border border-foreground/20 shadow-inner">
               {isFirst ? (
-                <img src={rheoLogo} alt="Rheo" className="h-8 w-8 object-contain" />
+                <img src={rheoLogo} alt="Rheo" className="h-10 w-10 object-contain rounded-full shadow-md" />
               ) : isLast ? (
                 <Sparkles className="h-7 w-7 text-foreground" />
               ) : currentStep === 1 ? (

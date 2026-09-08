@@ -263,8 +263,8 @@ function MainApp() {
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="w-48 h-48 rounded-full bg-white/10 blur-3xl animate-pulse" />
             </div>
-            <div className="w-28 h-28 rounded-3xl bg-card/80 p-5 border border-white/20 flex items-center justify-center shadow-2xl relative z-10 animate-fade-in-scale">
-              <img src={rheoLogo} alt="Rheo" className="w-full h-full object-contain" />
+            <div className="w-24 h-24 flex items-center justify-center relative z-10 animate-fade-in-scale">
+              <img src={rheoLogo} alt="Rheo" className="w-full h-full object-contain rounded-full shadow-2xl" />
             </div>
           </div>
           {startupError ? (
