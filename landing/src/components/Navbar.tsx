@@ -1,9 +1,9 @@
 'use client';
 
-import { Coffee, Coins, Github } from 'lucide-react';
+import { Coffee, Github } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
-import { DONATE_URL, GITHUB_REPO, TOKEN_TICKER } from '@/lib/constants';
+import { DONATE_URL, GITHUB_REPO } from '@/lib/constants';
 
 function formatStarCount(count: number): string {
   if (count >= 1000) {
@@ -98,7 +98,7 @@ export function Navbar() {
             Blog
           </a>
           <a
-            href="https://docs.rheo.sh"
+            href="https://github.com/MasterZ1311/Rheo/tree/MZ-Main/docs"
             target="_blank"
             rel="noopener noreferrer"
             className="rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
@@ -107,18 +107,8 @@ export function Navbar() {
           </a>
         </div>
 
-        {/* Token + Donate + GitHub star buttons */}
+        {/* Donate + GitHub star buttons */}
         <div className="flex items-center gap-2 justify-self-end">
-          <a
-            href="/token"
-            className="hidden sm:flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.04] px-3 py-1.5 text-sm text-zinc-400 transition-colors hover:text-white hover:border-white/30"
-            aria-label={`${TOKEN_TICKER} token`}
-          >
-            <Coins className="h-4 w-4 text-white" />
-            <span className="text-[13px] font-semibold tracking-wide text-white">
-              {TOKEN_TICKER}
-            </span>
-          </a>
           <a
             href={DONATE_URL}
             target="_blank"

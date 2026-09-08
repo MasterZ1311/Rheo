@@ -21,7 +21,7 @@
   <a href="https://github.com/MasterZ1311/Rheo/actions/workflows/ci.yml">
     <img src="https://img.shields.io/github/actions/workflow/status/MasterZ1311/Rheo/ci.yml?branch=MZ-Main&style=flat-square&color=black&label=CI" alt="CI Build" />
   </a>
-  <a href="https://github.com/MasterZ1311/Rheo/blob/main/LICENSE">
+  <a href="https://github.com/MasterZ1311/Rheo/blob/MZ-Main/LICENSE">
     <img src="https://img.shields.io/badge/License-AGPL--3.0-black.svg?style=flat-square" alt="License" />
   </a>
   <a href="https://github.com/MasterZ1311">

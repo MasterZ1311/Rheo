@@ -6,8 +6,8 @@ Welcome to Rheo! We are dedicated to providing support to our community and user
 
 Before opening an issue or asking for assistance, please check our official documentation:
 - **README Guide**: [Rheo Overview](https://github.com/MasterZ1311/Rheo#readme)
-- **REST & MCP API Documentation**: [docs/API.md](https://github.com/MasterZ1311/Rheo/blob/main/docs/API.md)
-- **Troubleshooting Guide**: [docs/content/docs/overview/troubleshooting.mdx](https://github.com/MasterZ1311/Rheo/blob/main/docs/content/docs/overview/troubleshooting.mdx)
+- **REST & MCP API Documentation**: [docs/API.md](https://github.com/MasterZ1311/Rheo/blob/MZ-Main/docs/API.md)
+- **Troubleshooting Guide**: [docs/content/docs/overview/troubleshooting.mdx](https://github.com/MasterZ1311/Rheo/blob/MZ-Main/docs/content/docs/overview/troubleshooting.mdx)
 
 ## 2. GitHub Discussions
 

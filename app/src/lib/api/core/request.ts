@@ -43,7 +43,7 @@ export const isFormData = (value: any): value is FormData => {
 export const base64 = (str: string): string => {
   try {
     return btoa(str);
-  } catch (err) {
+  } catch (_err) {
     // @ts-ignore
     return Buffer.from(str).toString('base64');
   }
@@ -286,7 +286,7 @@ export const catchErrorCodes = (options: ApiRequestOptions, result: ApiResult): 
     const errorBody = (() => {
       try {
         return JSON.stringify(result.body, null, 2);
-      } catch (e) {
+      } catch (_e) {
         return undefined;
       }
     })();

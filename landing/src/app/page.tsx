@@ -13,7 +13,6 @@ import { Personalities } from "@/components/Personalities";
 import { AppleIcon, LinuxIcon, WindowsIcon } from "@/components/PlatformIcons";
 import { SupportedModels } from "@/components/SupportedModels";
 import { Testimonials } from "@/components/Testimonials";
-import { TokenTeaser } from "@/components/TokenTeaser";
 import { TutorialsSection } from "@/components/TutorialsSection";
 import { VoiceCreator } from "@/components/VoiceCreator";
 import { GITHUB_REPO, AUTHOR_GITHUB } from "@/lib/constants";
@@ -390,9 +389,6 @@ export default function Home() {
 					</div>
 				</div>
 			</section>
-
-			{/* ── $RHEO token (teaser → /token) ─────────────────────── */}
-			<TokenTeaser />
 
 			{/* ── Footer ───────────────────────────────────────────────── */}
 			<Footer />

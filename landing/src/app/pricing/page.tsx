@@ -1,6 +1,4 @@
-import {Coins} from "lucide-react";
 import type {Metadata} from "next";
-import Link from "next/link";
 import {Footer} from "@/components/Footer";
 import {Navbar} from "@/components/Navbar";
 import {PricingTiers} from "@/components/PricingTiers";
@@ -8,11 +6,11 @@ import {PricingTiers} from "@/components/PricingTiers";
 export const metadata: Metadata = {
 	title: "Pricing — Rheo",
 	description:
-		"Rheo is free and open source forever. Optional, end-to-end encrypted cloud backup & sync — free for $RHEO holders.",
+		"Rheo is free and open source forever. Optional, end-to-end encrypted cloud backup & sync.",
 	openGraph: {
 		title: "Rheo Pricing",
 		description:
-			"The app is free forever. Cloud backup & sync is an optional add-on — free for $RHEO holders.",
+			"The app is free forever. Cloud backup & sync is an optional add-on.",
 		type: "website",
 		url: "https://rheo.sh/pricing",
 		images: [{url: "/rheo-logo-white.png", width: 1024, height: 1024}],
@@ -29,8 +27,8 @@ const FAQ = [
 		a: "Everything. Your profiles, generations, and captures are end-to-end encrypted on your device before upload. The server stores only ciphertext and can never read your data.",
 	},
 	{
-		q: "Do $RHEO holders really get Cloud free?",
-		a: "Yes. Holding the token unlocks the Cloud tier at no cost. The app itself is free regardless — the token is an optional way to support the project.",
+		q: "Do I need an account to use Rheo?",
+		a: "No. The core studio is 100% offline and private. You only need an account if you choose to subscribe to optional cloud sync.",
 	},
 	{
 		q: "What counts toward storage?",
@@ -61,8 +59,7 @@ export default function PricingPage() {
 					</h1>
 					<p className="fade-in mx-auto mt-6 max-w-2xl text-lg text-muted-foreground">
 						Everything that makes Rheo great runs locally at no cost. Pay
-						only if you want optional, encrypted cloud backup & sync — and
-						holders get that free.
+						only if you want optional, encrypted cloud backup & sync.
 					</p>
 				</div>
 			</section>
@@ -70,29 +67,6 @@ export default function PricingPage() {
 			{/* ── Tiers (with monthly/annual toggle) ───────────────────── */}
 			<section className="pb-8">
 				<PricingTiers />
-			</section>
-
-			{/* ── Holder callout ───────────────────────────────────────── */}
-			<section className="py-12">
-				<div className="mx-auto max-w-3xl px-6">
-					<Link
-						href="/token"
-						className="group flex flex-col items-center gap-3 rounded-2xl border border-accent/30 bg-card/40 backdrop-blur-sm px-6 py-8 text-center transition-colors hover:border-accent/50"
-					>
-						<Coins className="h-6 w-6 text-accent" />
-						<h2 className="text-xl md:text-2xl font-semibold tracking-tight text-foreground">
-							Hold $RHEO, get Cloud free.
-						</h2>
-						<p className="max-w-xl text-sm text-muted-foreground">
-							The token is an optional way to back the project — and holders get
-							the Cloud tier at no cost. Learn how it works and verify everything
-							on-chain.
-						</p>
-						<span className="mt-1 text-sm font-medium text-accent group-hover:underline underline-offset-4">
-							View the token →
-						</span>
-					</Link>
-				</div>
 			</section>
 
 			{/* ── FAQ ──────────────────────────────────────────────────── */}

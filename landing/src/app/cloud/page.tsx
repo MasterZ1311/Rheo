@@ -63,11 +63,7 @@ export default function CloudPage() {
 					<p className="fade-in mx-auto mt-6 max-w-2xl text-lg text-muted-foreground md:text-xl">
 						Optional, end-to-end encrypted backup and sync for your entire
 						Rheo library. We can't read a byte of it — only your devices
-						can. Free for{" "}
-						<Link href="/token" className="text-foreground underline-offset-4 hover:underline">
-							$RHEO
-						</Link>{" "}
-						holders.
+						can.
 					</p>
 
 					<div className="fade-in mt-10 flex flex-row items-center justify-center gap-3 sm:gap-4">
@@ -164,18 +160,12 @@ export default function CloudPage() {
 							the server stores only ciphertext, and the keys never leave your
 							control. Same philosophy as the app — just backed up.
 						</p>
-						<div className="mt-8 flex flex-row items-center justify-center gap-3">
+						<div className="mt-8 flex flex-row items-center justify-center">
 							<Link
 								href="/pricing"
 								className="rounded-full bg-accent px-6 py-3 text-sm font-semibold text-white shadow-[0_4px_20px_hsl(43_60%_50%/0.3)] transition-all hover:bg-accent-faint"
 							>
 								See pricing
-							</Link>
-							<Link
-								href="/token"
-								className="rounded-full border border-border/60 bg-card/40 px-6 py-3 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground hover:border-border"
-							>
-								Free for holders →
 							</Link>
 						</div>
 					</div>

@@ -1,7 +1,7 @@
 import { ArrowUpRight } from 'lucide-react';
 import type { CSSProperties, ReactNode } from 'react';
 import { useEffect, useState } from 'react';
-import { Trans, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import rheoLogo from '@/assets/logo.png';
 import { usePlatform } from '@/platform/PlatformContext';
 
@@ -80,7 +80,7 @@ export function AboutPage() {
           <FadeIn delay={320}>
             <div className="flex flex-wrap justify-center gap-3 pt-2">
               <a
-                href="https://github.com/masterz1311/Rheo"
+                href="https://github.com/MasterZ1311/Rheo"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group inline-flex items-center gap-2 rounded-lg border border-border/60 px-4 py-2 text-sm transition-colors hover:bg-muted/50"
@@ -89,7 +89,7 @@ export function AboutPage() {
                 <ArrowUpRight className="h-3.5 w-3.5 text-muted-foreground/40 group-hover:text-muted-foreground transition-colors" />
               </a>
               <a
-                href="https://github.com/masterz1311"
+                href="https://github.com/MasterZ1311"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group inline-flex items-center gap-2 rounded-lg border border-border/60 px-4 py-2 text-sm transition-colors hover:bg-muted/50"
@@ -104,14 +104,14 @@ export function AboutPage() {
             <p className="text-xs text-muted-foreground/40 pt-4">
               Licensed under the{' '}
               <a
-                href="https://github.com/masterz1311/Rheo/blob/main/LICENSE"
+                href="https://github.com/MasterZ1311/Rheo/blob/MZ-Main/LICENSE"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-cyan-400/80 hover:underline"
+                className="text-foreground underline underline-offset-4 hover:opacity-80"
               >
-                Apache License 2.0
+                GNU Affero General Public License v3.0
               </a>
-              . Architected by masterz1311.
+              . Architected by MasterZ1311.
             </p>
           </FadeIn>
         </div>

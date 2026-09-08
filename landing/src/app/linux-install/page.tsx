@@ -152,7 +152,7 @@ export default function LinuxInstall() {
               Report an issue
             </a>
             <a
-              href={`${GITHUB_REPO}/blob/main/CONTRIBUTING.md`}
+              href={`${GITHUB_REPO}/blob/MZ-Main/CONTRIBUTING.md`}
               target="_blank"
               rel="noopener noreferrer"
               className="text-muted-foreground hover:text-foreground transition-colors"

@@ -1,19 +1,16 @@
-import { ArrowUpRight, Coffee, Coins } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { CopyAddress } from '@/components/CopyAddress';
 import {
   DONATE_URL,
   GITHUB_REPO,
-  TOKEN_CONTRACT_ADDRESS,
-  TOKEN_TICKER,
 } from '@/lib/constants';
 
 export function Footer() {
   return (
     <footer className="border-t border-border py-12">
       <div className="mx-auto max-w-7xl px-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-8 mb-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 mb-10">
           {/* Brand */}
           <div className="md:col-span-1">
             <div className="flex items-center gap-2.5 mb-4">
@@ -85,7 +82,7 @@ export function Footer() {
               </li>
               <li>
                 <Link
-                  href="https://docs.rheo.sh"
+                  href="https://github.com/MasterZ1311/Rheo/tree/MZ-Main/docs"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hover:text-foreground transition-colors"
@@ -126,16 +123,16 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Author & Provenance */}
+          {/* Author & Community */}
           <div>
-            <h4 className="text-sm font-semibold mb-3">Creator</h4>
+            <h4 className="text-sm font-semibold mb-3">Community</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li>
                 <a
                   href="https://github.com/MasterZ1311"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 font-medium text-foreground hover:text-cyan-400 transition-colors"
+                  className="flex items-center gap-1.5 font-medium text-foreground hover:text-white transition-colors"
                 >
                   MasterZ1311
                   <ArrowUpRight className="h-3.5 w-3.5" />
@@ -143,40 +140,36 @@ export function Footer() {
               </li>
               <li>
                 <a
-                  href="https://github.com/MasterZ1311/Rheo"
+                  href="https://github.com/MasterZ1311/Rheo/discussions"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 hover:text-foreground transition-colors"
+                >
+                  GitHub Discussions
+                  <ArrowUpRight className="h-3.5 w-3.5" />
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://github.com/MasterZ1311/Rheo/blob/MZ-Main/CONTRIBUTING.md"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hover:text-foreground transition-colors"
                 >
-                  Rheo Project
+                  Contributing Guide
                 </a>
               </li>
               <li>
-                <span className="text-xs text-muted-foreground/60">
-                  Engineering & Architecture
-                </span>
+                <a
+                  href={DONATE_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-foreground transition-colors"
+                >
+                  Sponsor & Donate
+                </a>
               </li>
             </ul>
-          </div>
-
-          {/* Token */}
-          <div>
-            <h4 className="text-sm font-semibold mb-3">Ecosystem</h4>
-            <div className="space-y-3 text-sm text-muted-foreground">
-              <div className="flex items-center gap-2">
-                <Coins className="h-4 w-4 text-accent" />
-                <span className="font-semibold text-foreground">{TOKEN_TICKER}</span>
-                <span className="text-xs text-muted-foreground/60">Solana</span>
-              </div>
-              <CopyAddress address={TOKEN_CONTRACT_ADDRESS} />
-              <Link
-                href="/token"
-                className="inline-flex items-center gap-1.5 hover:text-foreground transition-colors"
-              >
-                Token details
-                <ArrowUpRight className="h-3.5 w-3.5" />
-              </Link>
-            </div>
           </div>
         </div>
 
@@ -191,7 +184,7 @@ export function Footer() {
             >
               MasterZ1311
             </a>
-            . Licensed under Apache 2.0.
+            . Licensed under AGPL-3.0.
           </p>
         </div>
       </div>

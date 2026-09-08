@@ -1,4 +1,4 @@
-import { BookA, Check, ChevronDown, FolderOpen, Info, Keyboard, Laptop, Lock, Play, Plus, Send, Volume2, X } from 'lucide-react';
+import { Check, ChevronDown, FolderOpen, Info, Keyboard, Laptop, Lock, Play, Plus, Volume2, X } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AccessibilityNotice } from '@/components/AccessibilityGate/AccessibilityGate';
