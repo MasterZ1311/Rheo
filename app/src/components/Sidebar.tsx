@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils/cn';
 import { usePlatform } from '@/platform/PlatformContext';
 import type { UpdateStatus } from '@/platform/types';
 import { usePlayerStore } from '@/stores/playerStore';
+import rheoLogo from '@/assets/logo.png';
 import { version } from '../../package.json';
 
 interface SidebarProps {
@@ -44,14 +45,12 @@ export function Sidebar({ isMacOS }: SidebarProps) {
         isMacOS && 'top-16',
       )}
     >
-      {/* Rheo Monogram Mark */}
-      <div className="mb-1 group cursor-pointer" title="Rheo by MasterZ1311">
-        <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-foreground text-background p-0.5 border border-border shadow-sm group-hover:scale-105 transition-transform">
-          <span className="font-mono font-black text-sm tracking-tighter">
-            R
-          </span>
+      {/* Rheo Sovereign Mark */}
+      <Link to="/" className="mb-1 group cursor-pointer" title="Rheo · Sovereign AI Voice Studio">
+        <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-foreground/10 border border-foreground/20 p-2 shadow-sm group-hover:scale-105 transition-transform overflow-hidden">
+          <img src={rheoLogo} alt="Rheo" className="h-full w-full object-contain" />
         </div>
-      </div>
+      </Link>
 
       {/* Navigation Buttons */}
       <div className="flex flex-col gap-2.5">
@@ -91,7 +90,7 @@ export function Sidebar({ isMacOS }: SidebarProps) {
           href="https://github.com/MasterZ1311"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-[8px] font-mono text-cyan-400/50 hover:text-cyan-300 transition-colors tracking-tighter"
+          className="text-[8px] font-mono text-muted-foreground/60 hover:text-foreground transition-colors tracking-tighter"
           title="MasterZ1311"
         >
           MasterZ1311

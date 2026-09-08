@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { DictateWindow } from '@/components/DictateWindow/DictateWindow';
 import ShinyText from '@/components/ShinyText';
 import { TitleBarDragRegion } from '@/components/TitleBarDragRegion';
+import rheoLogo from '@/assets/logo.png';
 import { useAutoUpdater } from '@/hooks/useAutoUpdater';
 import { useThemeSync } from '@/hooks/useThemeSync';
 import { apiClient } from '@/lib/api/client';
@@ -260,12 +261,10 @@ function MainApp() {
         <div className="text-center space-y-6">
           <div className="flex justify-center relative">
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-48 h-48 rounded-full bg-cyan-500/20 blur-3xl" />
+              <div className="w-48 h-48 rounded-full bg-white/10 blur-3xl animate-pulse" />
             </div>
-            <div className="w-36 h-36 rounded-3xl bg-gradient-to-br from-cyan-500/20 via-primary/20 to-purple-500/30 p-1 border border-cyan-500/30 flex items-center justify-center shadow-2xl relative z-10 animate-fade-in-scale">
-              <span className="font-mono font-black text-6xl bg-gradient-to-r from-cyan-300 via-white to-amber-300 bg-clip-text text-transparent">
-                R
-              </span>
+            <div className="w-28 h-28 rounded-3xl bg-card/80 p-5 border border-white/20 flex items-center justify-center shadow-2xl relative z-10 animate-fade-in-scale">
+              <img src={rheoLogo} alt="Rheo" className="w-full h-full object-contain" />
             </div>
           </div>
           {startupError ? (

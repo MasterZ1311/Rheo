@@ -1467,23 +1467,6 @@ pub fn run() {
                 speak_monitor::spawn_speak_monitor(app.handle().clone());
             }
 
-            // Hide title bar icon on Windows
-            #[cfg(windows)]
-            {
-                use windows::Win32::Foundation::HWND;
-                use windows::Win32::UI::WindowsAndMessaging::{SetClassLongPtrW, GCLP_HICON, GCLP_HICONSM};
-                
-                if let Some((_, window)) = app.webview_windows().iter().next() {
-                    if let Ok(hwnd) = window.hwnd() {
-                        let hwnd = HWND(hwnd.0);
-                        unsafe {
-                            // Set both small and regular icons to NULL to hide the title bar icon
-                            SetClassLongPtrW(hwnd, GCLP_HICON, 0);
-                            SetClassLongPtrW(hwnd, GCLP_HICONSM, 0);
-                        }
-                    }
-                }
-            }
 
             // Enable microphone access on Linux (WebKitGTK denies getUserMedia by default)
             #[cfg(target_os = "linux")]

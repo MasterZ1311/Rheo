@@ -1,7 +1,11 @@
-import { Activity, Cpu, ShieldCheck } from 'lucide-react';
+import { Activity, Compass, Cpu, ShieldCheck } from 'lucide-react';
+import rheoLogo from '@/assets/logo.png';
+import { useUIStore } from '@/stores/uiStore';
 import { version } from '../../package.json';
 
 export function RheoStudioBar() {
+  const setTourOpen = useUIStore((s) => s.setTourOpen);
+
   return (
     <header
       data-tauri-drag-region
@@ -9,26 +13,26 @@ export function RheoStudioBar() {
     >
       {/* Brand Identity & Engine Status */}
       <div className="flex items-center gap-3">
-        <div className="flex items-center gap-2">
-          <div className="h-6 w-6 rounded-md bg-foreground text-background flex items-center justify-center font-mono font-bold text-xs shadow-xs">
-            R
+        <div className="flex items-center gap-2.5">
+          <div className="h-6 w-6 rounded-md bg-foreground/10 border border-foreground/20 flex items-center justify-center shadow-xs overflow-hidden p-1">
+            <img src={rheoLogo} alt="Rheo" className="h-full w-full object-contain" />
           </div>
           <span className="text-xs font-semibold tracking-tight text-foreground">
             Rheo Studio
           </span>
         </div>
 
-        <div className="h-3 w-px bg-border" />
+        <div className="h-3 w-px bg-border/60" />
 
         {/* Live Engine Beacon */}
-        <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-foreground/5 border border-border text-[10px] font-medium text-foreground/75">
+        <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-foreground/5 border border-border/60 text-[10px] font-medium text-foreground/80">
           <span className="h-1.5 w-1.5 rounded-full bg-foreground animate-pulse" />
           <span>Engine Active</span>
         </div>
       </div>
 
       {/* Central Studio Capabilities Telemetry */}
-      <div className="hidden md:flex items-center gap-3 text-[11px] text-muted-foreground">
+      <div className="hidden md:flex items-center gap-3 text-[11px] text-muted-foreground/80">
         <div className="flex items-center gap-1.5">
           <Cpu className="h-3.5 w-3.5 text-foreground/70" />
           <span>Local Neural Inference</span>
@@ -45,19 +49,35 @@ export function RheoStudioBar() {
         </div>
       </div>
 
-      {/* Release Version & Author */}
-      <div className="flex items-center gap-2.5 font-mono text-[10px] text-muted-foreground/70">
-        <span className="font-medium text-foreground/80">v{version}</span>
-        <span>&middot;</span>
-        <a
-          href="https://github.com/MasterZ1311"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="hover:text-foreground transition-colors hover:underline"
-          title="Architected by MasterZ1311"
+      {/* Right Controls: Tour, Version & Author */}
+      <div className="flex items-center gap-3">
+        {/* Quick Guide / Tour Trigger */}
+        <button
+          type="button"
+          onClick={() => setTourOpen(true)}
+          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-foreground/5 hover:bg-foreground/10 border border-border/60 text-[10px] font-medium text-foreground/90 transition-all active:scale-95 cursor-pointer"
+          title="Start interactive app tutorial"
         >
-          MasterZ1311
-        </a>
+          <Compass className="h-3 w-3 text-foreground" />
+          <span>Quick Tour</span>
+        </button>
+
+        <div className="h-3 w-px bg-border/60" />
+
+        {/* Release Version & Author */}
+        <div className="flex items-center gap-2 font-mono text-[10px] text-muted-foreground/70">
+          <span className="font-medium text-foreground/80">v{version}</span>
+          <span>&middot;</span>
+          <a
+            href="https://github.com/MasterZ1311"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-foreground transition-colors hover:underline"
+            title="Architected by MasterZ1311"
+          >
+            MasterZ1311
+          </a>
+        </div>
       </div>
     </header>
   );

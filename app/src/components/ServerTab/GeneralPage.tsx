@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { AlertCircle, ArrowUpRight, Book, Download, Loader2, RefreshCw } from 'lucide-react';
+import { AlertCircle, ArrowUpRight, Book, Compass, Download, Loader2, RefreshCw } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Trans, useTranslation } from 'react-i18next';
@@ -14,6 +14,7 @@ import { useAutoUpdater } from '@/hooks/useAutoUpdater';
 import { useServerHealth } from '@/lib/hooks/useServer';
 import { usePlatform } from '@/platform/PlatformContext';
 import { useServerStore } from '@/stores/serverStore';
+import { useUIStore } from '@/stores/uiStore';
 import { CloudSection } from './CloudSection';
 import { LanguageSelect } from './LanguageSelect';
 import { SettingRow, SettingSection } from './SettingRow';
@@ -36,6 +37,7 @@ export function GeneralPage() {
   const setKeepServerRunningOnClose = useServerStore((state) => state.setKeepServerRunningOnClose);
   const mode = useServerStore((state) => state.mode);
   const setMode = useServerStore((state) => state.setMode);
+  const setTourOpen = useUIStore((state) => state.setTourOpen);
   const { toast } = useToast();
   const { data: health, isLoading, error: healthError } = useServerHealth();
 
@@ -71,148 +73,181 @@ export function GeneralPage() {
   }
 
   return (
-    <div className="space-y-8 max-w-2xl">
-      <div className="grid grid-cols-2 gap-3">
+    <div className="space-y-6 w-full max-w-5xl mx-auto">
+      {/* Quick Launch & Helpful Resources Banner */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        {/* Onboarding Tour Replay Card */}
+        <button
+          type="button"
+          onClick={() => setTourOpen(true)}
+          className="group flex items-center gap-3 rounded-xl border border-border/60 bg-card/40 p-4 transition-all hover:bg-muted/50 hover:border-foreground/20 text-left cursor-pointer"
+        >
+          <div className="p-2 rounded-lg bg-foreground/5 text-foreground group-hover:scale-105 transition-transform">
+            <Compass className="h-5 w-5" strokeWidth={2.2} />
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="text-sm font-semibold text-foreground">Interactive Tour</div>
+            <div className="text-xs text-muted-foreground">Step-by-step app walkthrough</div>
+          </div>
+          <ArrowUpRight className="h-4 w-4 text-muted-foreground/40 group-hover:text-muted-foreground transition-colors" />
+        </button>
+
+        {/* Documentation Card */}
         <a
           href="https://docs.rheo.sh"
           target="_blank"
           rel="noopener noreferrer"
-          className="group flex items-center gap-3 rounded-lg border border-border/60 p-4 transition-colors hover:bg-muted/50"
+          className="group flex items-center gap-3 rounded-xl border border-border/60 bg-card/40 p-4 transition-all hover:bg-muted/50 hover:border-foreground/20"
         >
-          <Book className="h-5 w-5 shrink-0 text-accent" strokeWidth={2.5} />
+          <div className="p-2 rounded-lg bg-foreground/5 text-foreground group-hover:scale-105 transition-transform">
+            <Book className="h-5 w-5" strokeWidth={2.2} />
+          </div>
           <div className="min-w-0 flex-1">
-            <div className="text-sm font-medium">{t('settings.general.docs.title')}</div>
+            <div className="text-sm font-semibold text-foreground">{t('settings.general.docs.title')}</div>
             <div className="text-xs text-muted-foreground">docs.rheo.sh</div>
           </div>
           <ArrowUpRight className="h-4 w-4 text-muted-foreground/40 group-hover:text-muted-foreground transition-colors" />
         </a>
+
+        {/* Discord Card */}
         <a
           href="https://discord.gg/StkzQasqPS"
           target="_blank"
           rel="noopener noreferrer"
-          className="group flex items-center gap-3 rounded-lg border border-border/60 p-4 transition-colors hover:bg-muted/50"
+          className="group flex items-center gap-3 rounded-xl border border-border/60 bg-card/40 p-4 transition-all hover:bg-muted/50 hover:border-foreground/20"
         >
-          <svg
-            className="h-5 w-5 shrink-0 text-accent"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            aria-hidden="true"
-          >
-            <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.095 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.095 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z" />
-          </svg>
+          <div className="p-2 rounded-lg bg-foreground/5 text-foreground group-hover:scale-105 transition-transform">
+            <svg
+              className="h-5 w-5"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.095 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.095 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z" />
+            </svg>
+          </div>
           <div className="min-w-0 flex-1">
-            <div className="text-sm font-medium">{t('settings.general.discord.title')}</div>
-            <div className="text-xs text-muted-foreground">
-              {t('settings.general.discord.subtitle')}
-            </div>
+            <div className="text-sm font-semibold text-foreground">{t('settings.general.discord.title')}</div>
+            <div className="text-xs text-muted-foreground">{t('settings.general.discord.subtitle')}</div>
           </div>
           <ArrowUpRight className="h-4 w-4 text-muted-foreground/40 group-hover:text-muted-foreground transition-colors" />
         </a>
       </div>
 
-      <SettingSection>
-        <SettingRow
-          title={t('settings.general.serverUrl.title')}
-          description={t('settings.general.serverUrl.description')}
-          action={
-            <ConnectionStatus health={health} isLoading={isLoading} healthError={healthError} />
-          }
-        >
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="flex gap-2">
-              <FormField
-                control={form.control}
-                name="serverUrl"
-                render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <FormControl>
-                      <Input placeholder="http://127.0.0.1:17493" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              {isDirty && (
-                <Button type="submit" size="sm">
-                  {t('common.save')}
-                </Button>
-              )}
-            </form>
-          </Form>
-        </SettingRow>
+      {/* Main Settings Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        {/* Left Column: Connectivity & API */}
+        <div className="lg:col-span-7 space-y-6">
+          <SettingSection>
+            <SettingRow
+              title={t('settings.general.serverUrl.title')}
+              description={t('settings.general.serverUrl.description')}
+              action={
+                <ConnectionStatus health={health} isLoading={isLoading} healthError={healthError} />
+              }
+            >
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="flex gap-2">
+                  <FormField
+                    control={form.control}
+                    name="serverUrl"
+                    render={({ field }) => (
+                      <FormItem className="flex-1">
+                        <FormControl>
+                          <Input placeholder="http://127.0.0.1:17493" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  {isDirty && (
+                    <Button type="submit" size="sm">
+                      {t('common.save')}
+                    </Button>
+                  )}
+                </form>
+              </Form>
+            </SettingRow>
 
-        <SettingRow
-          title={t('settings.general.keepServerRunning.title')}
-          description={t('settings.general.keepServerRunning.description')}
-          htmlFor="keepServerRunning"
-          action={
-            <Toggle
-              id="keepServerRunning"
-              checked={keepServerRunningOnClose}
-              onCheckedChange={(checked: boolean) => {
-                setKeepServerRunningOnClose(checked);
-                platform.lifecycle.setKeepServerRunning(checked).catch((error) => {
-                  console.error('Failed to sync setting to Rust:', error);
-                  setKeepServerRunningOnClose(!checked);
-                  toast({
-                    title: t('settings.general.keepServerRunning.failedTitle'),
-                    description: t('settings.general.keepServerRunning.failedDescription'),
-                    variant: 'destructive',
-                  });
-                  return;
-                });
-                toast({
-                  title: t('settings.general.keepServerRunning.updatedTitle'),
-                  description: checked
-                    ? t('settings.general.keepServerRunning.runningDescription')
-                    : t('settings.general.keepServerRunning.stoppedDescription'),
-                });
-              }}
+            <SettingRow
+              title={t('settings.general.keepServerRunning.title')}
+              description={t('settings.general.keepServerRunning.description')}
+              htmlFor="keepServerRunning"
+              action={
+                <Toggle
+                  id="keepServerRunning"
+                  checked={keepServerRunningOnClose}
+                  onCheckedChange={(checked: boolean) => {
+                    setKeepServerRunningOnClose(checked);
+                    platform.lifecycle.setKeepServerRunning(checked).catch((error) => {
+                      console.error('Failed to sync setting to Rust:', error);
+                      setKeepServerRunningOnClose(!checked);
+                      toast({
+                        title: t('settings.general.keepServerRunning.failedTitle'),
+                        description: t('settings.general.keepServerRunning.failedDescription'),
+                        variant: 'destructive',
+                      });
+                      return;
+                    });
+                    toast({
+                      title: t('settings.general.keepServerRunning.updatedTitle'),
+                      description: checked
+                        ? t('settings.general.keepServerRunning.runningDescription')
+                        : t('settings.general.keepServerRunning.stoppedDescription'),
+                    });
+                  }}
+                />
+              }
             />
-          }
-        />
 
-        {platform.metadata.isTauri && (
-          <SettingRow
-            title={t('settings.general.networkAccess.title')}
-            description={t('settings.general.networkAccess.description')}
-            htmlFor="allowNetworkAccess"
-            action={
-              <Toggle
-                id="allowNetworkAccess"
-                checked={mode === 'remote'}
-                onCheckedChange={(checked: boolean) => {
-                  setMode(checked ? 'remote' : 'local');
-                  toast({
-                    title: t('settings.general.networkAccess.updatedTitle'),
-                    description: checked
-                      ? t('settings.general.networkAccess.enabled')
-                      : t('settings.general.networkAccess.disabled'),
-                  });
-                }}
+            {platform.metadata.isTauri && (
+              <SettingRow
+                title={t('settings.general.networkAccess.title')}
+                description={t('settings.general.networkAccess.description')}
+                htmlFor="allowNetworkAccess"
+                action={
+                  <Toggle
+                    id="allowNetworkAccess"
+                    checked={mode === 'remote'}
+                    onCheckedChange={(checked: boolean) => {
+                      setMode(checked ? 'remote' : 'local');
+                      toast({
+                        title: t('settings.general.networkAccess.updatedTitle'),
+                        description: checked
+                          ? t('settings.general.networkAccess.enabled')
+                          : t('settings.general.networkAccess.disabled'),
+                      });
+                    }}
+                  />
+                }
               />
-            }
-          />
-        )}
+            )}
+          </SettingSection>
 
-        <SettingRow
-          title={t('settings.language.label')}
-          description={t('settings.language.description')}
-          action={<LanguageSelect />}
-        />
+          <ApiReferenceCard serverUrl={serverUrl} />
+        </div>
 
-        <SettingRow
-          title={t('settings.theme.label')}
-          description={t('settings.theme.description')}
-          action={<ThemeSelect />}
-        />
-      </SettingSection>
+        {/* Right Column: Studio Preferences & Cloud */}
+        <div className="lg:col-span-5 space-y-6">
+          <SettingSection>
+            <SettingRow
+              title={t('settings.language.label')}
+              description={t('settings.language.description')}
+              action={<LanguageSelect />}
+            />
 
-      <CloudSection />
+            <SettingRow
+              title={t('settings.theme.label')}
+              description={t('settings.theme.description')}
+              action={<ThemeSelect />}
+            />
+          </SettingSection>
 
-      <ApiReferenceCard serverUrl={serverUrl} />
+          <CloudSection />
 
-      {platform.metadata.isTauri && <UpdatesSection />}
+          {platform.metadata.isTauri && <UpdatesSection />}
+        </div>
+      </div>
     </div>
   );
 }

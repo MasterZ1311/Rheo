@@ -8,6 +8,7 @@ import { TOP_SAFE_AREA_PADDING } from '@/lib/constants/ui';
 import { cn } from '@/lib/utils/cn';
 import { useStoryStore } from '@/stores/storyStore';
 import { useStory } from '@/lib/hooks/useStories';
+import { OnboardingTour } from '@/components/Onboarding/OnboardingTour';
 
 interface AppFrameProps {
   children: React.ReactNode;
@@ -30,6 +31,7 @@ export function AppFrame({ children }: AppFrameProps) {
       <TitleBarDragRegion />
       <RheoStudioBar />
       <AudioKeepAlive />
+      <OnboardingTour />
       {children}
       {showTrackEditor ? (
         <StoryTrackEditor storyId={story.id} items={story.items} />

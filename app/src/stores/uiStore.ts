@@ -58,6 +58,12 @@ interface UIStore {
   profileFormDraft: ProfileFormDraft | null;
   setProfileFormDraft: (draft: ProfileFormDraft | null) => void;
 
+  // Onboarding Tour
+  tourOpen: boolean;
+  setTourOpen: (open: boolean) => void;
+  tourCompleted: boolean;
+  setTourCompleted: (completed: boolean) => void;
+
   // Theme
   theme: Theme;
   setTheme: (theme: Theme) => void;
@@ -89,6 +95,11 @@ export const useUIStore = create<UIStore>()(
       profileFormDraft: null,
       setProfileFormDraft: (draft) => set({ profileFormDraft: draft }),
 
+      tourOpen: false,
+      setTourOpen: (open) => set({ tourOpen: open }),
+      tourCompleted: false,
+      setTourCompleted: (completed) => set({ tourCompleted: completed }),
+
       theme: 'system',
       setTheme: (theme) => {
         set({ theme });
@@ -100,6 +111,7 @@ export const useUIStore = create<UIStore>()(
       partialize: (state) => ({
         selectedProfileId: state.selectedProfileId,
         theme: state.theme,
+        tourCompleted: state.tourCompleted,
       }),
       onRehydrateStorage: () => (state) => {
         if (state) applyTheme(state.theme);
