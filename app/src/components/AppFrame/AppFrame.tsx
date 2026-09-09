@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils/cn';
 import { useStoryStore } from '@/stores/storyStore';
 import { useStory } from '@/lib/hooks/useStories';
 import { OnboardingTour } from '@/components/Onboarding/OnboardingTour';
+import { UserNameModal } from '@/components/Onboarding/UserNameModal';
 
 interface AppFrameProps {
   children: React.ReactNode;
@@ -16,6 +17,7 @@ interface AppFrameProps {
 
 export function AppFrame({ children }: AppFrameProps) {
   const routerState = useRouterState();
+  const isHomeRoute = routerState.location.pathname === '/';
   const isStoriesRoute = routerState.location.pathname === '/stories';
 
   const selectedStoryId = useStoryStore((state) => state.selectedStoryId);
@@ -29,9 +31,14 @@ export function AppFrame({ children }: AppFrameProps) {
       className={cn('h-screen bg-background flex flex-col overflow-hidden', TOP_SAFE_AREA_PADDING)}
     >
       <TitleBarDragRegion />
-      <RheoStudioBar />
+      {!isHomeRoute && (
+        <div className="ml-16">
+          <RheoStudioBar />
+        </div>
+      )}
       <AudioKeepAlive />
       <OnboardingTour />
+      <UserNameModal />
       {children}
       {showTrackEditor ? (
         <StoryTrackEditor storyId={story.id} items={story.items} />

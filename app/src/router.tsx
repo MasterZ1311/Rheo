@@ -7,6 +7,7 @@ import {
 } from '@tanstack/react-router';
 import { AppFrame } from '@/components/AppFrame/AppFrame';
 import { CapturesTab } from '@/components/CapturesTab/CapturesTab';
+import { BentoDashboard } from '@/components/Dashboard/BentoDashboard';
 import { EffectsTab } from '@/components/EffectsTab/EffectsTab';
 import { MainEditor } from '@/components/MainEditor/MainEditor';
 import { ModelsTab } from '@/components/ModelsTab/ModelsTab';
@@ -43,7 +44,7 @@ function RootLayout() {
       <div className="flex flex-1 min-h-0 overflow-hidden">
         <Sidebar isMacOS={isMacOS()} />
 
-        <main className="flex-1 ml-24 overflow-hidden flex flex-col pt-2">
+        <main className="flex-1 ml-16 overflow-hidden flex flex-col pt-2 bg-background">
           <div className="container mx-auto px-6 max-w-[1800px] h-full overflow-hidden flex flex-col">
             <Outlet />
           </div>
@@ -92,10 +93,17 @@ const rootRoute = createRootRoute({
   component: RootLayout,
 });
 
-// Index route (main/generate)
+// Index route (Stream Matrix / Dashboard)
 const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/',
+  component: BentoDashboard,
+});
+
+// Voice Studio route (Speech Synthesis / Main Editor)
+const studioRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/studio',
   component: MainEditor,
 });
 
@@ -202,6 +210,7 @@ const serverRedirectRoute = createRoute({
 // Route tree
 const routeTree = rootRoute.addChildren([
   indexRoute,
+  studioRoute,
   storiesRoute,
   capturesRoute,
   voicesRoute,

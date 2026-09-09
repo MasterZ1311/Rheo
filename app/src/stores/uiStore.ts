@@ -58,6 +58,12 @@ interface UIStore {
   profileFormDraft: ProfileFormDraft | null;
   setProfileFormDraft: (draft: ProfileFormDraft | null) => void;
 
+  // User Name Onboarding
+  userName: string | null;
+  setUserName: (name: string | null) => void;
+  userNameModalOpen: boolean;
+  setUserNameModalOpen: (open: boolean) => void;
+
   // Onboarding Tour
   tourOpen: boolean;
   setTourOpen: (open: boolean) => void;
@@ -95,6 +101,11 @@ export const useUIStore = create<UIStore>()(
       profileFormDraft: null,
       setProfileFormDraft: (draft) => set({ profileFormDraft: draft }),
 
+      userName: null,
+      setUserName: (name) => set({ userName: name }),
+      userNameModalOpen: false,
+      setUserNameModalOpen: (open) => set({ userNameModalOpen: open }),
+
       tourOpen: false,
       setTourOpen: (open) => set({ tourOpen: open }),
       tourCompleted: false,
@@ -112,6 +123,7 @@ export const useUIStore = create<UIStore>()(
         selectedProfileId: state.selectedProfileId,
         theme: state.theme,
         tourCompleted: state.tourCompleted,
+        userName: state.userName,
       }),
       onRehydrateStorage: () => (state) => {
         if (state) applyTheme(state.theme);
