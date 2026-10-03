@@ -434,7 +434,7 @@ export function CapturesTab() {
   };
 
   return (
-    <div className="h-full flex gap-0 overflow-hidden -mx-8">
+    <div className="h-full flex gap-5 overflow-hidden py-4">
       <input
         ref={uploadInputRef}
         type="file"
@@ -450,8 +450,8 @@ export function CapturesTab() {
         className="hidden"
       />
 
-      {/* Left: capture list */}
-      <div className="w-[340px] shrink-0">
+      {/* Left: capture list card */}
+      <div className="w-[340px] shrink-0 bg-white rounded-3xl shadow-[0_4px_24px_rgba(0,0,0,0.03)] border border-black/[0.04] overflow-hidden">
         <ListPane>
           <ListPaneHeader>
             <ListPaneTitleRow>
@@ -533,9 +533,9 @@ export function CapturesTab() {
         </ListPane>
       </div>
 
-      {/* Right: capture detail */}
-      <div className="flex-1 flex flex-col relative overflow-hidden min-w-0">
-        <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-background to-transparent z-10 pointer-events-none" />
+      {/* Right: capture detail card */}
+      <div className="flex-1 flex flex-col relative overflow-hidden min-w-0 bg-white rounded-3xl shadow-[0_4px_24px_rgba(0,0,0,0.03)] border border-black/[0.04]">
+        <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-white to-transparent z-10 pointer-events-none" />
 
         {/* Top action bar */}
         <div className="absolute top-0 left-0 right-0 z-20 px-8">

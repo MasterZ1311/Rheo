@@ -50,8 +50,8 @@ export function SettingsLayout() {
   const matchRoute = useMatchRoute();
 
   return (
-    <div className="flex flex-col h-full min-h-0">
-      <nav className="flex items-center gap-1.5 p-1 rounded-xl bg-card/60 border border-border/50 backdrop-blur-md shrink-0 overflow-x-auto mb-2">
+    <div className="flex flex-col h-full min-h-0 py-4">
+      <nav className="flex items-center gap-1.5 p-1.5 rounded-2xl bg-white border border-black/[0.04] shadow-[0_4px_24px_rgba(0,0,0,0.03)] shrink-0 overflow-x-auto mb-4">
         {tabs.map((tab) => {
           if (tab.tauriOnly && !platform.metadata.isTauri) return null;
 
@@ -66,10 +66,10 @@ export function SettingsLayout() {
               key={tab.path}
               to={tab.path}
               className={cn(
-                'inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap cursor-pointer',
+                'inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-medium transition-all whitespace-nowrap cursor-pointer',
                 isActive
-                  ? 'bg-foreground text-background shadow-xs font-semibold'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-foreground/5',
+                  ? 'bg-[#F97316] text-white shadow-xs font-semibold'
+                  : 'text-[#6B7280] hover:text-[#111827] hover:bg-black/[0.04]',
               )}
             >
               <Icon className="h-3.5 w-3.5" />
@@ -81,7 +81,7 @@ export function SettingsLayout() {
 
       <div
         className={cn(
-          'flex-1 overflow-y-auto pt-2 pb-6 px-1',
+          'flex-1 overflow-y-auto pb-6',
           isPlayerVisible && BOTTOM_SAFE_AREA_PADDING,
         )}
       >
