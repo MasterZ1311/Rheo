@@ -64,6 +64,13 @@ interface UIStore {
   userNameModalOpen: boolean;
   setUserNameModalOpen: (open: boolean) => void;
 
+  // Dashboard Tasks
+  dashboardTasks: DashboardTask[];
+  setDashboardTasks: (tasks: DashboardTask[]) => void;
+  toggleDashboardTask: (id: string) => void;
+  addDashboardTask: (task: Omit<DashboardTask, 'id'>) => void;
+  deleteDashboardTask: (id: string) => void;
+
   // Onboarding Tour
   tourOpen: boolean;
   setTourOpen: (open: boolean) => void;
@@ -73,6 +80,14 @@ interface UIStore {
   // Theme
   theme: Theme;
   setTheme: (theme: Theme) => void;
+}
+
+export interface DashboardTask {
+  id: string;
+  title: string;
+  tag: string;
+  completed: boolean;
+  createdAt?: number;
 }
 
 export const useUIStore = create<UIStore>()(
@@ -106,6 +121,30 @@ export const useUIStore = create<UIStore>()(
       userNameModalOpen: false,
       setUserNameModalOpen: (open) => set({ userNameModalOpen: open }),
 
+      dashboardTasks: [
+        { id: '1', title: 'Calibrate neural voice clone', tag: 'Today', completed: false },
+        { id: '2', title: 'Generate keynote audio brief', tag: 'Today', completed: false },
+        { id: '3', title: 'Synchronize voice stream harmonics', tag: 'Today', completed: true },
+      ],
+      setDashboardTasks: (tasks) => set({ dashboardTasks: tasks }),
+      toggleDashboardTask: (id) =>
+        set((state) => ({
+          dashboardTasks: state.dashboardTasks.map((t) =>
+            t.id === id ? { ...t, completed: !t.completed } : t,
+          ),
+        })),
+      addDashboardTask: (task) =>
+        set((state) => ({
+          dashboardTasks: [
+            ...state.dashboardTasks,
+            { ...task, id: Math.random().toString(36).substring(2, 9), createdAt: Date.now() },
+          ],
+        })),
+      deleteDashboardTask: (id) =>
+        set((state) => ({
+          dashboardTasks: state.dashboardTasks.filter((t) => t.id !== id),
+        })),
+
       tourOpen: false,
       setTourOpen: (open) => set({ tourOpen: open }),
       tourCompleted: false,
@@ -124,6 +163,7 @@ export const useUIStore = create<UIStore>()(
         theme: state.theme,
         tourCompleted: state.tourCompleted,
         userName: state.userName,
+        dashboardTasks: state.dashboardTasks,
       }),
       onRehydrateStorage: () => (state) => {
         if (state) applyTheme(state.theme);
