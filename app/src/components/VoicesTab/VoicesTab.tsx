@@ -103,42 +103,43 @@ export function VoicesTab() {
   }
 
   return (
-    <div className="h-full flex gap-0 overflow-hidden -mx-8">
-      {/* Left: Table */}
-      <div className="flex-1 min-w-0 flex flex-col relative overflow-hidden">
-        {/* Scroll Mask */}
-        <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-background to-transparent z-10 pointer-events-none" />
-
-        {/* Fixed Header */}
-        <div className="absolute top-0 left-0 right-0 z-20 pl-8 pr-8">
-          <div className="flex items-center gap-3 mb-6">
-            <h1 className="text-2xl font-bold">{t('voicesTab.title')}</h1>
-            <div className="flex-1" />
-            <div className="relative w-[240px]">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
-              <Input
-                placeholder={t('voicesTab.searchPlaceholder')}
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="h-10 pl-8 text-sm rounded-full focus-visible:ring-0 focus-visible:ring-offset-0"
-              />
-            </div>
-            <Button onClick={() => setDialogOpen(true)}>
-              <Plus className="h-4 w-4 mr-2" />
-              {t('voicesTab.newVoice')}
-            </Button>
+    <div className="h-full flex gap-5 overflow-hidden py-4">
+      {/* Left: Table Card */}
+      <div className="bg-white rounded-3xl p-6 shadow-[0_4px_24px_rgba(0,0,0,0.03)] border border-black/[0.04] flex-1 min-w-0 flex flex-col relative overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center gap-3 mb-4 pb-3 border-b border-black/[0.04] shrink-0">
+          <div>
+            <h1 className="text-base font-bold text-[#111827]">{t('voicesTab.title')}</h1>
+            <p className="text-xs text-[#6B7280]">Manage, inspect, and configure voice identities</p>
           </div>
+          <div className="flex-1" />
+          <div className="relative w-[240px]">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+            <Input
+              placeholder={t('voicesTab.searchPlaceholder')}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="h-9 pl-8 text-xs rounded-xl border-[#D1D5DB] focus-visible:ring-1 focus-visible:ring-[#F97316]"
+            />
+          </div>
+          <Button
+            onClick={() => setDialogOpen(true)}
+            className="rounded-xl bg-[#F97316] text-white hover:bg-[#EA580C] text-xs font-semibold shadow-xs"
+          >
+            <Plus className="h-4 w-4 mr-1.5" />
+            {t('voicesTab.newVoice')}
+          </Button>
         </div>
 
         {/* Scrollable Content */}
         <div
           ref={scrollRef}
           className={cn(
-            'flex-1 overflow-y-auto overflow-x-hidden pt-16 relative z-0',
+            'flex-1 overflow-y-auto overflow-x-hidden relative z-0',
             isPlayerVisible && BOTTOM_SAFE_AREA_PADDING,
           )}
         >
-          <Table className="table-fixed [&_td:first-child]:pl-8 [&_th:first-child]:pl-8">
+          <Table className="table-fixed">
             <TableHeader>
               <TableRow>
                 <TableHead className="w-[30%]">{t('voicesTab.columns.name')}</TableHead>
@@ -167,9 +168,9 @@ export function VoicesTab() {
         </div>
       </div>
 
-      {/* Right: Inspector */}
+      {/* Right: Inspector Card */}
       {selectedVoiceId && (
-        <div className="w-[340px] shrink-0 border-l border-t rounded-tl-xl bg-muted/30">
+        <div className="w-[360px] shrink-0 bg-white rounded-3xl p-6 shadow-[0_4px_24px_rgba(0,0,0,0.03)] border border-black/[0.04] flex flex-col overflow-hidden">
           <VoiceInspector key={selectedVoiceId} profileId={selectedVoiceId} />
         </div>
       )}

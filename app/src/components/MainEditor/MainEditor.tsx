@@ -78,36 +78,45 @@ export function MainEditor() {
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-6 h-full min-h-0 overflow-hidden relative">
-      <div className="flex flex-col min-h-0 overflow-hidden relative lg:overflow-hidden">
-        <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-background to-transparent z-0 pointer-events-none" />
-
-        <div className="absolute top-0 left-0 right-0 z-10">
-          <div className="flex items-center justify-between mb-4 px-1">
-            <h2 className="text-2xl font-bold">Rheo</h2>
-            <div className="flex gap-2">
-              <Button variant="outline" onClick={handleImportClick}>
-                <Upload className="mr-2 h-4 w-4" />
-                {t('main.importVoice')}
-              </Button>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".rheo.zip"
-                onChange={handleFileChange}
-                className="hidden"
-              />
-              <Button onClick={() => setDialogOpen(true)}>
-                <Sparkles className="mr-2 h-4 w-4" />
-                {t('main.createVoice')}
-              </Button>
-            </div>
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full min-h-0 overflow-hidden relative py-4">
+      {/* Left Column: Voice Profiles Foundry */}
+      <div className="bg-white rounded-3xl p-6 shadow-[0_4px_24px_rgba(0,0,0,0.03)] border border-black/[0.04] flex flex-col min-h-0 overflow-hidden relative">
+        <div className="flex items-center justify-between mb-4 pb-3 border-b border-black/[0.04] shrink-0">
+          <div>
+            <h2 className="text-base font-bold text-[#111827]">Voice Foundry</h2>
+            <p className="text-xs text-[#6B7280]">Select or customize neural voice clones</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleImportClick}
+              className="rounded-xl border-[#D1D5DB] text-xs font-medium text-[#374151] hover:bg-[#F3F4F6]"
+            >
+              <Upload className="mr-1.5 h-3.5 w-3.5" />
+              {t('main.importVoice')}
+            </Button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".rheo.zip"
+              onChange={handleFileChange}
+              className="hidden"
+            />
+            <Button
+              size="sm"
+              onClick={() => setDialogOpen(true)}
+              className="rounded-xl bg-[#F97316] text-white hover:bg-[#EA580C] text-xs font-semibold shadow-xs"
+            >
+              <Sparkles className="mr-1.5 h-3.5 w-3.5" />
+              {t('main.createVoice')}
+            </Button>
           </div>
         </div>
 
         <div
           ref={scrollRef}
-          className={cn('flex-1 min-h-0 overflow-y-auto pt-14 pb-4', isPlayerVisible && 'lg:pb-32')}
+          className={cn('flex-1 min-h-0 overflow-y-auto pb-4', isPlayerVisible && 'lg:pb-32')}
         >
           <div className="flex flex-col gap-6">
             <div className="shrink-0 flex flex-col">
@@ -117,8 +126,17 @@ export function MainEditor() {
         </div>
       </div>
 
-      <div className="flex flex-col min-h-0 overflow-hidden">
-        <HistoryTable />
+      {/* Right Column: Generation History & Takes */}
+      <div className="bg-white rounded-3xl p-6 shadow-[0_4px_24px_rgba(0,0,0,0.03)] border border-black/[0.04] flex flex-col min-h-0 overflow-hidden relative">
+        <div className="flex items-center justify-between mb-4 pb-3 border-b border-black/[0.04] shrink-0">
+          <div>
+            <h2 className="text-base font-bold text-[#111827]">Generation Stream</h2>
+            <p className="text-xs text-[#6B7280]">Recent synthesized takes and versions</p>
+          </div>
+        </div>
+        <div className="flex-1 min-h-0 overflow-hidden flex flex-col">
+          <HistoryTable />
+        </div>
       </div>
 
       <FloatingGenerateBox isPlayerOpen={!!audioUrl} />
