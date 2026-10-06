@@ -73,3 +73,6 @@ backend/tests/fixtures/reference_voice.txt
 # Local AI assistant workspace settings
 .claude/settings.local.json
 
+# Agent run cache and scratch
+.agents/teamwork/
+

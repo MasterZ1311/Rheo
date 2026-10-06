@@ -3,6 +3,34 @@
 All notable changes to the **Rheo** project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- **Bento Dashboard with Live Data**:
+  - Integrated live API endpoints (`GET /api/history` and `GET /profiles`) across all 5 bento cards.
+  - Dynamic Resonance Calendar with generation activity indicators and month navigation.
+  - Persisted Priority Streams (Tasks) with interactive checkmarks, creation, and deletion in `uiStore`.
+  - Real-time Voice Streams Directory and Persona Cards with online avatars and initials fallback.
+  - Loading skeletons and empty-state placeholders for all dashboard widgets.
+- **Unified Design System**:
+  - Standardized application-wide aesthetic: warm cream canvas (`#F4F5F8`), pure white cards (`rounded-3xl`), and warm orange active accents (`#F97316`).
+  - Elevated Voice Studio (`/studio`), Voice Profiles (`/voices`), Story Timeline (`/stories`), Captures (`/captures`), Models (`/models`), and Settings into modern bento cards.
+- **User Onboarding & Personalization**:
+  - Dynamic name prompt modal (`UserNameModal.tsx`) with persistent storage and inline profile editing.
+  - 6-step guided onboarding tour (`OnboardingTour.tsx`) covering neural synthesis, cloning, and dictation.
+- **Testing & Packaging**:
+  - Vitest + React Testing Library frontend test suite with 4 unit test suites (9 passing tests).
+  - Generated native macOS bundle icon (`tauri/src-tauri/icons/icon.icns`) with multi-resolution icon layers.
+  - High-resolution UI mockup screenshots, social preview cards, and OpenGraph metadata (`og.webp`).
+
+### Changed
+- Rebuilt navigation sidebar as a fixed 64px dark navy rail (`#141724`) with smooth orange indicator pills.
+- Cleaned and modernized Settings capsule navigation and two-column general configuration layout.
+
+### Fixed
+- Fixed Windows titlebar/taskbar icon visibility bug in Tauri native runtime.
+- Purged all dead external links and purged legacy crypto token code and unused assets.
+
 ---
 
 ## [0.1.0] - 2026-09-07
