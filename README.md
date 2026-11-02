@@ -31,6 +31,16 @@
 
 **Rheo** is built from the ground up from the **user's perspective**—not an enterprise billing API. Most synthetic voice platforms are predatory subscription black boxes that harvest your vocal biometric signature, inject watermarks, throttle bandwidth, and leak personal speech transcripts to external cloud servers. Rheo feels weightless, natural, and sovereign: studio-grade zero-shot voice cloning, real-time multi-engine speech synthesis, system-wide continuous dictation, and native AI agent tooling running 100% locally on your own silicon.
 
+<video src=".github/assets/rheo-launch.mp4" controls="controls" poster=".github/assets/rheo-launch-poster.jpg" width="100%" style="border-radius: 12px; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);">
+  <a href=".github/assets/rheo-launch.mp4">
+    <img src=".github/assets/rheo-launch-poster.jpg" alt="Rheo Launch Video" width="100%" style="border-radius: 12px; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);" />
+  </a>
+</video>
+
+<p><em><b>Rheo Launch Video:</b> Zero-Shot Voice Cloning, Zero-Latency Dictation, and Sovereign Multi-Engine Synthesis</em></p>
+
+<br>
+
 <a href=".github/assets/screenshot.webp">
   <img src=".github/assets/screenshot.webp" alt="Rheo Cinematic Bento Studio Showcase" width="100%" style="border-radius: 12px; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);" />
 </a>

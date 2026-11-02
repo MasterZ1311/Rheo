@@ -76,3 +76,4 @@ backend/tests/fixtures/reference_voice.txt
 # Agent run cache and scratch
 .agents/teamwork/
 
+brag-output/
