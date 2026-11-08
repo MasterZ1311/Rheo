@@ -45,12 +45,9 @@ const PERSONA_DESCRIPTION =
 
 function PersonaCard() {
   return (
-    <div className="rounded-xl border border-app-line bg-app-darkBox p-5 shadow-[0_20px_60px_rgba(0,0,0,0.35)]">
+    <div className="rounded-xl border border-app-line bg-app-darkBox p-5 shadow-xl">
       <div className="flex items-center gap-3 mb-4">
-        <div
-          className="h-12 w-12 rounded-full shrink-0 ring-1 ring-white/10"
-          style={{ background: 'linear-gradient(135deg, #dc2626, #7f1d1d)' }}
-        />
+        <div className="h-12 w-12 rounded-full shrink-0 ring-1 ring-white/10 bg-gradient-to-br from-red-600 to-red-950" />
         <div className="min-w-0">
           <div className="text-[15px] font-semibold text-foreground leading-tight">Marlowe</div>
           <div className="text-[11px] text-muted-foreground/80 leading-tight mt-0.5">
@@ -59,7 +56,7 @@ function PersonaCard() {
         </div>
       </div>
 
-      <div className="mb-1.5 text-[10px] font-mono uppercase tracking-[0.2em] text-ink-faint/70">
+      <div className="mb-1.5 text-xs font-medium text-ink-faint">
         Personality
       </div>
       <p className="text-[13px] leading-relaxed text-ink-dull italic">&ldquo;{PERSONA_DESCRIPTION}&rdquo;</p>
@@ -107,7 +104,7 @@ function ModeDemo({ mode, cycleKey }: { mode: Mode; cycleKey: number }) {
             {/* Input */}
             {mode.input ? (
               <div>
-                <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-ink-faint/70 mb-1.5">
+                <div className="text-xs font-medium text-ink-faint mb-1.5">
                   {mode.inputLabel}
                 </div>
                 <div className="text-[13px] leading-relaxed text-ink-dull/90 font-mono bg-black/20 rounded-md border border-app-line/60 px-3 py-2.5">
@@ -116,25 +113,25 @@ function ModeDemo({ mode, cycleKey }: { mode: Mode; cycleKey: number }) {
               </div>
             ) : (
               <div>
-                <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-ink-faint/70 mb-1.5">
+                <div className="text-xs font-medium text-ink-faint mb-1.5">
                   No input
                 </div>
                 <div className="flex items-center gap-2.5 text-[13px] text-ink-dull/90 bg-black/20 rounded-md border border-app-line/60 px-3 py-2.5">
                   <Dices className="h-4 w-4 text-accent shrink-0" />
-                  <span>Click Compose — the character improvises a fresh line.</span>
+                  <span>Click Compose to let the character improvises a fresh line.</span>
                 </div>
               </div>
             )}
 
             {/* Arrow */}
-            <div className="flex items-center justify-center gap-2 text-[10px] font-mono uppercase tracking-[0.2em] text-ink-faint/50">
+            <div className="flex items-center justify-center gap-2 text-xs font-medium text-ink-faint/70">
               <span>In character</span>
               <ArrowRight className="h-3 w-3" />
             </div>
 
             {/* Output */}
             <div>
-              <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-accent mb-1.5">
+              <div className="text-xs font-medium text-accent mb-1.5">
                 {mode.outputLabel}
               </div>
               <div className="text-[14px] leading-relaxed text-foreground bg-accent/[0.06] rounded-md border border-accent/20 px-3 py-2.5 italic">
@@ -184,16 +181,14 @@ export function Personalities() {
       <div className="mx-auto max-w-6xl px-6">
         {/* Header */}
         <div className="max-w-3xl mx-auto text-center mb-14">
-          <div className="text-[11px] font-semibold uppercase tracking-[0.22em] text-accent mb-4">
-            Personalities
-          </div>
+          
           <h2 className="text-4xl md:text-5xl font-semibold tracking-tight text-foreground mb-5">
             Voices with a personality.
           </h2>
           <p className="text-muted-foreground text-base md:text-lg leading-relaxed">
             Give any voice profile a free-form personality. Then{' '}
             <b className="text-foreground/90">Rewrite</b> your text in their voice, or let them{' '}
-            <b className="text-foreground/90">Compose</b> a fresh line of their own — your cloned voice, in full character.
+            <b className="text-foreground/90">Compose</b> a fresh line of their own: your cloned voice, in full character.
           </p>
         </div>
 

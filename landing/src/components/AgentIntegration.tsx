@@ -62,7 +62,7 @@ const TONE_CLASSES: Record<Scenario['log'][number]['tone'], string> = {
 
 function AgentConsole({ scenario, cycleKey }: { scenario: Scenario; cycleKey: number }) {
   return (
-    <div className="rounded-xl border border-app-line bg-app-darkerBox overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.35)]">
+    <div className="rounded-xl border border-app-line bg-app-darkerBox overflow-hidden shadow-xl">
       {/* Titlebar */}
       <div className="flex items-center gap-2 px-3 py-2 border-b border-app-line bg-app-darkBox/60">
         <div className="flex items-center gap-1.5">
@@ -102,7 +102,7 @@ function AgentConsole({ scenario, cycleKey }: { scenario: Scenario; cycleKey: nu
         {/* Idle cursor so the terminal doesn't feel empty */}
         <div className="mt-auto flex items-center gap-2 pt-4">
           <span className="text-ink-faint/50">$</span>
-          <span className="inline-block h-3.5 w-[7px] bg-ink-faint/40 animate-pulse" />
+          <span className="inline-block h-3.5 w-[7px] bg-ink-faint/40 motion-safe:animate-pulse" />
         </div>
       </div>
     </div>
@@ -124,7 +124,7 @@ function AgentSpeakStage({ scenario, cycleKey }: { scenario: Scenario; cycleKey:
       }}
     >
       {/* Caption in the corner — "this is on the desktop, not in a terminal" */}
-      <div className="absolute top-3 left-4 text-[9px] font-mono uppercase tracking-[0.22em] text-ink-faint/50">
+      <div className="absolute top-3 left-4 text-[11px] text-ink-faint/60">
         On your desktop
       </div>
 
@@ -146,7 +146,7 @@ function AgentSpeakStage({ scenario, cycleKey }: { scenario: Scenario; cycleKey:
       <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 px-6">
         <motion.div
           key={`pill-${cycleKey}`}
-          className="inline-flex items-center gap-3 px-4 h-11 rounded-full bg-black/55 backdrop-blur-md shadow-[0_12px_40px_rgba(0,0,0,0.45)]"
+          className="inline-flex items-center gap-3 px-4 h-11 rounded-full bg-black/55 backdrop-blur-md shadow-2xl"
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.6 }}
@@ -216,7 +216,7 @@ function CodePanel() {
           <span className="text-[9px] font-mono text-accent font-semibold tabular-nums">
             01
           </span>
-          <span className="text-[10px] font-mono text-ink-faint/70 uppercase tracking-wider">
+          <span className="text-xs text-ink-faint/70">
             Add Rheo to your MCP config
           </span>
         </div>
@@ -231,7 +231,7 @@ function CodePanel() {
           <span className="text-[9px] font-mono text-accent font-semibold tabular-nums">
             02
           </span>
-          <span className="text-[10px] font-mono text-ink-faint/70 uppercase tracking-wider">
+          <span className="text-xs text-ink-faint/70">
             The tool is now available
           </span>
         </div>
@@ -292,17 +292,12 @@ export function AgentIntegration() {
       <div className="mx-auto max-w-6xl px-6">
         {/* Header */}
         <div className="max-w-3xl mx-auto text-center mb-14">
-          <div className="text-[11px] font-semibold uppercase tracking-[0.22em] text-accent mb-4">
-            MCP
-          </div>
+          
           <h2 className="text-4xl md:text-5xl font-semibold tracking-tight text-foreground mb-5">
             Every agent gets a voice.
           </h2>
           <p className="text-muted-foreground text-base md:text-lg leading-relaxed">
-            One tool call —{' '}
-            <code className="text-accent font-mono text-[0.9em]">rheo.speak</code> —
-            and any MCP-aware agent can talk to you in a voice you&rsquo;ve cloned. Claude Code,
-            Cursor, Cline, or anything that speaks MCP.
+            With one tool call (<code className="text-accent font-mono text-[0.9em]">rheo.speak</code>), any MCP-aware agent can talk to you in a voice you&rsquo;ve cloned: Claude Code, Cursor, Cline, or anything that speaks MCP.
           </p>
         </div>
 

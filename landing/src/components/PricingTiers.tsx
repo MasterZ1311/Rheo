@@ -58,7 +58,7 @@ export function PricingTiers() {
 							key={tier.id}
 							className={`flex flex-col rounded-2xl border bg-card/50 backdrop-blur-sm p-7 ${
 								tier.highlighted
-									? "border-2 border-accent/50 shadow-[0_8px_40px_hsl(43_60%_50%/0.1)] md:-mt-2"
+									? "border-2 border-accent/50 shadow-lg md:-mt-2"
 									: "border-border"
 							}`}
 						>
@@ -68,7 +68,7 @@ export function PricingTiers() {
 								</h2>
 								{tier.badge ? (
 									<span
-										className={`rounded-full px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${
+										className={`rounded-full px-2.5 py-0.5 text-[10px] font-semibold  ${
 											tier.highlighted
 												? "bg-accent/15 text-accent"
 												: "border border-border/60 text-muted-foreground"
@@ -104,9 +104,9 @@ export function PricingTiers() {
 								{...(isExternal
 									? {target: "_blank", rel: "noopener noreferrer"}
 									: {})}
-								className={`mb-7 inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-semibold transition-all ${
+								className={`mb-7 inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent active:scale-[0.97] ${
 									tier.highlighted
-										? "bg-accent text-white shadow-[0_4px_20px_hsl(43_60%_50%/0.3)] hover:bg-accent-faint"
+										? "bg-accent text-white shadow-md hover:bg-accent-faint"
 										: "border border-border/60 bg-card/40 text-foreground hover:border-accent/40"
 								}`}
 							>

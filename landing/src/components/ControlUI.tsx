@@ -282,7 +282,7 @@ function TypewriterText({ text, speed }: { text: string; speed?: number }) {
   return (
     <>
       {displayed}
-      <span className="inline-block h-3.5 w-[2px] animate-pulse bg-foreground/70 ml-[1px] align-middle" />
+      <span className="inline-block h-3.5 w-[2px] motion-safe:animate-pulse bg-foreground/70 ml-[1px] align-middle" />
     </>
   );
 }
@@ -333,10 +333,10 @@ const ProfileCard = ({
   return (
     <motion.div
       ref={cardRef}
-      className={`rounded-xl border-2 bg-card p-3.5 flex flex-col h-[143px] transition-all duration-200 ${
+      className={`rounded-xl border-2 bg-card p-3.5 flex flex-col h-[143px] transition-colors duration-200 ${
         selected ? 'border-accent shadow-md' : 'border-border/50 hover:shadow-sm'
       } ${selecting && !selected ? 'opacity-60' : ''}`}
-      animate={selecting && selected ? { scale: [1, 1.02, 1] } : {}}
+      animate={selecting && selected ? { scale: [1, 1.05, 0.98, 1] } : {}} whileTap={{ scale: 0.97 }}
       transition={{ duration: 0.3 }}
     >
       <div className="text-[15px] font-bold leading-tight line-clamp-2">{profile.name}</div>
@@ -376,7 +376,7 @@ function HistoryRow({
       }`}
       initial={isNew ? { opacity: 0, y: -8 } : false}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, ease: 'easeOut' }}
+      transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }} layoutId={`history-row-${gen.id}`}
     >
       <div className="flex items-stretch gap-3 h-[80px] p-2.5">
         {/* Status icon */}
@@ -394,7 +394,7 @@ function HistoryRow({
           </div>
           <div className="text-[10px] text-muted-foreground">
             {mode === 'generating' ? (
-              <span className="text-accent">Generating...</span>
+              <span className="text-accent">Generating…</span>
             ) : (
               gen.timeAgo
             )}
@@ -482,8 +482,8 @@ function FloatingGenerateBox({
               ) : (
                 <span>
                   {selectedProfile
-                    ? `Generate speech using ${selectedProfile.name}...`
-                    : 'Select a voice profile above...'}
+                    ? `Generate speech using ${selectedProfile.name}…`
+                    : 'Select a voice profile above…'}
                 </span>
               )}
             </div>
@@ -491,7 +491,7 @@ function FloatingGenerateBox({
         </div>
 
         {/* Generate button */}
-        <button className="h-8 w-8 rounded-full bg-accent flex items-center justify-center shrink-0 shadow-lg">
+        <button className="h-8 w-8 rounded-full bg-accent flex items-center justify-center shrink-0 shadow-lg active:scale-[0.97] transition-transform duration-100 ease-out">
           <Sparkles className="h-3.5 w-3.5 text-white fill-white" />
         </button>
       </div>
@@ -726,7 +726,7 @@ export function ControlUI() {
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-app-line bg-app-box shadow-[0_25px_60px_rgba(0,0,0,0.5),0_8px_20px_rgba(0,0,0,0.3)] md:h-[640px] pointer-events-none select-none">
+      <div className="overflow-hidden rounded-2xl border border-app-line bg-app-box shadow-2xl md:h-[640px] pointer-events-none select-none">
         <div className="flex flex-col md:flex-row h-full">
           {/* ── Sidebar (hidden on mobile) ─────────────────────────── */}
           <div className="hidden md:flex w-16 shrink-0 border-r border-app-line bg-sidebar flex-col items-center py-4 gap-4">
@@ -755,7 +755,7 @@ export function ControlUI() {
                 return (
                   <div
                     key={item.label}
-                    className={`w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200 ${
+                    className={`w-9 h-9 rounded-full flex items-center justify-center transition-colors duration-200 ${
                       active
                         ? 'bg-white/[0.07] text-foreground shadow-lg backdrop-blur-sm border border-white/[0.08]'
                         : 'text-muted-foreground/60'
@@ -857,7 +857,7 @@ export function ControlUI() {
             {/* Right/Below: History */}
             <div className="md:w-[48%] shrink-0 flex flex-col min-w-0 border-t md:border-t-0 border-app-line">
               <div className="max-h-[360px] md:max-h-none flex-1 overflow-hidden px-3 pt-3 md:pt-6 pb-3">
-                <div className="flex flex-col gap-2">
+                <motion.div className="flex flex-col gap-2" initial="hidden" animate="visible" variants={{ visible: { transition: { staggerChildren: 0.03 } } }}>
                   {generations.map((gen) => {
                     const isThisNew = gen.id === newGenId;
                     const rowMode: 'idle' | 'generating' | 'playing' =
@@ -868,7 +868,7 @@ export function ControlUI() {
                           : 'idle';
                     return <HistoryRow key={gen.id} gen={gen} mode={rowMode} isNew={isThisNew} />;
                   })}
-                </div>
+                </motion.div>
               </div>
             </div>
 

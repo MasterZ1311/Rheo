@@ -40,7 +40,7 @@ export function DownloadSection() {
         {downloads.map(({ platform, icon: Icon, link, description, disabled }) => (
           <Card
             key={platform}
-            className={`transition-all duration-200 ${
+            className={`transition-colors duration-200 ${
               disabled
                 ? 'opacity-50'
                 : 'hover:border-primary/20 hover:shadow-lg hover:shadow-primary/3 hover:-translate-y-0.5'

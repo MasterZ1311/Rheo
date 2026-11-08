@@ -64,7 +64,7 @@ export function ApiSection() {
 				<div className="text-center mb-14">
 					<div className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/40 backdrop-blur-sm px-3 py-1 mb-4">
 						<Code2 className="h-3 w-3 text-accent" />
-						<span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+						<span className="text-xs font-medium text-muted-foreground">
 							Built-in REST API
 						</span>
 					</div>
@@ -73,7 +73,7 @@ export function ApiSection() {
 					</h2>
 					<p className="text-muted-foreground max-w-2xl mx-auto">
 						Every engine you download becomes a REST endpoint on your machine.
-						Build apps, games, and voice tools with full programmatic control —
+						Build apps, games, and voice tools with full programmatic control:
 						no API keys, no rate limits, no per-character fees.
 					</p>
 				</div>
@@ -122,11 +122,10 @@ export function ApiSection() {
 								href="http://127.0.0.1:17493/docs"
 								target="_blank"
 								rel="noopener noreferrer"
-								className="text-xs text-accent hover:underline"
+								className="text-xs text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent active:opacity-80"
 							>
 								See the full OpenAPI reference at{" "}
 								<code className="font-mono">/docs</code> when Rheo is running
-								→
 							</a>
 						</div>
 					</div>
@@ -138,7 +137,7 @@ export function ApiSection() {
 							<span className="text-xs font-medium text-foreground">
 								Generate a line
 							</span>
-							<span className="ml-auto text-[10px] text-muted-foreground/50 font-mono">
+							<span className="ml-auto text-[10px] text-muted-foreground/50">
 								curl
 							</span>
 						</div>

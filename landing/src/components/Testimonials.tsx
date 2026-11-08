@@ -61,7 +61,7 @@ export function Testimonials() {
 				<div className="text-center mb-14">
 					<div className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/40 backdrop-blur-sm px-3 py-1 mb-4">
 						<Heart className="h-3 w-3 text-accent" />
-						<span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+						<span className="text-xs font-medium text-muted-foreground">
 							Loved by users
 						</span>
 					</div>
@@ -69,7 +69,7 @@ export function Testimonials() {
 						What people are saying
 					</h2>
 					<p className="text-muted-foreground max-w-2xl mx-auto">
-						Rheo has passed 1M+ downloads. Here's a handful of notes from
+						Rheo has passed 1M+ downloads. Here’s a handful of notes from
 						the people using it every day.
 					</p>
 				</div>
@@ -100,7 +100,7 @@ export function Testimonials() {
 						rel="noopener noreferrer"
 						className="text-xs text-muted-foreground/70 hover:text-foreground transition-colors"
 					>
-						From supporters on Buy Me a Coffee →
+						From supporters on Buy Me a Coffee
 					</a>
 				</div>
 			</div>

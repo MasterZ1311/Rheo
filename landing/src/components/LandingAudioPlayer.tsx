@@ -237,7 +237,7 @@ export function LandingAudioPlayer({
           <button
             onClick={handlePlayPause}
             disabled={!isReady}
-            className="h-10 w-10 rounded-full bg-accent flex items-center justify-center shrink-0 disabled:opacity-50 md:order-1 shadow-lg"
+            className="h-10 w-10 rounded-full bg-accent flex items-center justify-center shrink-0 disabled:opacity-50 md:order-1 shadow-lg active:scale-[0.97] transition-transform duration-100 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           >
             {isPlaying ? (
               <Pause className="h-5 w-5 text-accent-foreground fill-accent-foreground" />
@@ -288,7 +288,7 @@ export function LandingAudioPlayer({
               max={100}
               value={volume * 100}
               onChange={(e) => setVolume(Number(e.target.value) / 100)}
-              className="flex-1 h-1 appearance-none bg-muted rounded-full accent-foreground cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-foreground"
+              className="flex-1 h-1 appearance-none bg-muted rounded-full accent-foreground cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-foreground [&::-webkit-slider-thumb]:transition-transform [&::-webkit-slider-thumb]:duration-150 [&::-webkit-slider-thumb:active]:scale-x-[1.12]"
             />
           </div>
         </div>

@@ -54,25 +54,25 @@ function TutorialCard({tutorial}: {tutorial: Tutorial}) {
 			href={`https://www.youtube.com/watch?v=${tutorial.id}`}
 			target="_blank"
 			rel="noopener noreferrer"
-			className="group rounded-xl border border-white/10 bg-white/[0.03] backdrop-blur-sm overflow-hidden transition-all hover:border-white/30 hover:bg-white/[0.06]"
+			className="group rounded-xl border border-white/10 bg-white/[0.03] backdrop-blur-sm overflow-hidden transition-colors hover:border-white/30 hover:bg-white/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white active:scale-[0.97]"
 		>
 			<div className="relative aspect-video overflow-hidden bg-black p-6 flex items-center justify-center">
 				{/* eslint-disable-next-line @next/next/no-img-element */}
 				<img
 					src={tutorial.thumbnail}
 					alt={tutorial.title}
-					className="h-20 w-20 object-contain transition-transform duration-500 group-hover:scale-110 opacity-80 group-hover:opacity-100"
+					className="h-20 w-20 object-contain transition-transform duration-500 opacity-80 group-hover:opacity-100"
 				/>
 				{/* Play button overlay */}
 				<div className="absolute inset-0 flex items-center justify-center">
-					<div className="flex h-12 w-12 items-center justify-center rounded-full bg-black/60 backdrop-blur-md border border-white/20 transition-all group-hover:scale-110 group-hover:bg-white group-hover:text-black">
+					<div className="flex h-12 w-12 items-center justify-center rounded-full bg-black/60 backdrop-blur-md border border-white/20 transition-colors group-hover:bg-white group-hover:text-black">
 						<Play className="h-4 w-4 text-white group-hover:text-black fill-current ml-0.5" />
 					</div>
 				</div>
 				{/* YouTube badge */}
 				<div className="absolute top-3 right-3 flex items-center gap-1 rounded bg-black/60 backdrop-blur-sm px-2 py-1">
 					<Youtube className="h-3 w-3 text-white" />
-					<span className="text-[10px] font-medium text-white uppercase tracking-wider">
+					<span className="text-[11px] font-medium text-white">
 						YouTube
 					</span>
 				</div>
@@ -100,7 +100,7 @@ function TutorialPlaceholder() {
 			<div className="p-4">
 				<div className="h-3 w-3/4 rounded bg-muted-foreground/10 mb-2" />
 				<div className="h-2.5 w-1/3 rounded bg-muted-foreground/10" />
-				<p className="text-[11px] text-muted-foreground/50 mt-3 uppercase tracking-wider">
+				<p className="text-xs text-muted-foreground/50 mt-3">
 					Coming soon
 				</p>
 			</div>
@@ -115,7 +115,7 @@ export function TutorialsSection() {
 				<div className="text-center mb-14">
 					<div className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/40 backdrop-blur-sm px-3 py-1 mb-4">
 						<Youtube className="h-3 w-3 text-accent" />
-						<span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+						<span className="text-xs font-medium text-muted-foreground">
 							Video tutorials
 						</span>
 					</div>

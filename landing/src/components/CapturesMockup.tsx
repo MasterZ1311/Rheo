@@ -60,7 +60,7 @@ function Sidebar() {
           return (
             <div
               key={item.label}
-              className={`w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200 ${
+              className={`w-9 h-9 rounded-full flex items-center justify-center transition-colors duration-200 ${
                 item.active
                   ? 'bg-white/[0.07] text-foreground shadow-lg backdrop-blur-sm border border-white/[0.08]'
                   : 'text-muted-foreground/60'
@@ -421,7 +421,7 @@ export function CapturesMockup() {
 
   return (
     <div className="relative z-20 mx-auto w-full max-w-5xl px-6">
-      <div className="overflow-hidden rounded-2xl border border-app-line bg-app-box shadow-[0_25px_60px_rgba(0,0,0,0.5),0_8px_20px_rgba(0,0,0,0.3)] md:h-[640px] pointer-events-none select-none">
+      <div className="overflow-hidden rounded-2xl border border-app-line bg-app-box shadow-2xl md:h-[640px] pointer-events-none select-none">
         <div className="flex flex-col md:flex-row h-full">
           <Sidebar />
 

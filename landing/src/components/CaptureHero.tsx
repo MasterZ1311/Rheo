@@ -22,7 +22,7 @@ export function CaptureHero({
       <div className="relative mx-auto max-w-5xl px-6 text-center">
         {/* Kicker */}
         <div
-          className="fade-in mb-6 text-[11px] font-semibold uppercase tracking-[0.22em] text-accent"
+          className="fade-in mb-6 text-[11px] font-medium text-accent"
           style={{ animationDelay: '50ms' }}
         >
           Voice dictation · for humans and AI agents
@@ -40,7 +40,7 @@ export function CaptureHero({
           className="fade-in mx-auto mt-6 max-w-2xl text-lg text-muted-foreground md:text-xl"
           style={{ animationDelay: '200ms' }}
         >
-          Hold a key anywhere on your machine, speak, release — your words land in the focused
+          Hold a key anywhere on your machine, speak, release: your words land in the focused
           text field. A free, open-source, entirely-local alternative to{' '}
           <b className="text-white">WisprFlow</b>. And because Rheo clones voices too, any
           AI agent can speak back in a voice you own.
@@ -53,7 +53,7 @@ export function CaptureHero({
         >
           <a
             href="/download"
-            className="rounded-full bg-white px-8 py-3.5 text-sm font-semibold uppercase tracking-wider text-black shadow-[0_0_25px_rgba(255,255,255,0.2)] transition-all hover:bg-zinc-200 active:scale-[0.98]"
+            className="rounded-full bg-white px-8 py-3.5 text-sm font-semibold text-black shadow-lg transition-colors hover:bg-zinc-200 active:scale-[0.97]"
           >
             Download
           </a>

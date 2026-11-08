@@ -205,7 +205,7 @@ function ModelGroupSection({ group }: { group: ModelGroup }) {
           <h3 className="text-base font-semibold text-foreground">{group.title}</h3>
           <p className="text-sm text-muted-foreground/80">{group.subtitle}</p>
         </div>
-        <span className="text-[11px] font-mono text-ink-faint/60 tabular-nums shrink-0">
+        <span className="text-xs text-ink-faint/60 tabular-nums shrink-0">
           {String(group.models.length).padStart(2, '0')} model
           {group.models.length === 1 ? '' : 's'}
         </span>
@@ -230,7 +230,7 @@ export function SupportedModels() {
             Supported models
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Pick the right model for every job — TTS, transcription, refinement. All models run
+            Pick the right model for every job: TTS, transcription, refinement. All models run
             locally on your hardware. Download once, use forever.
           </p>
         </div>

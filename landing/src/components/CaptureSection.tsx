@@ -49,7 +49,7 @@ function PillAudioBars({ mode }: { mode: 'live' | 'thinking' }) {
 
 function KbdKey({ children }: { children: string }) {
   return (
-    <kbd className="inline-flex items-center justify-center h-7 min-w-[1.75rem] px-2 rounded-md border border-app-line bg-app-darkBox/80 font-mono text-[12px] font-medium text-foreground shadow-[inset_0_-2px_0_rgba(0,0,0,0.2)]">
+    <kbd className="inline-flex items-center justify-center h-7 min-w-[1.75rem] px-2 rounded-md border border-app-line bg-app-darkBox/80 font-mono text-[12px] font-medium text-foreground shadow-sm">
       {children}
     </kbd>
   );
@@ -94,7 +94,7 @@ export function DictationHero() {
           <KbdKey>Ctrl</KbdKey>
           <KbdKey>Alt</KbdKey>
         </div>
-        <span>on Windows — from anywhere on your machine.</span>
+        <span>on Windows, from anywhere on your machine.</span>
       </div>
 
       {/* The stage — gridded field with the pill floating in the middle */}
@@ -116,14 +116,14 @@ export function DictationHero() {
         {/* Floating pill */}
         <div className="absolute inset-0 flex items-center justify-center">
           <div
-            className={`inline-flex items-center gap-4 px-6 h-14 rounded-full bg-black/55 backdrop-blur-md text-accent shadow-[0_12px_40px_rgba(0,0,0,0.45)] transition-opacity duration-500 ease-out ${
+            className={`inline-flex items-center gap-4 px-6 h-14 rounded-full bg-black/55 backdrop-blur-md text-accent shadow-2xl transition-opacity duration-500 ease-out ${
               pillVisible ? 'opacity-100' : 'opacity-0'
             }`}
           >
             {/* Gold dot — pings during recording */}
             <span className="relative flex h-2.5 w-2.5 shrink-0">
               {state === 'recording' && (
-                <span className="absolute inset-0 rounded-full bg-accent animate-ping opacity-70" />
+                <span className="absolute inset-0 rounded-full bg-accent motion-safe:animate-ping motion-reduce:hidden opacity-70" />
               )}
               <span className="relative rounded-full h-2.5 w-2.5 bg-accent" />
             </span>
@@ -254,7 +254,7 @@ function RefinementAnimation() {
         {/* Raw line — always visible, dims when refined */}
         <motion.div
           key={`raw-${pairIdx}`}
-          className="text-[10px] font-mono leading-relaxed"
+          className="text-[11px] leading-relaxed"
           initial={{ opacity: 0, y: 2 }}
           animate={{
             opacity: showClean ? 0.35 : 1,
@@ -339,7 +339,7 @@ function AgentVoiceAnimation() {
       {/* Which agent called speak() */}
       <motion.div
         key={`agent-${idx}`}
-        className="text-[9px] font-mono"
+        className="text-[10px] font-medium"
         initial={{ opacity: 0, y: 2 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
@@ -352,7 +352,7 @@ function AgentVoiceAnimation() {
       {/* Pill in speaking state */}
       <motion.div
         key={`pill-${idx}`}
-        className="inline-flex items-center gap-2.5 px-3 h-8 rounded-full bg-black/55 backdrop-blur-sm shadow-[0_6px_20px_rgba(0,0,0,0.35)]"
+        className="inline-flex items-center gap-2.5 px-3 h-8 rounded-full bg-black/55 backdrop-blur-sm shadow-lg"
         initial={{ opacity: 0, y: 4 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
@@ -403,7 +403,7 @@ const CAPTURE_FEATURES = [
   {
     title: 'Whisper, sized for every machine',
     description:
-      'Base, Small, Medium, Large, and Turbo. Pick the size that fits your hardware and quality bar — 99 languages across every tier, all running locally.',
+      'Base, Small, Medium, Large, and Turbo. Pick the size that fits your hardware and quality bar: 99 languages across every tier, all running locally.',
     icon: Mic2,
     animation: MultiEngineSTTAnimation,
   },
@@ -417,7 +417,7 @@ const CAPTURE_FEATURES = [
   {
     title: 'Agents speak in voices you own',
     description:
-      'Any MCP-aware agent — Claude Code, Cursor, Cline — gets a voice with one tool call. The pill surfaces when an agent is speaking, so you always see what’s coming out of your machine.',
+      'Any MCP-aware agent (Claude Code, Cursor, Cline) gets a voice with one tool call. The pill surfaces when an agent is speaking, so you always see what’s coming out of your machine.',
     icon: Bot,
     animation: AgentVoiceAnimation,
   },
@@ -450,9 +450,7 @@ export function CaptureSection() {
       <div className="mx-auto max-w-7xl px-6">
         {/* Kicker + headline */}
         <div className="text-center mb-14">
-          <div className="text-[11px] font-semibold uppercase tracking-[0.22em] text-accent mb-4">
-            Capture
-          </div>
+          
           <h2 className="text-4xl font-semibold tracking-tight text-foreground md:text-5xl mb-5">
             Dictate anywhere. Paste into any app.
           </h2>

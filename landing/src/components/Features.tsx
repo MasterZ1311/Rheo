@@ -97,7 +97,7 @@ function VoiceCloningAnimation() {
 
         {/* Result label */}
         <motion.div
-          className="text-[9px] font-mono"
+          className="text-[9px]"
           animate={{
             opacity: phase === 2 ? 1 : 0.3,
             color: phase === 2 ? 'hsl(43 50% 45%)' : 'rgba(255,255,255,0.3)',
@@ -638,7 +638,7 @@ function TranscriptionAnimation() {
       <div className="text-[10px] text-ink-dull font-mono max-w-[200px] text-center leading-relaxed min-h-[32px]">
         {text.slice(0, charIndex)}
         {charIndex < text.length && (
-          <span className="inline-block w-[2px] h-3 bg-accent animate-pulse ml-[1px] align-middle" />
+          <span className="inline-block w-[2px] h-3 bg-accent motion-safe:animate-pulse ml-[1px] align-middle" />
         )}
       </div>
     </div>
@@ -840,8 +840,7 @@ export function Features() {
             Professional voice tools, zero compromise
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Everything you need to clone voices, generate speech, and produce multi-voice content —
-            running entirely on your machine.
+            Tools to clone voices, generate speech, and produce multi-voice content, running entirely on your machine.
           </p>
         </div>
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">

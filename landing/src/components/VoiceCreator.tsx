@@ -200,7 +200,7 @@ function RecordPanel() {
             className="relative z-10 flex flex-col items-center gap-3"
           >
             <div className="flex items-center gap-3">
-              <div className="h-3 w-3 rounded-full bg-accent animate-pulse" />
+              <div className="h-3 w-3 rounded-full bg-accent motion-safe:animate-pulse" />
               <span className="text-lg font-mono font-semibold">{formatTime(elapsed)}</span>
             </div>
             <div className="h-9 px-4 rounded-md bg-accent text-accent-foreground flex items-center gap-2 text-sm font-medium">
@@ -308,7 +308,7 @@ function SystemPanel() {
             className="relative z-10 flex flex-col items-center gap-3"
           >
             <div className="flex items-center gap-3">
-              <div className="h-3 w-3 rounded-full bg-accent animate-pulse" />
+              <div className="h-3 w-3 rounded-full bg-accent motion-safe:animate-pulse" />
               <span className="text-lg font-mono font-semibold">{formatTime(elapsed)}</span>
             </div>
             <div className="h-9 px-4 rounded-md bg-accent text-accent-foreground flex items-center gap-2 text-sm font-medium">
@@ -399,7 +399,7 @@ export function VoiceCreator() {
                 <div>
                   <div className="text-sm font-medium">Upload a clip</div>
                   <div className="text-xs text-muted-foreground">
-                    Drag and drop any audio file — WAV, MP3, FLAC, or WebM.
+                    Drag and drop any audio file (WAV, MP3, FLAC, or WebM).
                   </div>
                 </div>
               </div>
