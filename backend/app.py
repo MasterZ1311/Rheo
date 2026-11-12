@@ -199,23 +199,9 @@ def create_app() -> FastAPI:
         if request.method in ("POST", "PUT", "DELETE", "PATCH"):
             origin = request.headers.get("origin")
             if origin:
-                default_origins = {
-                    "http://localhost:5173",
-                    "http://127.0.0.1:5173",
-                    "http://localhost:17493",
-                    "http://127.0.0.1:17493",
-                    "tauri://localhost",
-                    "https://tauri.localhost",
-                    "http://tauri.localhost",
-                }
-                env_origins = {
-                    o.strip()
-                    for o in os.environ.get("RHEO_CORS_ORIGINS", "").split(",")
-                    if o.strip()
-                }
-                allowed = default_origins | env_origins
-                is_local = origin.startswith("http://localhost:") or origin.startswith("http://127.0.0.1:")
-                if origin not in allowed and not is_local:
+                from .utils.auth import get_allowed_origins
+                allowed = get_allowed_origins()
+                if origin not in allowed:
                     logger.warning("Blocked potential CSRF request from origin: %s to %s", origin, request.url.path)
                     return JSONResponse(
                         status_code=403,
@@ -234,25 +220,54 @@ def create_app() -> FastAPI:
             limit_str = os.environ.get("RHEO_RATE_LIMIT_PER_MINUTE", "60")
             limit = int(limit_str)
             if limit > 0:
+                from .mcp_server.context import is_valid_client_id
+
                 client_ip = request.client.host if request.client else "unknown"
-                client_id = (
-                    request.headers.get("X-Rheo-Client-Id")
-                    or client_ip
-                )
                 now = time.time()
+                cutoff = now - _rate_limit_window
+
                 async with _rate_limit_lock:
-                    timestamps = _rate_limit_buckets.setdefault(client_id, [])
-                    cutoff = now - _rate_limit_window
-                    while timestamps and timestamps[0] < cutoff:
-                        timestamps.pop(0)
-                    if len(timestamps) >= limit:
-                        logger.warning("Rate limit exceeded for %s on %s", client_id, request.url.path)
+                    # Prune empty or stale buckets if dict grows large
+                    if len(_rate_limit_buckets) > 1000:
+                        stale_keys = [
+                            k for k, ts in _rate_limit_buckets.items()
+                            if not ts or ts[-1] < cutoff
+                        ]
+                        for k in stale_keys:
+                            _rate_limit_buckets.pop(k, None)
+
+                    # 1. Enforce IP-based rate limiting (prevents header spoofing bypass)
+                    ip_key = f"ip:{client_ip}"
+                    ip_timestamps = _rate_limit_buckets.setdefault(ip_key, [])
+                    while ip_timestamps and ip_timestamps[0] < cutoff:
+                        ip_timestamps.pop(0)
+
+                    if len(ip_timestamps) >= limit:
+                        logger.warning("Rate limit exceeded for IP %s on %s", client_ip, request.url.path)
                         return JSONResponse(
                             status_code=429,
                             content={"detail": "Rate limit exceeded. Please try again later."},
                             headers={"Retry-After": "60"},
                         )
-                    timestamps.append(now)
+
+                    # 2. Also track per-client if a valid client_id is present
+                    raw_client_id = request.headers.get("X-Rheo-Client-Id")
+                    client_id = raw_client_id.strip() if is_valid_client_id(raw_client_id) else None
+                    if client_id:
+                        client_key = f"client:{client_id}"
+                        client_timestamps = _rate_limit_buckets.setdefault(client_key, [])
+                        while client_timestamps and client_timestamps[0] < cutoff:
+                            client_timestamps.pop(0)
+                        if len(client_timestamps) >= limit:
+                            logger.warning("Rate limit exceeded for client %s on %s", client_id, request.url.path)
+                            return JSONResponse(
+                                status_code=429,
+                                content={"detail": "Rate limit exceeded. Please try again later."},
+                                headers={"Retry-After": "60"},
+                            )
+                        client_timestamps.append(now)
+
+                    ip_timestamps.append(now)
         return await call_next(request)
 
     allowed_hosts = ["localhost", "127.0.0.1", "[::1]", "::1", "tauri.localhost", "*.localhost", "testserver"]
@@ -404,7 +419,7 @@ async def _run_startup(application: FastAPI) -> None:
             sa_text(
                 "UPDATE generations SET status = 'failed', "
                 "error = 'Server was shut down during generation' "
-                "WHERE status IN ('generating', 'loading_model')"
+                "WHERE status IN ('generating', 'loading_model', 'queued')"
             )
         )
         if result.rowcount > 0:
@@ -458,8 +473,13 @@ async def _run_startup(application: FastAPI) -> None:
 
 
 async def _run_shutdown() -> None:
-    """Unload models on lifespan exit."""
+    """Unload models on lifespan exit after graceful queue shutdown."""
     logger.info("Rheo server shutting down...")
+    try:
+        from .services.task_queue import shutdown_queue
+        await shutdown_queue(grace_period=5.0)
+    except Exception:
+        logger.exception("Failed to cleanly shutdown generation queue")
     try:
         tts.unload_tts_model()
     except Exception:

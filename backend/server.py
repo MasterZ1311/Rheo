@@ -15,7 +15,9 @@ import re
 
 # On Windows with --noconsole (PyInstaller), sys.stdout/stderr are None.
 # They can also be broken file objects in some edge cases.
-# Redirect to devnull to prevent crashes from print()/tqdm/logging.
+# Try attaching to inherited standard pipe handles (fd 1 / fd 2) first so
+# version probes and logging work when spawned by Tauri or CLI pipes.
+# If no pipe is attached, fall back to devnull to prevent crashes.
 def _is_writable(stream):
     """Check if a stream is usable for writing."""
     if stream is None:
@@ -27,9 +29,16 @@ def _is_writable(stream):
         return False
 
 if not _is_writable(sys.stdout):
-    sys.stdout = open(os.devnull, 'w')
+    try:
+        sys.stdout = open(1, 'w', encoding='utf-8', buffering=1, closefd=False)
+    except Exception:
+        sys.stdout = open(os.devnull, 'w')
+
 if not _is_writable(sys.stderr):
-    sys.stderr = open(os.devnull, 'w')
+    try:
+        sys.stderr = open(2, 'w', encoding='utf-8', buffering=1, closefd=False)
+    except Exception:
+        sys.stderr = open(os.devnull, 'w')
 
 # PyInstaller + multiprocessing: child processes re-execute the frozen binary
 # with internal arguments. freeze_support() handles this and exits early.
@@ -45,11 +54,24 @@ if getattr(sys, 'frozen', False):
     if os.path.isdir(_espeak_data):
         os.environ.setdefault('ESPEAK_DATA_PATH', _espeak_data)
 
-# Fast path: handle --version before any heavy imports so the Rust
-# version check doesn't block for 30+ seconds loading torch etc.
+# Fast path: handle --version and --help before any heavy imports so the Rust
+# sidecar or CLI checks don't block for 30+ seconds loading torch/transformers.
 if "--version" in sys.argv:
     from backend import __version__
     print(f"rheo-server {__version__}")
+    sys.exit(0)
+
+if "-h" in sys.argv or "--help" in sys.argv:
+    print("usage: rheo-server [-h] [--host HOST] [--port PORT] [--data-dir DATA_DIR] [--parent-pid PARENT_PID] [--version]")
+    print("\nrheo backend server\n")
+    print("options:")
+    print("  -h, --help            show this help message and exit")
+    print("  --host HOST           Host to bind to (use 0.0.0.0 for remote access)")
+    print("  --port PORT           Port to bind to")
+    print("  --data-dir DATA_DIR   Data directory for database, profiles, and generated audio")
+    print("  --parent-pid PARENT_PID")
+    print("                        PID of parent process to monitor; server exits when parent dies")
+    print("  --version             Print version and exit")
     sys.exit(0)
 
 # Detect backend variant from binary name BEFORE importing backend modules

@@ -89,10 +89,15 @@ def resolve_storage_path(path: str | Path | None) -> Path | None:
         rebased_path = _path_relative_to_any_data_dir(stored_path)
         if rebased_path is not None:
             candidate = (_data_dir / rebased_path).resolve()
-            if candidate.exists() or not stored_path.exists():
+            if candidate.is_relative_to(_data_dir) and (candidate.exists() or not stored_path.exists()):
                 return candidate
 
-        return stored_path
+        resolved_absolute = stored_path.resolve()
+        if resolved_absolute.is_relative_to(_data_dir):
+            return resolved_absolute
+
+        logger.warning("Storage path escapes data directory: %s", path)
+        return None
 
     # Legacy records sometimes stored relative paths with the data-dir name
     # baked in (e.g. "data/profiles/..."). Joining those directly with
@@ -102,7 +107,17 @@ def resolve_storage_path(path: str | Path | None) -> Path | None:
             Path(*stored_path.parts[1:]) if len(stored_path.parts) > 1 else Path()
         )
 
-    return (_data_dir / stored_path).resolve()
+    resolved = (_data_dir / stored_path).resolve()
+    if not resolved.is_relative_to(_data_dir):
+        logger.warning("Path traversal detected in storage path: %s", path)
+        return None
+
+    return resolved
+
+
+def is_safe_storage_path(path: str | Path | None) -> bool:
+    """Return True if path is safely within the configured data directory."""
+    return resolve_storage_path(path) is not None
 
 
 def get_db_path() -> Path:
@@ -142,6 +157,53 @@ def get_models_dir() -> Path:
     """Get models directory path."""
     path = _data_dir / "models"
     path.mkdir(parents=True, exist_ok=True)
+    return path
+
+
+def get_models_cache_dir() -> Path:
+    """Get the active HuggingFace model cache directory path.
+
+    Resolves priority:
+    1. RHEO_MODELS_DIR environment variable
+    2. HF_HUB_CACHE environment variable
+    3. Default ~/.cache/huggingface/hub
+    """
+    env_path = os.environ.get("RHEO_MODELS_DIR") or os.environ.get("HF_HUB_CACHE")
+    if env_path:
+        path = Path(env_path).resolve()
+    else:
+        try:
+            from huggingface_hub import constants as hf_constants
+
+            path = Path(hf_constants.HF_HUB_CACHE).resolve()
+        except Exception:
+            path = (Path.home() / ".cache" / "huggingface" / "hub").resolve()
+
+    path.mkdir(parents=True, exist_ok=True)
+    return path
+
+
+def set_models_cache_dir(new_path: Path | str) -> Path:
+    """Dynamically set the active model cache directory.
+
+    Updates environment variables and huggingface_hub runtime constants.
+    Supports paths with spaces and arbitrary drive letters.
+    """
+    path = Path(new_path).resolve()
+    path.mkdir(parents=True, exist_ok=True)
+    str_path = str(path)
+
+    os.environ["RHEO_MODELS_DIR"] = str_path
+    os.environ["HF_HUB_CACHE"] = str_path
+
+    try:
+        import huggingface_hub.constants as hf_constants
+
+        hf_constants.HF_HUB_CACHE = str_path
+    except Exception:
+        pass
+
+    logger.info("Updated model cache directory to: %s", str_path)
     return path
 
 

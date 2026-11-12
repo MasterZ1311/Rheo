@@ -510,6 +510,13 @@ class ModelStatus(BaseModel):
     downloading: bool = False  # True if download is in progress
     size_mb: Optional[float] = None
     loaded: bool = False
+    engine: Optional[str] = None
+    description: Optional[str] = None
+    version: Optional[str] = "main"
+    required_disk_mb: Optional[int] = None
+    supported_hardware: List[str] = Field(default_factory=list)
+    dependencies: List[str] = Field(default_factory=list)
+    languages: List[str] = Field(default_factory=list)
 
 
 class ModelStatusListResponse(BaseModel):
@@ -541,6 +548,8 @@ class ActiveDownloadTask(BaseModel):
     current: Optional[int] = None  # bytes downloaded
     total: Optional[int] = None  # total bytes
     filename: Optional[str] = None  # current file being downloaded
+    speed_bps: Optional[float] = None  # download speed in bytes/sec
+    eta_seconds: Optional[int] = None  # estimated seconds remaining
 
 
 class ActiveGenerationTask(BaseModel):
