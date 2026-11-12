@@ -240,70 +240,88 @@ async def delete_generation(
     db: Session,
 ) -> bool:
     """
-    Delete a generation.
-    
-    Args:
-        generation_id: Generation ID
-        db: Database session
-        
-    Returns:
-        True if deleted, False if not found
+    Delete a generation atomically, preserving filesystem state on rollback.
     """
     generation = db.query(DBGeneration).filter_by(id=generation_id).first()
     if not generation:
         return False
 
-    # Delete all version files and records
     from . import versions as versions_mod
-    versions_mod.delete_versions_for_generation(generation_id, db)
+    from ..database import StoryItem as DBStoryItem
 
-    # Delete main audio file (if not already removed by version cleanup)
-    if generation.audio_path:
-        audio_path = config.resolve_storage_path(generation.audio_path)
-        if audio_path is not None and audio_path.exists():
-            audio_path.unlink()
+    files_to_unlink = []
+    raw_audio_path = generation.audio_path
+    if raw_audio_path:
+        is_shared = (
+            db.query(DBGeneration)
+            .filter(DBGeneration.audio_path == raw_audio_path, DBGeneration.id != generation_id)
+            .count()
+            > 0
+        )
+        if not is_shared:
+            audio_path = config.resolve_storage_path(raw_audio_path)
+            if audio_path is not None and audio_path.exists():
+                files_to_unlink.append(audio_path)
 
-    # Delete from database
-    db.delete(generation)
-    db.commit()
-    
+    try:
+        # Delete referencing story items
+        db.query(DBStoryItem).filter_by(generation_id=generation_id).delete(synchronize_session=False)
+
+        # Delete versions in same transaction
+        versions_mod.delete_versions_for_generation(generation_id, db, commit=False)
+        db.flush()
+
+        # Delete generation row
+        db.query(DBGeneration).filter_by(id=generation_id).delete(synchronize_session=False)
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
+
+    for f in files_to_unlink:
+        try:
+            f.unlink()
+        except OSError:
+            pass
+
     return True
 
 
 async def delete_failed_generations(db: Session) -> int:
     """
     Delete every generation whose status is 'failed'.
-
-    Used by the "Clear failed" action in the UI so users can tidy up
-    history after the model wasn't loaded, the app was closed mid-run,
-    or a generation otherwise errored out.
-
-    Returns:
-        Number of generations deleted.
     """
     from . import versions as versions_mod
+    from ..database import StoryItem as DBStoryItem
 
     failed = db.query(DBGeneration).filter(DBGeneration.status == "failed").all()
     count = 0
-    for generation in failed:
-        # Clean up version files/rows first.
-        versions_mod.delete_versions_for_generation(generation.id, db)
+    files_to_unlink = []
 
-        # Remove the main audio file if it somehow made it to disk.
-        if generation.audio_path:
-            audio_path = config.resolve_storage_path(generation.audio_path)
-            if audio_path is not None and audio_path.exists():
-                try:
-                    audio_path.unlink()
-                except OSError:
-                    # Best-effort cleanup — don't abort the whole sweep
-                    # if a single file can't be removed.
-                    pass
+    try:
+        for generation in failed:
+            db.query(DBStoryItem).filter_by(generation_id=generation.id).delete()
+            versions_mod.delete_versions_for_generation(generation.id, db, commit=False)
 
-        db.delete(generation)
-        count += 1
+            if generation.audio_path:
+                audio_path = config.resolve_storage_path(generation.audio_path)
+                if audio_path is not None and audio_path.exists():
+                    files_to_unlink.append(audio_path)
 
-    db.commit()
+            db.delete(generation)
+            count += 1
+
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
+
+    for p in files_to_unlink:
+        try:
+            p.unlink()
+        except OSError:
+            pass
+
     return count
 
 
@@ -312,34 +330,40 @@ async def delete_generations_by_profile(
     db: Session,
 ) -> int:
     """
-    Delete all generations for a profile.
-    
-    Args:
-        profile_id: Profile ID
-        db: Database session
-        
-    Returns:
-        Number of generations deleted
+    Delete all generations for a profile atomically.
     """
-    generations = db.query(DBGeneration).filter_by(profile_id=profile_id).all()
-    
-    count = 0
-    for generation in generations:
-        # Delete associated version files and rows first
-        from . import versions as versions_mod
-        versions_mod.delete_versions_for_generation(generation.id, db)
+    from . import versions as versions_mod
+    from ..database import StoryItem as DBStoryItem
 
-        # Delete audio file
-        audio_path = config.resolve_storage_path(generation.audio_path)
-        if audio_path is not None and audio_path.exists():
-            audio_path.unlink()
-        
-        # Delete from database
-        db.delete(generation)
-        count += 1
-    
-    db.commit()
-    
+    generations = db.query(DBGeneration).filter_by(profile_id=profile_id).all()
+    count = 0
+    files_to_unlink = []
+
+    try:
+        for generation in generations:
+            db.query(DBStoryItem).filter_by(generation_id=generation.id).delete(synchronize_session=False)
+            versions_mod.delete_versions_for_generation(generation.id, db, commit=False)
+            db.flush()
+
+            if generation.audio_path:
+                audio_path = config.resolve_storage_path(generation.audio_path)
+                if audio_path is not None and audio_path.exists():
+                    files_to_unlink.append(audio_path)
+
+            db.query(DBGeneration).filter_by(id=generation.id).delete(synchronize_session=False)
+            count += 1
+
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
+
+    for f in files_to_unlink:
+        try:
+            f.unlink()
+        except OSError:
+            pass
+
     return count
 
 

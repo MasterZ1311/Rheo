@@ -6,11 +6,84 @@ Also handles exporting individual generations.
 """
 
 import json
+import re
 import zipfile
 import io
 from pathlib import Path
 from typing import Optional
 from sqlalchemy.orm import Session
+
+MAX_UNCOMPRESSED_PROFILE_BYTES = 200 * 1024 * 1024  # 200 MB
+MAX_UNCOMPRESSED_GENERATION_BYTES = 100 * 1024 * 1024  # 100 MB
+MAX_ZIP_ENTRIES = 500
+_SAFE_FILENAME_RE = re.compile(r"^[a-zA-Z0-9_.-]+$")
+
+
+def _safe_read_zip_entry(
+    zip_file: zipfile.ZipFile,
+    name: str,
+    max_bytes: int,
+    cumulative_tracker: list[int] | None = None,
+    overall_limit: int | None = None,
+) -> bytes:
+    """Safely stream and decompress a zip entry with strict byte limits.
+
+    Guards against high-compression zip bombs and incorrect/misleading file_size
+    metadata in the central directory or local headers.
+    """
+    chunks: list[bytes] = []
+    total = 0
+    with zip_file.open(name, "r") as stream:
+        while True:
+            chunk = stream.read(64 * 1024)
+            if not chunk:
+                break
+            total += len(chunk)
+            if total > max_bytes:
+                raise ValueError(
+                    f"ZIP entry {name!r} decompressed size exceeds allowed limit ({max_bytes} bytes)"
+                )
+            if cumulative_tracker is not None and overall_limit is not None:
+                cumulative_tracker[0] += len(chunk)
+                if cumulative_tracker[0] > overall_limit:
+                    raise ValueError(
+                        f"Cumulative decompressed size exceeds archive limit ({overall_limit} bytes)"
+                    )
+            chunks.append(chunk)
+    return b"".join(chunks)
+
+
+def _audit_zip_safety(zip_file: zipfile.ZipFile, max_uncompressed_bytes: int) -> None:
+    """Validate archive against Zip Slip, symlinks, reparse points, and zip bombs."""
+    infos = zip_file.infolist()
+    if len(infos) > MAX_ZIP_ENTRIES:
+        raise ValueError(f"ZIP archive contains too many files ({len(infos)} > {MAX_ZIP_ENTRIES})")
+
+    total_uncompressed = 0
+    for info in infos:
+        name = info.filename
+        if (
+            ".." in name
+            or name.startswith("/")
+            or name.startswith("\\")
+            or ":" in name
+            or "\x00" in name
+        ):
+            raise ValueError(f"Malicious path traversal detected in ZIP entry: {name}")
+
+        # Reject POSIX symlinks (S_IFLNK = 0o120000)
+        if (info.external_attr >> 16) & 0o170000 == 0o120000:
+            raise ValueError(f"Symlinks are forbidden in ZIP archive: {name}")
+
+        # Reject Windows directory reparse points / junctions
+        if info.external_attr & 0x400 != 0:
+            raise ValueError(f"Reparse points / symlinks are forbidden in ZIP archive: {name}")
+
+        total_uncompressed += info.file_size
+        if total_uncompressed > max_uncompressed_bytes:
+            raise ValueError(
+                f"ZIP uncompressed content exceeds size limit ({max_uncompressed_bytes // (1024 * 1024)} MB)"
+            )
 
 from ..models import VoiceProfileResponse
 from ..database import VoiceProfile as DBVoiceProfile, ProfileSample as DBProfileSample, Generation as DBGeneration, GenerationVersion as DBGenerationVersion
@@ -120,6 +193,21 @@ def export_profile_to_zip(profile_id: str, db: Session) -> bytes:
     return zip_buffer.read()
 
 
+def _cleanup_failed_profile(profile_id: str | None, profile_dir, db: Session) -> None:
+    """Clean up filesystem directory and database row on failed profile import."""
+    import shutil
+    if profile_dir is not None and Path(profile_dir).exists():
+        shutil.rmtree(profile_dir, ignore_errors=True)
+    if profile_id is not None:
+        try:
+            row = db.query(DBVoiceProfile).filter(DBVoiceProfile.id == profile_id).first()
+            if row:
+                db.delete(row)
+                db.commit()
+        except Exception:
+            db.rollback()
+
+
 async def import_profile_from_zip(file_bytes: bytes, db: Session) -> VoiceProfileResponse:
     """
     Import a voice profile from a ZIP archive.
@@ -135,9 +223,12 @@ async def import_profile_from_zip(file_bytes: bytes, db: Session) -> VoiceProfil
         ValueError: If ZIP is invalid or missing required files
     """
     zip_buffer = io.BytesIO(file_bytes)
+    profile = None
+    profile_dir = None
     
     try:
         with zipfile.ZipFile(zip_buffer, 'r') as zip_file:
+            _audit_zip_safety(zip_file, MAX_UNCOMPRESSED_PROFILE_BYTES)
             # Validate ZIP structure
             namelist = zip_file.namelist()
             
@@ -147,8 +238,12 @@ async def import_profile_from_zip(file_bytes: bytes, db: Session) -> VoiceProfil
             if "samples.json" not in namelist:
                 raise ValueError("ZIP archive missing samples.json")
             
-            # Read manifest
-            manifest_data = json.loads(zip_file.read("manifest.json"))
+            cumulative_tracker = [0]
+            # Read manifest with streaming byte limits
+            manifest_raw = _safe_read_zip_entry(
+                zip_file, "manifest.json", 1024 * 1024, cumulative_tracker, MAX_UNCOMPRESSED_PROFILE_BYTES
+            )
+            manifest_data = json.loads(manifest_raw.decode("utf-8"))
             
             if "version" not in manifest_data:
                 raise ValueError("Invalid manifest.json: missing version")
@@ -158,8 +253,11 @@ async def import_profile_from_zip(file_bytes: bytes, db: Session) -> VoiceProfil
             
             profile_data = manifest_data["profile"]
             
-            # Read samples mapping
-            samples_data = json.loads(zip_file.read("samples.json"))
+            # Read samples mapping with streaming byte limits
+            samples_raw = _safe_read_zip_entry(
+                zip_file, "samples.json", 1024 * 1024, cumulative_tracker, MAX_UNCOMPRESSED_PROFILE_BYTES
+            )
+            samples_data = json.loads(samples_raw.decode("utf-8"))
             
             if not isinstance(samples_data, dict):
                 raise ValueError("Invalid samples.json: must be a dictionary")
@@ -182,14 +280,22 @@ async def import_profile_from_zip(file_bytes: bytes, db: Session) -> VoiceProfil
             profile_dir.mkdir(parents=True, exist_ok=True)
 
             # Handle avatar if present
-            avatar_files = [f for f in namelist if f.startswith("avatar.")]
+            avatar_files = [
+                f for f in namelist
+                if f.startswith("avatar.")
+                and Path(f).name == f
+                and Path(f).suffix.lower() in {".png", ".jpg", ".jpeg", ".webp"}
+            ]
             if avatar_files:
                 try:
                     avatar_file = avatar_files[0]
                     # Extract to temporary file
                     import tempfile
+                    avatar_bytes = _safe_read_zip_entry(
+                        zip_file, avatar_file, 10 * 1024 * 1024, cumulative_tracker, MAX_UNCOMPRESSED_PROFILE_BYTES
+                    )
                     with tempfile.NamedTemporaryFile(suffix=Path(avatar_file).suffix, delete=False) as tmp:
-                        tmp.write(zip_file.read(avatar_file))
+                        tmp.write(avatar_bytes)
                         tmp_path = tmp.name
 
                     try:
@@ -203,8 +309,15 @@ async def import_profile_from_zip(file_bytes: bytes, db: Session) -> VoiceProfil
 
             for filename, reference_text in samples_data.items():
                 # Validate filename
-                if not filename.endswith('.wav'):
-                    raise ValueError(f"Invalid sample filename: {filename} (must be .wav)")
+                if (
+                    not isinstance(filename, str)
+                    or not filename.endswith('.wav')
+                    or not _SAFE_FILENAME_RE.match(filename)
+                    or ".." in filename
+                    or "/" in filename
+                    or "\\" in filename
+                ):
+                    raise ValueError(f"Invalid sample filename: {filename} (must be a clean .wav filename)")
                 
                 # Extract audio file to temp location
                 zip_path = f"samples/{filename}"
@@ -212,10 +325,13 @@ async def import_profile_from_zip(file_bytes: bytes, db: Session) -> VoiceProfil
                 if zip_path not in namelist:
                     raise ValueError(f"Sample file not found in ZIP: {zip_path}")
                 
-                # Extract to temporary file
+                # Extract to temporary file with streaming size limit
+                sample_bytes = _safe_read_zip_entry(
+                    zip_file, zip_path, 50 * 1024 * 1024, cumulative_tracker, MAX_UNCOMPRESSED_PROFILE_BYTES
+                )
                 import tempfile
                 with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp:
-                    tmp.write(zip_file.read(zip_path))
+                    tmp.write(sample_bytes)
                     tmp_path = tmp.name
                 
                 try:
@@ -233,10 +349,13 @@ async def import_profile_from_zip(file_bytes: bytes, db: Session) -> VoiceProfil
             return profile
             
     except zipfile.BadZipFile:
+        _cleanup_failed_profile(profile.id if profile else None, profile_dir, db)
         raise ValueError("Invalid ZIP file")
     except json.JSONDecodeError as e:
+        _cleanup_failed_profile(profile.id if profile else None, profile_dir, db)
         raise ValueError(f"Invalid JSON in archive: {e}")
     except Exception as e:
+        _cleanup_failed_profile(profile.id if profile else None, profile_dir, db)
         if isinstance(e, ValueError):
             raise
         raise ValueError(f"Error importing profile: {str(e)}")
@@ -354,14 +473,16 @@ async def import_generation_from_zip(file_bytes: bytes, db: Session) -> dict:
     
     try:
         with zipfile.ZipFile(zip_buffer, 'r') as zip_file:
+            _audit_zip_safety(zip_file, MAX_UNCOMPRESSED_GENERATION_BYTES)
             # Validate ZIP structure
             namelist = zip_file.namelist()
             
             if "manifest.json" not in namelist:
                 raise ValueError("ZIP archive missing manifest.json")
             
-            # Read manifest
-            manifest_data = json.loads(zip_file.read("manifest.json"))
+            # Read manifest with streaming byte limit
+            manifest_raw = _safe_read_zip_entry(zip_file, "manifest.json", 1024 * 1024)
+            manifest_data = json.loads(manifest_raw.decode("utf-8"))
             
             if "version" not in manifest_data:
                 raise ValueError("Invalid manifest.json: missing version")
@@ -405,9 +526,12 @@ async def import_generation_from_zip(file_bytes: bytes, db: Session) -> dict:
                 else:
                     raise ValueError("No voice profiles found. Please create a profile before importing generations.")
             
-            # Extract audio file to temporary location
+            # Extract audio file to temporary location with streaming byte limit
+            audio_bytes = _safe_read_zip_entry(
+                zip_file, audio_file_path, MAX_UNCOMPRESSED_GENERATION_BYTES
+            )
             with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp:
-                tmp.write(zip_file.read(audio_file_path))
+                tmp.write(audio_bytes)
                 tmp_path = tmp.name
             
             try:

@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from .. import models
 from ..database import get_db
 from ..services import settings as settings_service
+from ..utils.auth import require_admin
 
 router = APIRouter(prefix="/settings", tags=["settings"])
 
@@ -20,6 +21,7 @@ async def get_capture_settings_endpoint(db: Session = Depends(get_db)):
 async def update_capture_settings_endpoint(
     patch: models.CaptureSettingsUpdate,
     db: Session = Depends(get_db),
+    _admin: None = Depends(require_admin),
 ):
     """Update voice capture and transcription preferences."""
     return settings_service.update_capture_settings(db, patch.model_dump(exclude_unset=True))
@@ -35,6 +37,7 @@ async def get_generation_settings_endpoint(db: Session = Depends(get_db)):
 async def update_generation_settings_endpoint(
     patch: models.GenerationSettingsUpdate,
     db: Session = Depends(get_db),
+    _admin: None = Depends(require_admin),
 ):
     """Update default speech generation preferences."""
     return settings_service.update_generation_settings(db, patch.model_dump(exclude_unset=True))

@@ -62,7 +62,8 @@ def _to_response(row: DBCapture) -> CaptureResponse:
 
 async def create_capture(
     *,
-    audio_bytes: bytes,
+    audio_bytes: Optional[bytes] = None,
+    audio_file_path: Optional[Path | str] = None,
     filename: str,
     source: str,
     language: Optional[str],
@@ -73,6 +74,9 @@ async def create_capture(
     if source not in VALID_SOURCES:
         raise ValueError(f"Invalid source '{source}'. Must be one of {sorted(VALID_SOURCES)}")
 
+    if audio_bytes is None and audio_file_path is None:
+        raise ValueError("Either audio_bytes or audio_file_path must be provided")
+
     capture_id = str(uuid.uuid4())
     suffix = Path(filename).suffix.lower() or ".wav"
     if suffix not in (".wav", ".mp3", ".m4a", ".flac", ".ogg", ".webm"):
@@ -82,7 +86,11 @@ async def create_capture(
     written_files: list[Path] = []
 
     try:
-        raw_path.write_bytes(audio_bytes)
+        if audio_file_path is not None:
+            import shutil
+            shutil.copyfile(str(audio_file_path), str(raw_path))
+        else:
+            raw_path.write_bytes(audio_bytes)
         written_files.append(raw_path)
 
         # Decode once with librosa — its audioread fallback handles webm/opus
@@ -164,9 +172,8 @@ async def create_capture(
         with contextlib.suppress(Exception):
             prune_expired_captures(db, capture_settings)
     except Exception:
-        # Anything between the first write and the commit means the audio on
-        # disk has no row pointing at it — clean up so data/captures doesn't
-        # accumulate orphan blobs across failed transcribes.
+        db.rollback()
+        # Clean up any written files on disk
         for path in written_files:
             try:
                 path.unlink()
@@ -266,14 +273,28 @@ def delete_capture(capture_id: str, db: Session) -> bool:
         return False
 
     resolved = config.resolve_storage_path(row.audio_path)
-    if resolved and resolved.exists():
+    is_shared = False
+    if resolved is not None and row.audio_path:
+        is_shared = (
+            db.query(DBCapture)
+            .filter(DBCapture.audio_path == row.audio_path, DBCapture.id != capture_id)
+            .count()
+            > 0
+        )
+
+    try:
+        db.delete(row)
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
+
+    if not is_shared and resolved and resolved.exists():
         try:
             resolved.unlink()
         except OSError:
             logger.exception("Failed to remove capture audio %s", resolved)
 
-    db.delete(row)
-    db.commit()
     return True
 
 

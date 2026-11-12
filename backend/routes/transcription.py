@@ -14,6 +14,7 @@ from ..utils.tasks import get_task_manager
 router = APIRouter()
 
 UPLOAD_CHUNK_SIZE = 1024 * 1024  # 1MB
+MAX_TRANSCRIBE_SIZE = 200 * 1024 * 1024  # 200MB limit
 
 # Same set profiles.py accepts for voice samples. librosa picks its decoder from the
 # file extension, so the temp file has to keep the uploaded one.
@@ -30,10 +31,23 @@ async def transcribe_audio(
     uploaded_ext = Path(file.filename or "").suffix.lower()
     file_suffix = uploaded_ext if uploaded_ext in ALLOWED_AUDIO_EXTS else ".wav"
 
+    total_size = 0
     with tempfile.NamedTemporaryFile(suffix=file_suffix, delete=False) as tmp:
         while chunk := await file.read(UPLOAD_CHUNK_SIZE):
+            total_size += len(chunk)
+            if total_size > MAX_TRANSCRIBE_SIZE:
+                tmp.close()
+                Path(tmp.name).unlink(missing_ok=True)
+                raise HTTPException(
+                    status_code=413,
+                    detail=f"Audio file exceeds {MAX_TRANSCRIBE_SIZE // (1024 * 1024)} MB limit.",
+                )
             tmp.write(chunk)
         tmp_path = tmp.name
+
+    if total_size == 0:
+        Path(tmp_path).unlink(missing_ok=True)
+        raise HTTPException(status_code=400, detail="Uploaded audio file is empty")
 
     stt_path = tmp_path
     try:

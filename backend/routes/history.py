@@ -45,13 +45,23 @@ async def import_generation(
 ):
     """Import a generation from a ZIP archive."""
     MAX_FILE_SIZE = 50 * 1024 * 1024
+    CHUNK_SIZE = 64 * 1024
 
-    content = await file.read()
+    chunks = []
+    total_size = 0
+    while chunk := await file.read(CHUNK_SIZE):
+        total_size += len(chunk)
+        if total_size > MAX_FILE_SIZE:
+            raise HTTPException(
+                status_code=413,
+                detail=f"File too large. Maximum size is {MAX_FILE_SIZE // (1024 * 1024)}MB",
+            )
+        chunks.append(chunk)
 
-    if len(content) > MAX_FILE_SIZE:
-        raise HTTPException(
-            status_code=400, detail=f"File too large. Maximum size is {MAX_FILE_SIZE / (1024 * 1024)}MB"
-        )
+    if total_size == 0:
+        raise HTTPException(status_code=400, detail="Uploaded file is empty")
+
+    content = b"".join(chunks)
 
     try:
         result = await export_import.import_generation_from_zip(content, db)

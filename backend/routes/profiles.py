@@ -49,13 +49,23 @@ async def import_profile(
 ):
     """Import a voice profile from a ZIP archive."""
     MAX_FILE_SIZE = 100 * 1024 * 1024
+    CHUNK_SIZE = 64 * 1024
 
-    content = await file.read()
+    chunks = []
+    total_size = 0
+    while chunk := await file.read(CHUNK_SIZE):
+        total_size += len(chunk)
+        if total_size > MAX_FILE_SIZE:
+            raise HTTPException(
+                status_code=413,
+                detail=f"File too large. Maximum size is {MAX_FILE_SIZE // (1024 * 1024)}MB",
+            )
+        chunks.append(chunk)
 
-    if len(content) > MAX_FILE_SIZE:
-        raise HTTPException(
-            status_code=400, detail=f"File too large. Maximum size is {MAX_FILE_SIZE / (1024 * 1024)}MB"
-        )
+    if total_size == 0:
+        raise HTTPException(status_code=400, detail="Uploaded file is empty")
+
+    content = b"".join(chunks)
 
     try:
         profile = await export_import.import_profile_from_zip(content, db)
@@ -167,6 +177,7 @@ async def add_profile_sample(
         while chunk := await file.read(SAMPLE_UPLOAD_CHUNK_SIZE):
             total_size += len(chunk)
             if total_size > SAMPLE_MAX_FILE_SIZE:
+                tmp.close()
                 Path(tmp.name).unlink(missing_ok=True)
                 raise HTTPException(
                     status_code=413,
@@ -232,10 +243,30 @@ async def upload_profile_avatar(
     db: Session = Depends(get_db),
 ):
     """Upload or update avatar image for a profile."""
-    with tempfile.NamedTemporaryFile(delete=False, suffix=Path(file.filename or "").suffix) as tmp:
-        content = await file.read()
-        tmp.write(content)
+    MAX_AVATAR_SIZE = 10 * 1024 * 1024
+    CHUNK_SIZE = 64 * 1024
+
+    raw_ext = Path(file.filename or "").suffix.lower()
+    allowed_exts = {".png", ".jpg", ".jpeg", ".webp"}
+    file_suffix = raw_ext if raw_ext in allowed_exts else ".png"
+
+    with tempfile.NamedTemporaryFile(delete=False, suffix=file_suffix) as tmp:
+        total_size = 0
+        while chunk := await file.read(CHUNK_SIZE):
+            total_size += len(chunk)
+            if total_size > MAX_AVATAR_SIZE:
+                tmp.close()
+                Path(tmp.name).unlink(missing_ok=True)
+                raise HTTPException(
+                    status_code=413,
+                    detail=f"Avatar file exceeds {MAX_AVATAR_SIZE // (1024 * 1024)}MB limit",
+                )
+            tmp.write(chunk)
         tmp_path = tmp.name
+
+    if total_size == 0:
+        Path(tmp_path).unlink(missing_ok=True)
+        raise HTTPException(status_code=400, detail="Avatar file is empty")
 
     try:
         profile = await profiles.upload_avatar(profile_id, tmp_path, db)

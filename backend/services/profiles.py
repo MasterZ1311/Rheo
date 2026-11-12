@@ -188,9 +188,13 @@ async def create_profile(
         updated_at=datetime.utcnow(),
     )
 
-    db.add(db_profile)
-    db.commit()
-    db.refresh(db_profile)
+    try:
+        db.add(db_profile)
+        db.commit()
+        db.refresh(db_profile)
+    except Exception:
+        db.rollback()
+        raise
 
     profile_dir = config.get_profiles_dir() / db_profile.id
     profile_dir.mkdir(parents=True, exist_ok=True)
@@ -243,12 +247,16 @@ async def add_profile_sample(
         reference_text=reference_text,
     )
 
-    db.add(db_sample)
-
-    profile.updated_at = datetime.utcnow()
-
-    db.commit()
-    db.refresh(db_sample)
+    try:
+        db.add(db_sample)
+        profile.updated_at = datetime.utcnow()
+        db.commit()
+        db.refresh(db_sample)
+    except Exception:
+        db.rollback()
+        if dest_path.exists():
+            dest_path.unlink(missing_ok=True)
+        raise
 
     # Invalidate combined audio cache for this profile
     # Since a new sample was added, any cached combined audio is now stale
@@ -406,8 +414,12 @@ async def update_profile(
         profile.default_engine = data.default_engine or None  # empty string → NULL
     profile.updated_at = datetime.utcnow()
 
-    db.commit()
-    db.refresh(profile)
+    try:
+        db.commit()
+        db.refresh(profile)
+    except Exception:
+        db.rollback()
+        raise
 
     return _profile_to_response(profile)
 
@@ -430,14 +442,38 @@ async def delete_profile(
     if not profile:
         return False
 
-    db.query(DBProfileSample).filter_by(profile_id=profile_id).delete()
+    from ..database import ProfileChannelMapping, MCPClientBinding, Generation as DBGeneration, StoryItem as DBStoryItem
+    from .history import delete_generations_by_profile
 
-    db.delete(profile)
-    db.commit()
+    try:
+        # Clean up channel mappings for this profile
+        db.query(ProfileChannelMapping).filter_by(profile_id=profile_id).delete(synchronize_session=False)
 
+        # Reset any MCP client bindings pointing to this profile
+        db.query(MCPClientBinding).filter_by(profile_id=profile_id).update({"profile_id": None}, synchronize_session=False)
+
+        # Clean up story items referencing generations for this profile
+        gen_ids = [g[0] for g in db.query(DBGeneration.id).filter_by(profile_id=profile_id).all()]
+        if gen_ids:
+            db.query(DBStoryItem).filter(DBStoryItem.generation_id.in_(gen_ids)).delete(synchronize_session=False)
+
+        # Clean up generations for this profile
+        await delete_generations_by_profile(profile_id, db)
+
+        # Clean up samples
+        db.query(DBProfileSample).filter_by(profile_id=profile_id).delete(synchronize_session=False)
+
+        # Delete profile row
+        db.query(DBVoiceProfile).filter_by(id=profile_id).delete(synchronize_session=False)
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
+
+    # Only delete filesystem directory after successful DB commit
     profile_dir = config.get_profiles_dir() / profile_id
-    if profile_dir.exists():
-        shutil.rmtree(profile_dir)
+    if config.is_safe_storage_path(profile_dir) and profile_dir.exists():
+        shutil.rmtree(profile_dir, ignore_errors=True)
 
     # Clean up combined audio cache files for this profile
     clear_profile_cache(profile_id)
@@ -466,12 +502,31 @@ async def delete_profile_sample(
     # Store profile_id before deleting
     profile_id = sample.profile_id
 
-    audio_path = config.resolve_storage_path(sample.audio_path)
-    if audio_path is not None and audio_path.exists():
-        audio_path.unlink()
+    raw_audio_path = sample.audio_path
+    audio_path = config.resolve_storage_path(raw_audio_path)
 
-    db.delete(sample)
-    db.commit()
+    # Check whether other sample records share this audio file before deleting from disk
+    is_shared = False
+    if raw_audio_path:
+        is_shared = (
+            db.query(DBProfileSample)
+            .filter(DBProfileSample.audio_path == raw_audio_path, DBProfileSample.id != sample_id)
+            .count()
+            > 0
+        )
+
+    try:
+        db.delete(sample)
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
+
+    if not is_shared and audio_path is not None and audio_path.exists():
+        try:
+            audio_path.unlink()
+        except OSError:
+            logger.warning("Could not unlink sample audio %s", audio_path)
 
     # Invalidate combined audio cache for this profile
     # Since the sample set changed, any cached combined audio is now stale

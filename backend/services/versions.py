@@ -140,7 +140,7 @@ def set_default_version(version_id: str, db: Session) -> Optional[GenerationVers
 
 
 def delete_version(version_id: str, db: Session) -> bool:
-    """Delete a version. Cannot delete the last remaining version."""
+    """Delete a version atomically. Cannot delete the last remaining version."""
     version = db.query(DBGenerationVersion).filter_by(id=version_id).first()
     if not version:
         return False
@@ -156,50 +156,88 @@ def delete_version(version_id: str, db: Session) -> bool:
 
     was_default = version.is_default
     gen_id = version.generation_id
+    raw_audio_path = version.audio_path
+    audio_path = config.resolve_storage_path(raw_audio_path)
 
-    # Delete audio file
-    audio_path = config.resolve_storage_path(version.audio_path)
-    if audio_path is not None and audio_path.exists():
-        audio_path.unlink()
-
-    db.delete(version)
-    db.commit()
-
-    # If this was the default, promote the first remaining version
-    if was_default:
-        first = (
+    # Check whether other versions or generations share this audio file
+    is_shared = False
+    if raw_audio_path:
+        v_count = (
             db.query(DBGenerationVersion)
-            .filter_by(generation_id=gen_id)
-            .order_by(DBGenerationVersion.created_at)
-            .first()
+            .filter(DBGenerationVersion.audio_path == raw_audio_path, DBGenerationVersion.id != version_id)
+            .count()
         )
-        if first:
-            first.is_default = True
-            db.commit()
-            gen = db.query(DBGeneration).filter_by(id=gen_id).first()
-            if gen:
-                gen.audio_path = first.audio_path
-                db.commit()
+        g_count = (
+            db.query(DBGeneration)
+            .filter(DBGeneration.audio_path == raw_audio_path, DBGeneration.id != gen_id)
+            .count()
+        )
+        is_shared = (v_count + g_count) > 0
+
+    try:
+        db.delete(version)
+        # If this was default, promote first remaining version in the SAME transaction
+        if was_default:
+            first = (
+                db.query(DBGenerationVersion)
+                .filter(DBGenerationVersion.generation_id == gen_id, DBGenerationVersion.id != version_id)
+                .order_by(DBGenerationVersion.created_at)
+                .first()
+            )
+            if first:
+                first.is_default = True
+                gen = db.query(DBGeneration).filter_by(id=gen_id).first()
+                if gen:
+                    gen.audio_path = first.audio_path
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
+
+    # Only unlink if unshared and commit succeeded
+    if not is_shared and audio_path is not None and audio_path.exists():
+        try:
+            audio_path.unlink()
+        except OSError:
+            pass
 
     return True
 
 
-def delete_versions_for_generation(generation_id: str, db: Session) -> int:
-    """Delete all versions for a generation (used when deleting a generation)."""
+def delete_versions_for_generation(generation_id: str, db: Session, commit: bool = True) -> int:
+    """Delete all versions for a generation, deferring file unlinks until commit succeeds."""
     versions = (
         db.query(DBGenerationVersion)
         .filter_by(generation_id=generation_id)
         .all()
     )
-    count = 0
+    count = len(versions)
+    files_to_unlink = []
     for v in versions:
         audio_path = config.resolve_storage_path(v.audio_path)
         if audio_path is not None and audio_path.exists():
-            audio_path.unlink()
-        db.delete(v)
-        count += 1
+            files_to_unlink.append(audio_path)
+
     if count > 0:
-        db.commit()
+        db.query(DBGenerationVersion).filter_by(generation_id=generation_id).update(
+            {"source_version_id": None}, synchronize_session=False
+        )
+        db.query(DBGenerationVersion).filter_by(generation_id=generation_id).delete(
+            synchronize_session=False
+        )
+        db.flush()
+
+    if commit and count > 0:
+        try:
+            db.commit()
+        except Exception:
+            db.rollback()
+            raise
+        for p in files_to_unlink:
+            try:
+                p.unlink()
+            except OSError:
+                pass
     return count
 
 

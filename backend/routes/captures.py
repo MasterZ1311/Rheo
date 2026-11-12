@@ -30,20 +30,31 @@ async def create_capture_endpoint(
     stt_model: str | None = Form(None),
     db: Session = Depends(get_db),
 ):
-    """Upload audio, run STT, persist the capture."""
-    chunks = []
-    total_size = 0
-    while chunk := await file.read(UPLOAD_CHUNK_SIZE):
-        total_size += len(chunk)
-        if total_size > MAX_CAPTURE_SIZE:
-            raise HTTPException(
-                status_code=413,
-                detail=f"Uploaded file exceeds maximum size limit of {MAX_CAPTURE_SIZE // (1024 * 1024)} MB",
-            )
-        chunks.append(chunk)
-    audio_bytes = b"".join(chunks)
+    """Upload audio, run STT, persist the capture with streaming memory bounds."""
+    import tempfile
+    from pathlib import Path
 
-    if not audio_bytes:
+    suffix = Path(file.filename or "capture.wav").suffix or ".wav"
+    with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp:
+        tmp_path = Path(tmp.name)
+        total_size = 0
+        try:
+            while chunk := await file.read(64 * 1024):
+                total_size += len(chunk)
+                if total_size > MAX_CAPTURE_SIZE:
+                    raise HTTPException(
+                        status_code=413,
+                        detail=f"Uploaded file exceeds maximum size limit of {MAX_CAPTURE_SIZE // (1024 * 1024)} MB",
+                    )
+                tmp.write(chunk)
+            tmp.flush()
+        except Exception:
+            tmp.close()
+            tmp_path.unlink(missing_ok=True)
+            raise
+
+    if total_size == 0:
+        tmp_path.unlink(missing_ok=True)
         raise HTTPException(status_code=400, detail="Uploaded file is empty")
 
     saved = settings_service.get_capture_settings(db)
@@ -54,19 +65,22 @@ async def create_capture_endpoint(
         resolved_language = None if language == "auto" else language
 
     try:
-        capture = await captures_service.create_capture(
-            audio_bytes=audio_bytes,
-            filename=file.filename or "capture.wav",
-            source=source,
-            language=resolved_language,
-            stt_model=resolved_stt,
-            db=db,
-        )
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except Exception as e:
-        logger.exception("Failed to create capture")
-        raise HTTPException(status_code=500, detail=str(e))
+        try:
+            capture = await captures_service.create_capture(
+                audio_file_path=tmp_path,
+                filename=file.filename or "capture.wav",
+                source=source,
+                language=resolved_language,
+                stt_model=resolved_stt,
+                db=db,
+            )
+        except ValueError as e:
+            raise HTTPException(status_code=400, detail=str(e))
+        except Exception as e:
+            logger.exception("Failed to create capture")
+            raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        tmp_path.unlink(missing_ok=True)
 
     return models.CaptureCreateResponse(
         **capture.model_dump(),
