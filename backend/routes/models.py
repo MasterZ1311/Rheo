@@ -1,6 +1,7 @@
 """Model management endpoints."""
 
 import asyncio
+import logging
 import os
 import shutil
 from pathlib import Path
@@ -14,6 +15,9 @@ from ..utils.platform_detect import get_backend_type
 from ..services.task_queue import create_background_task
 from ..utils.progress import get_progress_manager
 from ..utils.tasks import get_task_manager
+from ..utils.auth import require_admin
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -51,6 +55,7 @@ def _copy_with_progress(src: Path, dst: Path, progress_manager, copied_so_far: i
 @router.post("/models/load")
 async def load_model(
     model_size: str = Query(default="1.7B", pattern="^(1\\.7B|0\\.6B|1B|3B)$"),
+    _admin: None = Depends(require_admin),
 ):
     """Manually load TTS model."""
     from ..services import tts
@@ -64,7 +69,7 @@ async def load_model(
 
 
 @router.post("/models/unload")
-async def unload_model():
+async def unload_model(_admin: None = Depends(require_admin)):
     """Unload the default Qwen TTS model to free memory."""
     from ..services import tts
 
@@ -76,7 +81,7 @@ async def unload_model():
 
 
 @router.post("/models/{model_name}/unload")
-async def unload_model_by_name(model_name: str):
+async def unload_model_by_name(model_name: str, _admin: None = Depends(require_admin)):
     """Unload a specific model from memory without deleting it from disk."""
     from ..backends import get_model_config, unload_model_by_config
 
@@ -115,97 +120,41 @@ async def get_model_progress(model_name: str):
 
 @router.get("/models/cache-dir")
 async def get_models_cache_dir():
-    """Get the path to the HuggingFace model cache directory."""
-    from huggingface_hub import constants as hf_constants
+    """Get the path to the active model cache directory."""
+    from ..config import get_models_cache_dir as get_cache_path
 
-    return {"path": str(Path(hf_constants.HF_HUB_CACHE))}
+    return {"path": str(get_cache_path())}
 
 
 @router.post("/models/migrate")
 async def migrate_models(request: models.ModelMigrateRequest, raw_request: Request):
     """Move all downloaded models to a new directory with byte-level progress via SSE."""
     from huggingface_hub import constants as hf_constants
-    from ..mcp_server.context import request_is_loopback
+    from ..services.model_migration import validate_migration_paths, stage_and_migrate_models
 
-    api_key = raw_request.headers.get("X-API-Key")
-    expected_key = os.environ.get("RHEO_API_KEY")
-    if not request_is_loopback() and (not expected_key or api_key != expected_key):
-        raise HTTPException(status_code=403, detail="Remote model migration requires API key")
+    require_admin(raw_request)
 
     source = Path(hf_constants.HF_HUB_CACHE)
     destination = Path(request.destination)
 
-    if not source.exists():
-        raise HTTPException(status_code=404, detail="Current model cache directory not found")
-
-    if source.resolve() == destination.resolve():
-        raise HTTPException(status_code=400, detail="Source and destination are the same directory")
-
-    if destination.resolve().is_relative_to(source.resolve()):
-        raise HTTPException(status_code=400, detail="Destination cannot be inside the current cache directory")
+    try:
+        model_dirs = validate_migration_paths(source, destination)
+    except FileNotFoundError as err:
+        raise HTTPException(status_code=404, detail=str(err)) from err
+    except ValueError as err:
+        raise HTTPException(status_code=400, detail=str(err)) from err
 
     progress_manager = get_progress_manager()
-    model_dirs = [d for d in source.iterdir() if d.name.startswith("models--") and d.is_dir()]
     if not model_dirs:
         progress_manager.update_progress("migration", 1, 1, status="complete")
         progress_manager.mark_complete("migration")
         return {"moved": 0, "errors": [], "source": str(source), "destination": str(destination)}
 
-    destination.mkdir(parents=True, exist_ok=True)
-
-    same_fs = False
-    try:
-        same_fs = source.stat().st_dev == destination.stat().st_dev
-    except OSError:
-        pass
-
     async def migrate_background():
-        moved = 0
-        errors = []
         try:
-            if same_fs:
-                total = len(model_dirs)
-                for i, item in enumerate(model_dirs):
-                    dest_item = destination / item.name
-                    try:
-                        if dest_item.exists():
-                            shutil.rmtree(dest_item)
-                        shutil.move(str(item), str(dest_item))
-                        moved += 1
-                        progress_manager.update_progress(
-                            "migration",
-                            i + 1,
-                            total,
-                            filename=item.name,
-                            status="downloading",
-                        )
-                    except Exception as e:
-                        errors.append(f"{item.name}: {str(e)}")
-            else:
-                total_bytes = sum(_get_dir_size(d) for d in model_dirs)
-                progress_manager.update_progress(
-                    "migration", 0, total_bytes, filename="Calculating...", status="downloading"
-                )
-
-                copied = 0
-                for item in model_dirs:
-                    dest_item = destination / item.name
-                    try:
-                        if dest_item.exists():
-                            shutil.rmtree(dest_item)
-                        copied = await asyncio.to_thread(
-                            _copy_with_progress, item, dest_item, progress_manager, copied, total_bytes
-                        )
-                        await asyncio.to_thread(shutil.rmtree, str(item))
-                        moved += 1
-                    except Exception as e:
-                        errors.append(f"{item.name}: {str(e)}")
-
-            progress_manager.update_progress("migration", 1, 1, status="complete")
-            progress_manager.mark_complete("migration")
+            await stage_and_migrate_models(source, destination, progress_manager)
         except Exception as e:
-            progress_manager.update_progress("migration", 0, 0, status="error")
-            progress_manager.mark_error("migration", str(e))
+            logger.error("Background model migration failed: %s", e)
 
     create_background_task(migrate_background())
 
@@ -253,10 +202,12 @@ async def get_model_status():
         use_scan_cache = False
 
     from ..backends import get_all_model_configs, check_model_loaded
+    from ..services.model_verification import verify_model_cache
 
     registry_configs = get_all_model_configs()
     model_configs = [
         {
+            "config": cfg,
             "model_name": cfg.model_name,
             "display_name": cfg.display_name,
             "hf_repo_id": cfg.hf_repo_id,
@@ -362,15 +313,28 @@ async def get_model_status():
                 downloaded = False
                 size_mb = None
 
+            cfg = config["config"]
+            if downloaded:
+                is_valid, _ = verify_model_cache(cfg.hf_repo_id, expected_sha256=cfg.sha256_checksums or None)
+                if not is_valid:
+                    downloaded = False
+
             statuses.append(
                 models.ModelStatus(
-                    model_name=config["model_name"],
-                    display_name=config["display_name"],
-                    hf_repo_id=config["hf_repo_id"],
+                    model_name=cfg.model_name,
+                    display_name=cfg.display_name,
+                    hf_repo_id=cfg.hf_repo_id,
                     downloaded=downloaded,
                     downloading=is_downloading,
-                    size_mb=size_mb,
+                    size_mb=size_mb or (cfg.size_mb if downloaded else None),
                     loaded=loaded,
+                    engine=cfg.engine,
+                    description=cfg.description,
+                    version=cfg.version,
+                    required_disk_mb=cfg.required_disk_mb,
+                    supported_hardware=cfg.supported_hardware,
+                    dependencies=cfg.dependencies,
+                    languages=cfg.languages,
                 )
             )
         except Exception:
@@ -380,6 +344,7 @@ async def get_model_status():
                 loaded = False
 
             is_downloading = config["hf_repo_id"] in active_download_repos
+            cfg = config.get("config")
 
             statuses.append(
                 models.ModelStatus(
@@ -390,6 +355,13 @@ async def get_model_status():
                     downloading=is_downloading,
                     size_mb=None,
                     loaded=loaded,
+                    engine=cfg.engine if cfg else None,
+                    description=cfg.description if cfg else None,
+                    version=cfg.version if cfg else "main",
+                    required_disk_mb=cfg.required_disk_mb if cfg else None,
+                    supported_hardware=cfg.supported_hardware if cfg else [],
+                    dependencies=cfg.dependencies if cfg else [],
+                    languages=cfg.languages if cfg else [],
                 )
             )
 
@@ -398,8 +370,10 @@ async def get_model_status():
 
 @router.post("/models/download")
 async def trigger_model_download(request: models.ModelDownloadRequest):
-    """Trigger download of a specific model."""
+    """Trigger download of a specific model with pre-flight checks."""
     from ..backends import get_model_config, get_model_load_func
+    from ..config import get_models_cache_dir
+    from ..services.model_verification import verify_model_by_name
 
     task_manager = get_task_manager()
     progress_manager = get_progress_manager()
@@ -408,6 +382,38 @@ async def trigger_model_download(request: models.ModelDownloadRequest):
     if not config:
         raise HTTPException(status_code=400, detail=f"Unknown model: {request.model_name}")
 
+    # Check if download is already in progress
+    if task_manager.is_download_active(request.model_name):
+        raise HTTPException(
+            status_code=409,
+            detail=f"Download already in progress for {request.model_name}",
+        )
+
+    # Check if model is already downloaded and verified
+    is_valid, _ = verify_model_by_name(request.model_name)
+    if is_valid:
+        return {"message": f"Model {request.model_name} is already downloaded and verified"}
+
+    # Pre-flight disk space check
+    cache_dir = get_models_cache_dir()
+    required_mb = config.required_disk_mb or config.size_mb or 500
+    try:
+        check_path = cache_dir if cache_dir.exists() else cache_dir.parent
+        free_bytes = shutil.disk_usage(check_path).free
+        free_mb = free_bytes / (1024 * 1024)
+        if free_mb < required_mb:
+            raise HTTPException(
+                status_code=400,
+                detail=(
+                    f"Insufficient disk space for {config.display_name}. "
+                    f"Required: {required_mb} MB, Available: {int(free_mb)} MB."
+                ),
+            )
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.warning("Could not check disk usage before download: %s", e)
+
     load_func = get_model_load_func(config)
 
     async def download_in_background():
@@ -415,9 +421,21 @@ async def trigger_model_download(request: models.ModelDownloadRequest):
             result = load_func()
             if asyncio.iscoroutine(result):
                 await result
+            # Verify downloaded model integrity
+            valid, err = verify_model_by_name(request.model_name)
+            if not valid:
+                raise RuntimeError(f"Model integrity verification failed: {err}")
             task_manager.complete_download(request.model_name)
+            progress_manager.mark_complete(request.model_name)
+        except asyncio.CancelledError:
+            logger.info("Download cancelled for %s", request.model_name)
+            task_manager.cancel_download(request.model_name)
+            progress_manager.mark_error(request.model_name, "Download cancelled")
+            raise
         except Exception as e:
+            logger.error("Download failed for %s: %s", request.model_name, e)
             task_manager.error_download(request.model_name, str(e))
+            progress_manager.mark_error(request.model_name, str(e))
 
     task_manager.start_download(request.model_name)
 
@@ -429,14 +447,15 @@ async def trigger_model_download(request: models.ModelDownloadRequest):
         status="downloading",
     )
 
-    create_background_task(download_in_background())
+    task = create_background_task(download_in_background())
+    task_manager.register_download_task(request.model_name, task)
 
     return {"message": f"Model {request.model_name} download started"}
 
 
 @router.post("/models/download/cancel")
 async def cancel_model_download(request: models.ModelDownloadRequest):
-    """Cancel or dismiss an errored/stale download task."""
+    """Cancel or dismiss an active or errored download task."""
     task_manager = get_task_manager()
     progress_manager = get_progress_manager()
 
@@ -445,6 +464,9 @@ async def cancel_model_download(request: models.ModelDownloadRequest):
     progress_removed = False
     with progress_manager._lock:
         if request.model_name in progress_manager._progress:
+            progress_manager._speed_bps.pop(request.model_name, None)
+            progress_manager._last_bytes.pop(request.model_name, None)
+            progress_manager._last_bytes_time.pop(request.model_name, None)
             del progress_manager._progress[request.model_name]
             progress_removed = True
 
@@ -454,7 +476,7 @@ async def cancel_model_download(request: models.ModelDownloadRequest):
 
 
 @router.delete("/models/{model_name}")
-async def delete_model(model_name: str):
+async def delete_model(model_name: str, _admin: None = Depends(require_admin)):
     """Delete a downloaded model from the HuggingFace cache."""
     from huggingface_hub import constants as hf_constants
     from ..backends import get_model_config, unload_model_by_config
