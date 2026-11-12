@@ -12,6 +12,7 @@ and a model config registry that eliminates per-engine dispatch maps.
 # HF_HUB_OFFLINE=1 and on network failures.
 from ..utils import hf_offline_patch  # noqa: F401
 
+import asyncio
 import threading
 from dataclasses import dataclass, field
 from typing import Protocol, Optional, Tuple, List
@@ -59,6 +60,16 @@ class ModelConfig:
     retries_runaway: bool = False
     supports_instruct: bool = False
     languages: list[str] = field(default_factory=lambda: ["en"])
+    description: str = ""
+    version: str = "main"
+    required_disk_mb: int = 0
+    supported_hardware: list[str] = field(default_factory=lambda: ["cpu", "cuda", "rocm", "mlx"])
+    dependencies: list[str] = field(default_factory=list)
+    sha256_checksums: dict[str, str] = field(default_factory=dict)
+
+    def __post_init__(self):
+        if not self.required_disk_mb and self.size_mb:
+            self.required_disk_mb = int(self.size_mb * 1.25) + 100
 
 
 @runtime_checkable
@@ -249,6 +260,10 @@ def _get_qwen_model_configs() -> list[ModelConfig]:
             retries_runaway=retries_runaway,
             supports_instruct=False,  # Base model drops instruct silently
             languages=["zh", "en", "ja", "ko", "de", "fr", "ru", "pt", "es", "it"],
+            description="Qwen3 TTS base model with 1.7B parameters for expressive multilingual speech synthesis.",
+            version="main",
+            supported_hardware=["cpu", "cuda", "rocm", "mlx"],
+            dependencies=["transformers", "torch", "accelerate"],
         ),
         ModelConfig(
             model_name="qwen-tts-0.6B",
@@ -260,6 +275,10 @@ def _get_qwen_model_configs() -> list[ModelConfig]:
             retries_runaway=retries_runaway,
             supports_instruct=False,
             languages=["zh", "en", "ja", "ko", "de", "fr", "ru", "pt", "es", "it"],
+            description="Qwen3 TTS lightweight base model with 0.6B parameters, optimized for faster inference.",
+            version="main",
+            supported_hardware=["cpu", "cuda", "rocm", "mlx"],
+            dependencies=["transformers", "torch", "accelerate"],
         ),
     ]
 
@@ -276,6 +295,10 @@ def _get_qwen_custom_voice_configs() -> list[ModelConfig]:
             size_mb=3500,
             supports_instruct=True,
             languages=["zh", "en", "ja", "ko", "de", "fr", "ru", "pt", "es", "it"],
+            description="Qwen3 CustomVoice 1.7B parameter model supporting natural style and instruction control.",
+            version="main",
+            supported_hardware=["cpu", "cuda", "rocm", "mlx"],
+            dependencies=["transformers", "torch", "accelerate"],
         ),
         ModelConfig(
             model_name="qwen-custom-voice-0.6B",
@@ -286,6 +309,10 @@ def _get_qwen_custom_voice_configs() -> list[ModelConfig]:
             size_mb=1200,
             supports_instruct=True,
             languages=["zh", "en", "ja", "ko", "de", "fr", "ru", "pt", "es", "it"],
+            description="Qwen3 CustomVoice 0.6B lightweight model supporting natural style and instruction control.",
+            version="main",
+            supported_hardware=["cpu", "cuda", "rocm", "mlx"],
+            dependencies=["transformers", "torch", "accelerate"],
         ),
     ]
 
@@ -303,6 +330,10 @@ def _get_non_qwen_tts_configs() -> list[ModelConfig]:
             hf_repo_id="YatharthS/LuxTTS",
             size_mb=300,
             languages=["en"],
+            description="Ultra-fast, lightweight CPU-friendly TTS model designed for real-time local synthesis.",
+            version="main",
+            supported_hardware=["cpu", "cuda", "rocm", "mlx"],
+            dependencies=["torch", "torchaudio"],
         ),
         ModelConfig(
             model_name="chatterbox-tts",
@@ -336,6 +367,10 @@ def _get_non_qwen_tts_configs() -> list[ModelConfig]:
                 "sw",
                 "tr",
             ],
+            description="Multilingual conversational voice cloning TTS model by Resemble AI.",
+            version="main",
+            supported_hardware=["cpu", "cuda", "rocm", "mlx"],
+            dependencies=["chatterbox-tts", "torch"],
         ),
         ModelConfig(
             model_name="chatterbox-turbo",
@@ -345,6 +380,10 @@ def _get_non_qwen_tts_configs() -> list[ModelConfig]:
             size_mb=1500,
             needs_trim=True,
             languages=["en"],
+            description="Low-latency English TTS model supporting emotional pacing and tone tags.",
+            version="main",
+            supported_hardware=["cpu", "cuda", "rocm", "mlx"],
+            dependencies=["chatterbox-tts", "torch"],
         ),
         ModelConfig(
             model_name="tada-1b",
@@ -354,6 +393,10 @@ def _get_non_qwen_tts_configs() -> list[ModelConfig]:
             model_size="1B",
             size_mb=4000,
             languages=["en"],
+            description="Hume AI TADA 1B parameter expressive speech generation model.",
+            version="main",
+            supported_hardware=["cuda", "rocm", "mlx", "cpu"],
+            dependencies=["tada", "torch"],
         ),
         ModelConfig(
             model_name="tada-3b-ml",
@@ -363,6 +406,10 @@ def _get_non_qwen_tts_configs() -> list[ModelConfig]:
             model_size="3B",
             size_mb=8000,
             languages=["en", "ar", "zh", "de", "es", "fr", "it", "ja", "pl", "pt"],
+            description="Hume AI TADA 3B parameter multilingual expressive speech generation model.",
+            version="main",
+            supported_hardware=["cuda", "rocm", "mlx", "cpu"],
+            dependencies=["tada", "torch"],
         ),
         ModelConfig(
             model_name="kokoro",
@@ -371,12 +418,18 @@ def _get_non_qwen_tts_configs() -> list[ModelConfig]:
             hf_repo_id="hexgrad/Kokoro-82M",
             size_mb=350,
             languages=["en", "es", "fr", "hi", "it", "pt", "ja", "zh"],
+            description="Compact 82M parameter high-fidelity TTS model with multi-accent support.",
+            version="main",
+            supported_hardware=["cpu", "cuda", "rocm", "mlx"],
+            dependencies=["kokoro", "soundfile"],
         ),
     ]
 
 
 def _get_whisper_configs() -> list[ModelConfig]:
     """Return Whisper STT model configs."""
+    whisper_langs = ["en", "zh", "ja", "ko", "de", "fr", "ru", "pt", "es", "it"]
+    whisper_deps = ["transformers", "torch"]
     return [
         ModelConfig(
             model_name="whisper-base",
@@ -384,6 +437,12 @@ def _get_whisper_configs() -> list[ModelConfig]:
             engine="whisper",
             hf_repo_id="openai/whisper-base",
             model_size="base",
+            size_mb=140,
+            languages=whisper_langs,
+            description="OpenAI Whisper Base speech recognition model (39M parameters).",
+            version="main",
+            supported_hardware=["cpu", "cuda", "rocm", "mlx"],
+            dependencies=whisper_deps,
         ),
         ModelConfig(
             model_name="whisper-small",
@@ -391,6 +450,12 @@ def _get_whisper_configs() -> list[ModelConfig]:
             engine="whisper",
             hf_repo_id="openai/whisper-small",
             model_size="small",
+            size_mb=460,
+            languages=whisper_langs,
+            description="OpenAI Whisper Small speech recognition model (244M parameters).",
+            version="main",
+            supported_hardware=["cpu", "cuda", "rocm", "mlx"],
+            dependencies=whisper_deps,
         ),
         ModelConfig(
             model_name="whisper-medium",
@@ -398,6 +463,12 @@ def _get_whisper_configs() -> list[ModelConfig]:
             engine="whisper",
             hf_repo_id="openai/whisper-medium",
             model_size="medium",
+            size_mb=1500,
+            languages=whisper_langs,
+            description="OpenAI Whisper Medium speech recognition model (769M parameters).",
+            version="main",
+            supported_hardware=["cpu", "cuda", "rocm", "mlx"],
+            dependencies=whisper_deps,
         ),
         ModelConfig(
             model_name="whisper-large",
@@ -405,6 +476,12 @@ def _get_whisper_configs() -> list[ModelConfig]:
             engine="whisper",
             hf_repo_id="openai/whisper-large-v3",
             model_size="large",
+            size_mb=3000,
+            languages=whisper_langs,
+            description="OpenAI Whisper Large v3 speech recognition model (1550M parameters).",
+            version="main",
+            supported_hardware=["cpu", "cuda", "rocm", "mlx"],
+            dependencies=whisper_deps,
         ),
         ModelConfig(
             model_name="whisper-turbo",
@@ -412,6 +489,12 @@ def _get_whisper_configs() -> list[ModelConfig]:
             engine="whisper",
             hf_repo_id="openai/whisper-large-v3-turbo",
             model_size="turbo",
+            size_mb=1600,
+            languages=whisper_langs,
+            description="OpenAI Whisper Large v3 Turbo fast speech recognition model.",
+            version="main",
+            supported_hardware=["cpu", "cuda", "rocm", "mlx"],
+            dependencies=whisper_deps,
         ),
     ]
 
@@ -435,6 +518,7 @@ def _get_qwen_llm_configs() -> list[ModelConfig]:
     common_languages = [
         "en", "zh", "ja", "ko", "de", "fr", "ru", "pt", "es", "it",
     ]
+    llm_deps = ["transformers", "torch", "accelerate"]
 
     return [
         ModelConfig(
@@ -445,6 +529,10 @@ def _get_qwen_llm_configs() -> list[ModelConfig]:
             model_size="0.6B",
             size_mb=400 if backend_type == "mlx" else 1400,
             languages=common_languages,
+            description="Qwen3 0.6B lightweight language model for prompt refinement and chat.",
+            version="main",
+            supported_hardware=["cpu", "cuda", "rocm", "mlx"],
+            dependencies=llm_deps,
         ),
         ModelConfig(
             model_name="qwen3-1.7b",
@@ -454,6 +542,10 @@ def _get_qwen_llm_configs() -> list[ModelConfig]:
             model_size="1.7B",
             size_mb=1100 if backend_type == "mlx" else 3500,
             languages=common_languages,
+            description="Qwen3 1.7B versatile language model for prompt refinement and chat.",
+            version="main",
+            supported_hardware=["cpu", "cuda", "rocm", "mlx"],
+            dependencies=llm_deps,
         ),
         ModelConfig(
             model_name="qwen3-4b",
@@ -463,6 +555,10 @@ def _get_qwen_llm_configs() -> list[ModelConfig]:
             model_size="4B",
             size_mb=2500 if backend_type == "mlx" else 8000,
             languages=common_languages,
+            description="Qwen3 4B high-capability language model for prompt refinement and chat.",
+            version="main",
+            supported_hardware=["cpu", "cuda", "rocm", "mlx"],
+            dependencies=llm_deps,
         ),
     ]
 
@@ -526,15 +622,26 @@ def engine_has_model_sizes(engine: str) -> bool:
     return len(configs) > 1
 
 
+_model_load_async_lock: Optional[asyncio.Lock] = None
+
+
+def _get_model_load_lock() -> asyncio.Lock:
+    global _model_load_async_lock
+    if _model_load_async_lock is None:
+        _model_load_async_lock = asyncio.Lock()
+    return _model_load_async_lock
+
+
 async def load_engine_model(engine: str, model_size: str = "default") -> None:
-    """Load a model for the given engine, handling engines with multiple model sizes."""
-    backend = get_tts_backend_for_engine(engine)
-    if engine in ("qwen", "qwen_custom_voice"):
-        await backend.load_model_async(model_size)
-    elif engine == "tada":
-        await backend.load_model(model_size)
-    else:
-        await backend.load_model()
+    """Load a model for the given engine, serializing simultaneous model loads."""
+    async with _get_model_load_lock():
+        backend = get_tts_backend_for_engine(engine)
+        if engine in ("qwen", "qwen_custom_voice"):
+            await backend.load_model_async(model_size)
+        elif engine == "tada":
+            await backend.load_model(model_size)
+        else:
+            await backend.load_model()
 
 
 async def ensure_model_cached_or_raise(engine: str, model_size: str = "default") -> None:

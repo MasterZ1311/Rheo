@@ -83,6 +83,8 @@ async def get_active_tasks():
                     current=prog.get("current"),
                     total=prog.get("total"),
                     filename=prog.get("filename"),
+                    speed_bps=prog.get("speed_bps"),
+                    eta_seconds=prog.get("eta_seconds"),
                 )
             )
         elif progress:
@@ -105,6 +107,8 @@ async def get_active_tasks():
                     current=progress.get("current"),
                     total=progress.get("total"),
                     filename=progress.get("filename"),
+                    speed_bps=progress.get("speed_bps"),
+                    eta_seconds=progress.get("eta_seconds"),
                 )
             )
 

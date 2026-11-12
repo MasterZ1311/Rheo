@@ -135,20 +135,37 @@ async def run_generation(
         )
 
     except asyncio.CancelledError:
+        clean_path = config.get_generations_dir() / f"{generation_id}.wav"
+        if clean_path.exists():
+            clean_path.unlink(missing_ok=True)
         await history.update_generation_status(
             generation_id=generation_id,
-            status="failed",
+            status="cancelled",
             db=bg_db,
             error="Generation cancelled",
         )
         _notify_speak_end(generation_id, status="cancelled")
     except Exception as e:
-        traceback.print_exc()
+        clean_path = config.get_generations_dir() / f"{generation_id}.wav"
+        if clean_path.exists():
+            clean_path.unlink(missing_ok=True)
+        is_oom = "out of memory" in str(e).lower() or "cuda oom" in str(e).lower()
+        if is_oom:
+            try:
+                from ..backends.base import empty_device_cache
+                from ..utils.platform_detect import get_torch_device
+                empty_device_cache(get_torch_device())
+            except Exception:
+                pass
+            err_msg = "GPU out of memory during generation. Try a smaller model size (e.g. 0.6B) or shorter text chunks."
+        else:
+            traceback.print_exc()
+            err_msg = str(e)
         await history.update_generation_status(
             generation_id=generation_id,
             status="failed",
             db=bg_db,
-            error=str(e),
+            error=err_msg,
         )
         _notify_speak_end(generation_id, status="failed")
     else:

@@ -27,6 +27,9 @@ class ProgressManager:
         self._main_loop: Optional[asyncio.AbstractEventLoop] = None
         self._last_notify_time: Dict[str, float] = {}  # Last notification time per model
         self._last_notify_progress: Dict[str, float] = {}  # Last notified progress per model
+        self._last_bytes: Dict[str, int] = {}
+        self._last_bytes_time: Dict[str, float] = {}
+        self._speed_bps: Dict[str, float] = {}
     
     def _set_main_loop(self, loop: asyncio.AbstractEventLoop):
         """Set the main event loop for thread-safe operations."""
@@ -98,6 +101,30 @@ class ProgressManager:
         else:
             progress_pct = 0
 
+        # Calculate download speed and ETA
+        current_time = time.time()
+        last_bytes = self._last_bytes.get(model_name, 0)
+        last_b_time = self._last_bytes_time.get(model_name, current_time)
+        byte_time_delta = current_time - last_b_time
+
+        speed_bps = self._speed_bps.get(model_name, 0.0)
+        if byte_time_delta >= 0.5 and current >= last_bytes:
+            instant_speed = (current - last_bytes) / byte_time_delta
+            if speed_bps > 0:
+                speed_bps = 0.7 * speed_bps + 0.3 * instant_speed
+            else:
+                speed_bps = instant_speed
+            self._speed_bps[model_name] = speed_bps
+            self._last_bytes[model_name] = current
+            self._last_bytes_time[model_name] = current_time
+        elif model_name not in self._last_bytes_time:
+            self._last_bytes[model_name] = current
+            self._last_bytes_time[model_name] = current_time
+
+        eta_seconds = None
+        if speed_bps > 1024 and total > current:
+            eta_seconds = int((total - current) / speed_bps)
+
         progress_data = {
             "model_name": model_name,
             "current": current,
@@ -105,6 +132,8 @@ class ProgressManager:
             "progress": progress_pct,
             "filename": filename,
             "status": status,
+            "speed_bps": round(speed_bps, 2) if speed_bps > 0 else None,
+            "eta_seconds": eta_seconds,
             "timestamp": datetime.now().isoformat(),
         }
 
@@ -262,9 +291,14 @@ class ProgressManager:
         logger = logging.getLogger(__name__)
 
         with self._lock:
+            self._speed_bps.pop(model_name, None)
+            self._last_bytes.pop(model_name, None)
+            self._last_bytes_time.pop(model_name, None)
             if model_name in self._progress:
                 self._progress[model_name]["status"] = "complete"
                 self._progress[model_name]["progress"] = 100.0
+                self._progress[model_name]["speed_bps"] = None
+                self._progress[model_name]["eta_seconds"] = None
                 progress_data = self._progress[model_name].copy()
             else:
                 logger.warning(f"Cannot mark {model_name} as complete: not found in progress")
@@ -280,9 +314,14 @@ class ProgressManager:
         logger = logging.getLogger(__name__)
 
         with self._lock:
+            self._speed_bps.pop(model_name, None)
+            self._last_bytes.pop(model_name, None)
+            self._last_bytes_time.pop(model_name, None)
             if model_name in self._progress:
                 self._progress[model_name]["status"] = "error"
                 self._progress[model_name]["error"] = error
+                self._progress[model_name]["speed_bps"] = None
+                self._progress[model_name]["eta_seconds"] = None
                 progress_data = self._progress[model_name].copy()
             else:
                 # Create new progress entry for error
@@ -294,6 +333,8 @@ class ProgressManager:
                     "filename": None,
                     "status": "error",
                     "error": error,
+                    "speed_bps": None,
+                    "eta_seconds": None,
                     "timestamp": datetime.now().isoformat(),
                 }
                 self._progress[model_name] = progress_data

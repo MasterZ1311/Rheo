@@ -21,7 +21,12 @@ def get_tts_model() -> TTSBackend:
 
 
 def unload_tts_model():
-    """Unload TTS model to free memory."""
+    """Unload TTS model to free memory, avoiding crash if generation is active."""
+    from . import task_queue
+    if getattr(task_queue, "_running_generation_tasks", None):
+        import logging
+        logging.getLogger(__name__).warning("Skipping TTS model unload: generation task currently active")
+        return
     backend = get_tts_backend()
     backend.unload_model()
 

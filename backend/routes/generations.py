@@ -5,7 +5,8 @@ import logging
 import uuid
 from pathlib import Path
 
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile
+import hashlib
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 
@@ -53,14 +54,38 @@ def _resolve_generation_engine(data: models.GenerationRequest, profile) -> str:
     return data.engine or getattr(profile, "default_engine", None) or getattr(profile, "preset_engine", None) or "qwen"
 
 
+def compute_generation_fingerprint(
+    profile_id: str,
+    text: str,
+    engine: str,
+    language: str,
+    seed: int | None = None,
+    instruct: str | None = None,
+    mode: str = "generate",
+    idempotency_key: str | None = None,
+) -> str:
+    """Compute an idempotency fingerprint to detect and deduplicate identical submissions."""
+    if idempotency_key:
+        return f"idemp:{idempotency_key}"
+    raw = f"{profile_id}|{text.strip()}|{engine}|{language}|{seed}|{instruct or ''}|{mode}"
+    return hashlib.sha256(raw.encode("utf-8")).hexdigest()
+
 @router.post("/generate", response_model=models.GenerationResponse)
 async def generate_speech(
     data: models.GenerationRequest,
+    request: Request = None,
     db: Session = Depends(get_db),
 ):
-    """Generate speech from text using a voice profile."""
+    """Generate speech from text using a voice profile with duplicate job protection."""
+    from ..services import task_queue
+
+    if task_queue.is_queue_full():
+        raise HTTPException(
+            status_code=429,
+            detail="Generation queue is at maximum capacity. Please try again later.",
+        )
+
     task_manager = get_task_manager()
-    generation_id = str(uuid.uuid4())
 
     profile = await profiles.get_profile(data.profile_id, db)
     if not profile:
@@ -88,6 +113,31 @@ async def generate_speech(
             raise HTTPException(status_code=500, detail="LLM produced empty output; nothing to speak.")
         source = "personality_speak"
 
+    # Compute idempotency fingerprint for deduplication
+    idempotency_key = None
+    if request is not None and hasattr(request, "headers"):
+        idempotency_key = request.headers.get("Idempotency-Key") or request.headers.get("X-Idempotency-Key")
+
+    fingerprint = compute_generation_fingerprint(
+        profile_id=data.profile_id,
+        text=text,
+        engine=engine,
+        language=data.language or "en",
+        seed=data.seed,
+        instruct=data.instruct,
+        mode="generate",
+        idempotency_key=idempotency_key,
+    )
+
+    # Return existing generation if duplicate active job detected
+    existing_job = task_queue.get_active_job_by_fingerprint(fingerprint, max_age_seconds=10.0)
+    if existing_job:
+        existing_gen = db.query(DBGeneration).filter_by(id=existing_job.generation_id).first()
+        if existing_gen:
+            logger.info("Deduplicating identical generation request (reusing active job %s)", existing_job.generation_id)
+            return existing_gen
+
+    generation_id = str(uuid.uuid4())
     generation = await history.create_generation(
         profile_id=data.profile_id,
         text=text,
@@ -123,24 +173,36 @@ async def generate_speech(
             except Exception:
                 pass
 
-    enqueue_generation(
-        generation_id,
-        run_generation(
-            generation_id=generation_id,
-            profile_id=data.profile_id,
-            text=text,
-            language=data.language,
-            engine=engine,
-            model_size=model_size,
-            seed=data.seed,
-            normalize=data.normalize,
-            effects_chain=effects_chain_config,
-            instruct=data.instruct,
-            mode="generate",
-            max_chunk_chars=data.max_chunk_chars,
-            crossfade_ms=data.crossfade_ms,
+    try:
+        enqueue_generation(
+            generation_id,
+            run_generation(
+                generation_id=generation_id,
+                profile_id=data.profile_id,
+                text=text,
+                language=data.language,
+                engine=engine,
+                model_size=model_size,
+                seed=data.seed,
+                normalize=data.normalize,
+                effects_chain=effects_chain_config,
+                instruct=data.instruct,
+                mode="generate",
+                max_chunk_chars=data.max_chunk_chars,
+                crossfade_ms=data.crossfade_ms,
+            ),
+            fingerprint=fingerprint,
         )
-    )
+    except ValueError as err:
+        db.query(DBGeneration).filter_by(id=generation_id).delete(synchronize_session=False)
+        db.commit()
+        task_manager.complete_generation(generation_id)
+        raise HTTPException(status_code=429, detail=str(err))
+    except RuntimeError as err:
+        db.query(DBGeneration).filter_by(id=generation_id).delete(synchronize_session=False)
+        db.commit()
+        task_manager.complete_generation(generation_id)
+        raise HTTPException(status_code=503, detail=str(err))
 
     return generation
 
@@ -239,37 +301,28 @@ async def cancel_generation(generation_id: str, db: Session = Depends(get_db)):
     if not gen:
         raise HTTPException(status_code=404, detail="Generation not found")
 
-    if (gen.status or "completed") not in ("loading_model", "generating"):
+    if (gen.status or "completed") not in ("loading_model", "generating", "queued"):
         raise HTTPException(status_code=400, detail="Only active generations can be cancelled")
 
-    cancellation_state = cancel_generation_job(generation_id)
-    if cancellation_state is None:
-        # Row says active but the worker is no longer tracking it — the gen
-        # coroutine exited without writing a terminal status (most often a
-        # SQLite lock racing with the failed-status write inside the worker's
-        # exception handler). Fail the row here so the user can move on.
-        task_manager = get_task_manager()
-        task_manager.complete_generation(generation_id)
-        await history.update_generation_status(
-            generation_id=generation_id,
-            status="failed",
-            db=db,
-            error="Generation orphaned by worker",
-        )
-        return {"message": "Orphaned generation cleared"}
+    from ..services.task_queue import cancel_generation_and_await
+    from ..services.generation import _notify_speak_end
 
-    if cancellation_state == "queued":
-        task_manager = get_task_manager()
-        task_manager.complete_generation(generation_id)
-        await history.update_generation_status(
-            generation_id=generation_id,
-            status="failed",
-            db=db,
-            error="Generation cancelled",
-        )
-        return {"message": "Queued generation cancelled"}
+    cancellation_state = await cancel_generation_and_await(generation_id, timeout=3.0)
 
-    return {"message": "Generation cancellation requested"}
+    task_manager = get_task_manager()
+    task_manager.complete_generation(generation_id)
+    await history.update_generation_status(
+        generation_id=generation_id,
+        status="cancelled",
+        db=db,
+        error="Generation cancelled",
+    )
+    _notify_speak_end(generation_id, status="cancelled")
+
+    return {
+        "message": f"Generation {cancellation_state or 'active'} cancelled successfully",
+        "status": "cancelled",
+    }
 
 
 @router.get("/generate/{generation_id}/status")
@@ -297,7 +350,7 @@ async def get_generation_status(generation_id: str, db: Session = Depends(get_db
                 }
                 yield f"data: {json.dumps(payload)}\n\n"
 
-                if (gen.status or "completed") in ("completed", "failed"):
+                if (gen.status or "completed") in ("completed", "failed", "cancelled"):
                     return
 
                 await asyncio.sleep(1)

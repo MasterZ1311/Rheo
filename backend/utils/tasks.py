@@ -3,6 +3,7 @@ Task tracking for active downloads and generations.
 """
 
 from typing import Optional, Dict, List
+import asyncio
 from datetime import datetime
 from dataclasses import dataclass, field
 
@@ -30,8 +31,13 @@ class TaskManager:
     
     def __init__(self):
         self._active_downloads: Dict[str, DownloadTask] = {}
+        self._download_asyncio_tasks: Dict[str, asyncio.Task] = {}
         self._active_generations: Dict[str, GenerationTask] = {}
     
+    def register_download_task(self, model_name: str, task: asyncio.Task) -> None:
+        """Register the underlying asyncio.Task for cancellation handling."""
+        self._download_asyncio_tasks[model_name] = task
+
     def start_download(self, model_name: str) -> None:
         """Mark a download as started."""
         self._active_downloads[model_name] = DownloadTask(
@@ -41,11 +47,13 @@ class TaskManager:
     
     def complete_download(self, model_name: str) -> None:
         """Mark a download as complete."""
+        self._download_asyncio_tasks.pop(model_name, None)
         if model_name in self._active_downloads:
             del self._active_downloads[model_name]
     
     def error_download(self, model_name: str, error: str) -> None:
         """Mark a download as failed."""
+        self._download_asyncio_tasks.pop(model_name, None)
         if model_name in self._active_downloads:
             self._active_downloads[model_name].status = "error"
             self._active_downloads[model_name].error = error
@@ -86,11 +94,18 @@ class TaskManager:
         return list(self._active_generations.values())
     
     def cancel_download(self, model_name: str) -> bool:
-        """Cancel/dismiss a download task (removes it from active list)."""
+        """Cancel/dismiss a download task (cancels running asyncio task and removes from active list)."""
+        asyncio_task = self._download_asyncio_tasks.pop(model_name, None)
+        if asyncio_task and not asyncio_task.done():
+            asyncio_task.cancel()
         return self._active_downloads.pop(model_name, None) is not None
 
     def clear_all(self) -> None:
         """Clear all download and generation tasks."""
+        for task in self._download_asyncio_tasks.values():
+            if not task.done():
+                task.cancel()
+        self._download_asyncio_tasks.clear()
         self._active_downloads.clear()
         self._active_generations.clear()
 
