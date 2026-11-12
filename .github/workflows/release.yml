@@ -203,7 +203,7 @@ jobs:
       # Cap the step at 30 min so we get logs instead of waiting out the 6hr
       # job timeout. Other platforms historically complete in ~25 min, so 45
       # is comfortable.
-      - uses: tauri-apps/tauri-action@v0.6
+      - uses: tauri-apps/tauri-action@v1
         timeout-minutes: ${{ (contains(matrix.platform, 'ubuntu') || contains(matrix.platform, 'namespace')) && 30 || 45 }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
