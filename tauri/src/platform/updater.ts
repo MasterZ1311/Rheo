@@ -20,7 +20,9 @@ class TauriUpdater implements PlatformUpdater {
   private subscribers: Set<(status: UpdateStatus) => void> = new Set();
 
   private notifySubscribers() {
-    this.subscribers.forEach((callback) => callback(this.status));
+    this.subscribers.forEach((callback) => {
+      callback(this.status);
+    });
   }
 
   subscribe(callback: (status: UpdateStatus) => void): () => void {
