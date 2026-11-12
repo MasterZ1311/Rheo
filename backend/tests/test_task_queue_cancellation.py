@@ -5,6 +5,15 @@ import pytest
 from backend.services import task_queue
 
 
+@pytest.fixture(autouse=True)
+async def cleanup_queue():
+    """Ensure generation queue and worker are gracefully shut down after each test."""
+    try:
+        yield
+    finally:
+        await task_queue.shutdown_queue(grace_period=0.1)
+
+
 @pytest.mark.asyncio
 async def test_cancel_queued_generation_skips_execution():
     task_queue.init_queue(force=True)

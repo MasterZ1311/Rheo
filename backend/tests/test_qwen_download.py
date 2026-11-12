@@ -72,7 +72,7 @@ async def monitor_sse_stream(model_name: str, timeout: int = 600) -> List[Dict]:
                             # Stop if complete or error
                             if status in ("complete", "error"):
                                 if status == "complete":
-                                    print(f"   ✅ Download complete!")
+                                    print("   ✅ Download complete!")
                                 else:
                                     print(f"   ❌ Download error: {data.get('error', 'unknown')}")
                                 break
@@ -119,10 +119,10 @@ async def delete_model(model_name: str) -> bool:
         async with httpx.AsyncClient(timeout=30) as client:
             response = await client.delete(url)
             if response.status_code == 200:
-                print(f"   ✅ Model deleted")
+                print("   ✅ Model deleted")
                 return True
             elif response.status_code == 404:
-                print(f"   ℹ️  Model not found (already deleted)")
+                print("   ℹ️  Model not found (already deleted)")
                 return True
             else:
                 print(f"   ⚠️  Delete response: {response.status_code} - {response.text}")
@@ -271,11 +271,11 @@ async def main():
     first_event = events[0]
     last_event = events[-1]
     
-    print(f"\n📊 First event:")
+    print("\n📊 First event:")
     print(f"   Status: {first_event.get('status')}")
     print(f"   Progress: {first_event.get('progress', 0):.1f}%")
     
-    print(f"\n📊 Last event:")
+    print("\n📊 Last event:")
     print(f"   Status: {last_event.get('status')}")
     print(f"   Progress: {last_event.get('progress', 0):.1f}%")
 
