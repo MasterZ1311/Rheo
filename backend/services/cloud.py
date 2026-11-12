@@ -140,13 +140,17 @@ def _get_or_create_row(db: Session) -> DBCloudSettings:
 
 
 def _store_key(db: Session, *, api_key: str, device_name: str | None, account_user_id: str | None):
-    from datetime import datetime
+    from datetime import datetime, timezone
+    from .credentials import store_cloud_key
 
     row = _get_or_create_row(db)
-    row.api_key = api_key
+    store_cloud_key(api_key)
+    # Database record NEVER contains the plaintext secret
+    row.api_key = f"[KEYRING]:{api_key[:13]}"
+
     row.device_name = device_name
     row.account_user_id = account_user_id
-    row.connected_at = datetime.utcnow()
+    row.connected_at = datetime.now(timezone.utc)
     db.commit()
 
 
@@ -154,8 +158,17 @@ def get_status(db: Session) -> dict:
     """Local view of the cloud link — never returns the full key."""
     row = _get_or_create_row(db)
     connected = bool(row.api_key)
-    # Prefix only: "rheo_" (5) + 8 chars, matching the cloud's key_prefix.
-    key_prefix = row.api_key[:13] if row.api_key else None
+    key_prefix = None
+    if row.api_key:
+        if row.api_key.startswith("[KEYRING]:"):
+            key_prefix = row.api_key[len("[KEYRING]:"):]
+        elif row.api_key == "[KEYRING]":
+            from .credentials import retrieve_cloud_key
+            stored = retrieve_cloud_key()
+            key_prefix = stored[:13] if stored else None
+        else:
+            key_prefix = row.api_key[:13]
+
     return {
         "connected": connected,
         "device_name": row.device_name if connected else None,
@@ -169,6 +182,9 @@ def get_status(db: Session) -> dict:
 def disconnect(db: Session) -> None:
     """Forget the local credential. The key remains valid on the server until
     revoked from the account dashboard — surface that in the UI."""
+    from .credentials import delete_cloud_key
+
+    delete_cloud_key()
     row = _get_or_create_row(db)
     row.api_key = None
     row.device_name = None
@@ -179,5 +195,19 @@ def disconnect(db: Session) -> None:
 
 def get_api_key(db: Session) -> str | None:
     """The stored bearer key, for the (future) sync client. None if not linked."""
+    from .credentials import retrieve_cloud_key, store_cloud_key
+
+    key = retrieve_cloud_key()
+    if key:
+        return key
+
     row = _get_or_create_row(db)
-    return row.api_key
+    if row.api_key and not row.api_key.startswith("[KEYRING]"):
+        # Migrate plaintext key from database into OS keyring / secure fallback
+        legacy_key = row.api_key
+        store_cloud_key(legacy_key)
+        row.api_key = f"[KEYRING]:{legacy_key[:13]}"
+        db.commit()
+        return legacy_key
+
+    return None

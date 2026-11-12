@@ -10,13 +10,15 @@ The browser-based pairing flow:
 
 import socket
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import HTMLResponse
 from sqlalchemy.orm import Session
 
 from .. import models
 from ..database import get_db
+from ..mcp_server.context import request_is_loopback
 from ..services import cloud as cloud_service
+from ..utils.auth import require_admin
 
 router = APIRouter(prefix="/cloud", tags=["cloud"])
 
@@ -30,6 +32,11 @@ def _callback_url(request: Request) -> str:
 @router.post("/login/start", response_model=models.CloudLoginStartResponse)
 async def start_cloud_login(request: Request):
     """Initiate browser-based device authorization with Rheo Cloud."""
+    if not request_is_loopback():
+        raise HTTPException(
+            status_code=403,
+            detail="Cloud pairing can only be initiated from the local machine",
+        )
     device_name = socket.gethostname() or "Desktop"
     authorize_url = cloud_service.start_login(_callback_url(request), device_name)
     return models.CloudLoginStartResponse(authorize_url=authorize_url)
@@ -73,7 +80,7 @@ async def cloud_status(db: Session = Depends(get_db)):
 
 
 @router.post("/disconnect", response_model=models.CloudStatusResponse)
-async def cloud_disconnect(db: Session = Depends(get_db)):
+async def cloud_disconnect(db: Session = Depends(get_db), _admin: None = Depends(require_admin)):
     """Unlink this instance from Rheo Cloud and discard the stored token."""
     cloud_service.disconnect(db)
     return models.CloudStatusResponse(**cloud_service.get_status(db))

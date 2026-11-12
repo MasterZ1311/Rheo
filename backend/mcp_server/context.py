@@ -9,6 +9,7 @@ object through every service call.
 
 import asyncio
 import ipaddress
+import re
 import logging
 from contextvars import ContextVar
 from datetime import datetime, timezone
@@ -26,6 +27,15 @@ logger = logging.getLogger(__name__)
 _pending_stamps: set[asyncio.Task] = set()
 
 CLIENT_ID_HEADER = "X-Rheo-Client-Id"
+_CLIENT_ID_REGEX = re.compile(r"^[a-zA-Z0-9_.-]{1,64}$")
+
+
+def is_valid_client_id(client_id: str | None) -> bool:
+    """Validate client_id syntax: alphanumeric, dashes, dots, underscores, max 64 chars."""
+    if not client_id or not isinstance(client_id, str):
+        return False
+    return bool(_CLIENT_ID_REGEX.match(client_id.strip()))
+
 
 # Tool handlers read this to apply per-client voice bindings.
 current_client_id: ContextVar[str | None] = ContextVar(
@@ -80,10 +90,12 @@ class ClientIdMiddleware(BaseHTTPMiddleware):
         super().__init__(app)
 
     async def dispatch(self, request: Request, call_next) -> Response:
-        client_id = request.headers.get(CLIENT_ID_HEADER)
+        raw_client_id = request.headers.get(CLIENT_ID_HEADER)
+        client_id = raw_client_id.strip() if is_valid_client_id(raw_client_id) else None
         remote_addr = request.client.host if request.client else None
         client_token = current_client_id.set(client_id)
         addr_token = current_remote_addr.set(remote_addr)
+        is_loopback = request_is_loopback()
         try:
             response = await call_next(request)
         finally:
@@ -91,11 +103,11 @@ class ClientIdMiddleware(BaseHTTPMiddleware):
             current_remote_addr.reset(addr_token)
 
         if client_id and _is_stamped_path(request.url.path):
-            _enqueue_stamp(client_id)
+            _enqueue_stamp(client_id, is_loopback=is_loopback)
         return response
 
 
-def _enqueue_stamp(client_id: str) -> None:
+def _enqueue_stamp(client_id: str, is_loopback: bool = True) -> None:
     """Fire-and-forget the SQLite write so it doesn't block the response.
 
     The stamp does sync SQLAlchemy I/O; running it inline on the event loop
@@ -108,9 +120,9 @@ def _enqueue_stamp(client_id: str) -> None:
     except RuntimeError:
         # Middleware shouldn't run outside a loop, but if it ever does
         # (tests, weird wsgi shim), do the write inline rather than drop it.
-        _stamp_last_seen(client_id)
+        _stamp_last_seen(client_id, is_loopback=is_loopback)
         return
-    task = loop.create_task(asyncio.to_thread(_stamp_last_seen, client_id))
+    task = loop.create_task(asyncio.to_thread(_stamp_last_seen, client_id, is_loopback))
     _pending_stamps.add(task)
     task.add_done_callback(_pending_stamps.discard)
 
@@ -121,8 +133,10 @@ def _is_stamped_path(path: str) -> bool:
     return any(path == p or path.startswith(p + "/") for p in _STAMPED_PATH_PREFIXES)
 
 
-def _stamp_last_seen(client_id: str) -> None:
+def _stamp_last_seen(client_id: str, is_loopback: bool = True) -> None:
     """Update or create the MCPClientBinding row for this client_id."""
+    if not is_valid_client_id(client_id):
+        return
     try:
         from ..database import get_db
         from ..database.models import MCPClientBinding
@@ -139,6 +153,10 @@ def _stamp_last_seen(client_id: str) -> None:
             .first()
         )
         if row is None:
+            # Only loopback callers may auto-register new client bindings.
+            # Remote callers cannot inject arbitrary unauthenticated bindings.
+            if not is_loopback:
+                return
             row = MCPClientBinding(client_id=client_id)
             db.add(row)
         row.last_seen_at = datetime.now(timezone.utc)

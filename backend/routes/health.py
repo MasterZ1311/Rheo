@@ -36,12 +36,8 @@ async def root():
 @router.post("/shutdown")
 async def shutdown(request: Request):
     """Gracefully shutdown the server."""
-    from ..mcp_server.context import request_is_loopback
-
-    api_key = request.headers.get("X-API-Key")
-    expected_key = os.environ.get("RHEO_API_KEY")
-    if not request_is_loopback() and (not expected_key or api_key != expected_key):
-        raise HTTPException(status_code=403, detail="Remote shutdown requires API key")
+    from ..utils.auth import require_admin
+    require_admin(request)
 
     async def shutdown_async():
         await asyncio.sleep(0.1)
@@ -54,12 +50,8 @@ async def shutdown(request: Request):
 @router.post("/watchdog/disable")
 async def watchdog_disable(request: Request):
     """Disable the parent process watchdog so the server keeps running."""
-    from ..mcp_server.context import request_is_loopback
-
-    api_key = request.headers.get("X-API-Key")
-    expected_key = os.environ.get("RHEO_API_KEY")
-    if not request_is_loopback() and (not expected_key or api_key != expected_key):
-        raise HTTPException(status_code=403, detail="Remote administration requires API key")
+    from ..utils.auth import require_admin
+    require_admin(request)
 
     from backend.server import disable_watchdog
 

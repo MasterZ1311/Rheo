@@ -14,6 +14,8 @@ from sqlalchemy.orm import Session
 from .. import models
 from ..database import get_db
 from ..database.models import MCPClientBinding
+from ..mcp_server.context import is_valid_client_id
+from ..utils.auth import require_admin
 
 
 router = APIRouter()
@@ -42,8 +44,12 @@ async def list_mcp_bindings(db: Session = Depends(get_db)):
 async def upsert_mcp_binding(
     data: models.MCPClientBindingUpsert,
     db: Session = Depends(get_db),
+    _admin: None = Depends(require_admin),
 ):
     """Create-or-update a binding. Matches by client_id."""
+    if not is_valid_client_id(data.client_id):
+        raise HTTPException(status_code=400, detail="Invalid client_id format")
+
     row = (
         db.query(MCPClientBinding)
         .filter(MCPClientBinding.client_id == data.client_id)
@@ -67,6 +73,7 @@ async def upsert_mcp_binding(
 async def delete_mcp_binding(
     client_id: str,
     db: Session = Depends(get_db),
+    _admin: None = Depends(require_admin),
 ):
     """Delete an MCP client binding by client ID."""
     row = (
