@@ -269,6 +269,28 @@ jobs:
             echo "::endgroup::"
           done
 
+      # Windows Authenticode signing: signs the generated installer (.exe and .msi)
+      # artifacts using an EV/OV certificate if provided in GitHub repository secrets.
+      - name: Sign Windows Installers (Authenticode)
+        if: matrix.platform == 'windows-latest' && env.WINDOWS_CERTIFICATE_BASE64 != ''
+        shell: powershell
+        env:
+          WINDOWS_CERTIFICATE_BASE64: ${{ secrets.WINDOWS_CERTIFICATE_BASE64 }}
+          WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $certBytes = [System.Convert]::FromBase64String($env:WINDOWS_CERTIFICATE_BASE64)
+          $certPath = Join-Path $env:RUNNER_TEMP "authenticode.pfx"
+          [System.IO.File]::WriteAllBytes($certPath, $certBytes)
+          $RELEASE_TAG = "v$(jq -r '.version' tauri/src-tauri/tauri.conf.json)"
+          $targetFiles = Get-ChildItem -Path "tauri/src-tauri/target/release/bundle" -Recurse -Include "*.exe", "*.msi"
+          foreach ($file in $targetFiles) {
+            Write-Host "Signing $($file.FullName) with Authenticode..."
+            & signtool.exe sign /f $certPath /p $env:WINDOWS_CERTIFICATE_PASSWORD /tr http://timestamp.digicert.com /td sha256 /fd sha256 $file.FullName
+            gh release upload $RELEASE_TAG $file.FullName --clobber --repo $env:GITHUB_REPOSITORY
+          }
+          Remove-Item -Path $certPath -Force -ErrorAction SilentlyContinue
+
   build-cuda-windows:
     runs-on: windows-latest
     permissions:

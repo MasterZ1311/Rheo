@@ -9,7 +9,7 @@ on:
 
 jobs:
   frontend-quality:
-    name: Frontend (Typecheck & Web Build)
+    name: Frontend (Lint, Typecheck, Tests & Web Build)
     runs-on: ubuntu-latest
 
     steps:
@@ -21,14 +21,20 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
+      - name: Lint check with Biome
+        run: bun run lint
+
       - name: Typecheck app + web
         run: bun run typecheck
+
+      - name: Frontend unit tests
+        run: bun run test:frontend
 
       - name: Build web smoke test
         run: bun run build:web
 
   backend-quality:
-    name: Backend (Python Tests & Lint)
+    name: Backend (Python Lint & Tests)
     runs-on: ubuntu-latest
 
     steps:
@@ -43,13 +49,13 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install ruff pytest pytest-asyncio httpx fastapi
-          pip install -r backend/requirements.txt || true
+          pip install torch torchaudio --index-url https://download.pytorch.org/whl/cpu
+          pip install -r backend/requirements-test.txt
 
       - name: Lint check with Ruff
         run: |
-          ruff check backend || true
+          ruff check backend
 
       - name: Run Pytest Suite
         run: |
-          python -m pytest backend/tests -v --maxfail=5
+          python -m pytest backend/tests -v -m "not slow" --maxfail=5
