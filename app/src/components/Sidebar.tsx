@@ -8,7 +8,6 @@ import {
   PlusSquare,
   Settings,
 } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils/cn';
 import { usePlatform } from '@/platform/PlatformContext';
 import { usePlayerStore } from '@/stores/playerStore';
@@ -20,7 +19,6 @@ interface SidebarProps {
 }
 
 export function Sidebar({ isMacOS }: SidebarProps) {
-  const { t } = useTranslation();
   const matchRoute = useMatchRoute();
   const isPlayerOpen = !!usePlayerStore((s) => s.audioUrl);
   const setProfileDialogOpen = useUIStore((s) => s.setProfileDialogOpen);

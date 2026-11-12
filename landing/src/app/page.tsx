@@ -1,6 +1,6 @@
 "use client";
 
-import { Activity, ArrowUpRight, Cpu, Download, Github, Mic, Play, ShieldCheck, Sparkles, Volume2, Wand2, Zap } from "lucide-react";
+import { Activity, ArrowUpRight, Cpu, Download, Github, Mic, ShieldCheck } from "lucide-react";
 import { useEffect, useState } from "react";
 import { AgentIntegration } from "@/components/AgentIntegration";
 import { ApiSection } from "@/components/ApiSection";

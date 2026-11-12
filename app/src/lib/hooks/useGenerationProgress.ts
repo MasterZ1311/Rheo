@@ -8,7 +8,7 @@ import { usePlayerStore } from '@/stores/playerStore';
 
 interface GenerationStatusEvent {
   id: string;
-  status: 'loading_model' | 'generating' | 'completed' | 'failed' | 'not_found';
+  status: 'loading_model' | 'generating' | 'completed' | 'failed' | 'not_found' | 'cancelled';
   duration?: number;
   error?: string;
   source?: string;
@@ -123,7 +123,7 @@ export function useGenerationProgress() {
               const genAudioUrl = apiClient.getAudioUrl(id);
               setAudioWithAutoPlay(genAudioUrl, id, '', '');
             }
-          } else if (data.status === 'failed' || data.status === 'not_found') {
+          } else if (data.status === 'failed' || data.status === 'not_found' || data.status === 'cancelled') {
             source.close();
             currentSources.delete(id);
             removePendingGeneration(id);
@@ -132,9 +132,14 @@ export function useGenerationProgress() {
             queryClient.refetchQueries({ queryKey: ['history'] });
 
             toast({
-              title: data.status === 'not_found' ? 'Generation not found' : 'Generation failed',
-              description: data.error || 'An error occurred during generation',
-              variant: 'destructive',
+              title:
+                data.status === 'not_found'
+                  ? 'Generation not found'
+                  : data.status === 'cancelled'
+                    ? 'Generation cancelled'
+                    : 'Generation failed',
+              description: data.error || (data.status === 'cancelled' ? 'Generation was cancelled' : 'An error occurred during generation'),
+              variant: data.status === 'cancelled' ? 'default' : 'destructive',
             });
           }
         } catch {

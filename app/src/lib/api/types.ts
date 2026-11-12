@@ -349,6 +349,13 @@ export interface ModelStatus {
   downloading: boolean; // True if download is in progress
   size_mb?: number;
   loaded: boolean;
+  engine?: string;
+  description?: string;
+  version?: string;
+  required_disk_mb?: number;
+  supported_hardware?: string[];
+  dependencies?: string[];
+  languages?: string[];
 }
 
 export interface HuggingFaceModelInfo {
@@ -384,6 +391,8 @@ export interface ActiveDownloadTask {
   current?: number; // bytes downloaded
   total?: number; // total bytes
   filename?: string; // current file being downloaded
+  speed_bps?: number; // download speed in bytes per second
+  eta_seconds?: number; // estimated seconds remaining
 }
 
 export interface ActiveGenerationTask {
