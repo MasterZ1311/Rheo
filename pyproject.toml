@@ -1,0 +1,45 @@
+# Root pyproject.toml for Rheo workspace tooling (Ruff & Pytest)
+
+[tool.ruff]
+target-version = "py312"
+line-length = 120
+
+extend-exclude = [
+    "backend/rheo-server.spec",
+    "backend/rheo-mcp.spec",
+    "backend/build_binary.py",
+    "rheo-server.spec",
+    "rheo-mcp.spec",
+    ".agents",
+]
+
+[tool.ruff.lint]
+select = [
+    "F",     # pyflakes
+    "E",     # pycodestyle errors
+    "W",     # pycodestyle warnings
+]
+
+ignore = [
+    "E501",   # line too long (formatter handles this)
+    "W293",   # blank line contains whitespace
+    "E402",   # module level import not at top of file
+    "F401",   # unused imports
+    "F841",   # local variable assigned but never used
+]
+
+[tool.ruff.lint.per-file-ignores]
+"backend/tests/**" = ["S101", "T201", "PLR2004", "ERA001"]
+"**/__init__.py" = ["F401"]
+"backend/server.py" = ["T201"]
+"backend/main.py" = ["T201"]
+"backend/app.py" = ["E402"]
+
+[tool.pytest.ini_options]
+testpaths = ["backend/tests"]
+asyncio_mode = "auto"
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "asyncio: marks tests as asyncio coroutines",
+    "timeout: test timeout in seconds",
+]

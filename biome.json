@@ -16,18 +16,21 @@
     "rules": {
       "recommended": true,
       "a11y": {
-        "useButtonType": "warn"
+        "useButtonType": "warn",
+        "recommended": false
       },
       "correctness": {
         "noUnusedVariables": "warn",
         "noUnusedImports": "error",
         "useExhaustiveDependencies": "warn",
-        "useHookAtTopLevel": "error"
+        "useHookAtTopLevel": "error",
+        "noInnerDeclarations": "warn"
       },
       "suspicious": {
         "noDoubleEquals": "error",
         "noExplicitAny": "warn",
-        "noUnknownAtRules": "off"
+        "noUnknownAtRules": "off",
+        "noArrayIndexKey": "warn"
       },
       "style": {
         "useFilenamingConvention": "off",
@@ -58,5 +61,20 @@
     "linter": {
       "enabled": true
     }
-  }
+  },
+  "overrides": [
+    {
+      "includes": [
+        ".agents/**",
+        "backend/**",
+        "app/src/lib/api/**"
+      ],
+      "linter": {
+        "enabled": false
+      },
+      "formatter": {
+        "enabled": false
+      }
+    }
+  ]
 }
