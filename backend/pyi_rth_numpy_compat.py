@@ -40,6 +40,10 @@ def _patch_torch_from_numpy():
         torch = sys.modules.get("torch")
         if torch is None or not hasattr(torch, "from_numpy"):
             continue
+        # Wait until torch._torch_docs has finished executing so that
+        # C-level add_docstr(torch.from_numpy, ...) does not fail on a Python wrapper.
+        if "torch._torch_docs" not in sys.modules:
+            continue
         if getattr(torch, "_vb_from_numpy_patched", False):
             return
         try:
@@ -53,17 +57,17 @@ def _patch_torch_from_numpy():
             # silently corrupt data (e.g. fp16 tensors from some TTS engines),
             # so we raise instead.
             dtype_map = {
-                "float16": _t.float16,
-                "float32": _t.float32,
-                "float64": _t.float64,
-                "int8": _t.int8,
-                "int16": _t.int16,
-                "int32": _t.int32,
-                "int64": _t.int64,
-                "uint8": _t.uint8,
-                "bool": _t.bool,
-                "complex64": _t.complex64,
-                "complex128": _t.complex128,
+                "float16": torch.float16,
+                "float32": torch.float32,
+                "float64": torch.float64,
+                "int8": torch.int8,
+                "int16": torch.int16,
+                "int32": torch.int32,
+                "int64": torch.int64,
+                "uint8": torch.uint8,
+                "bool": torch.bool,
+                "complex64": torch.complex64,
+                "complex128": torch.complex128,
             }
 
             def _safe_from_numpy(
@@ -85,6 +89,7 @@ def _patch_torch_from_numpy():
                     _c.memmove(out.data_ptr(), a.ctypes.data, a.nbytes)
                     return out
 
+            _safe_from_numpy.__doc__ = getattr(_orig, "__doc__", None)
             torch.from_numpy = _safe_from_numpy
             torch._vb_from_numpy_patched = True
         except Exception:

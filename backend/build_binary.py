@@ -31,7 +31,7 @@ def is_apple_silicon():
     return platform.system() == "Darwin" and platform.machine() == "arm64"
 
 
-def build_server(cuda=False, rocm=False):
+def build_server(cuda=False, rocm=False, skip_torch_swap=False):
     """Build Python server as standalone binary.
 
     Args:
@@ -39,6 +39,7 @@ def build_server(cuda=False, rocm=False):
               rheo-server-cuda instead of rheo-server.
         rocm: If True, build with ROCm support and name the binary
               rheo-server-rocm instead of rheo-server.
+        skip_torch_swap: If True, do not attempt to swap torch wheels via pip.
     """
     if cuda and rocm:
         raise ValueError("Cannot build with both CUDA and ROCm support")
@@ -145,6 +146,16 @@ def build_server(cuda=False, rocm=False):
             "backend.utils.effects",
             "--hidden-import",
             "backend.services.versions",
+            "--hidden-import",
+            "backend.services.model_verification",
+            "--hidden-import",
+            "backend.services.backup",
+            "--hidden-import",
+            "backend.services.credentials",
+            "--hidden-import",
+            "backend.services.model_migration",
+            "--hidden-import",
+            "backend.services.task_queue",
             "--hidden-import",
             "pedalboard",
             "--hidden-import",
@@ -336,6 +347,19 @@ def build_server(cuda=False, rocm=False):
             "mcp",
             "--hidden-import",
             "sse_starlette",
+            # Collect all backend submodules to ensure routes, services, and utils
+            # are fully packaged into the frozen binary.
+            "--collect-submodules",
+            "backend",
+            # Secure credential storage (Windows Credential Vault)
+            "--collect-all",
+            "keyring",
+            "--copy-metadata",
+            "keyring",
+            "--hidden-import",
+            "cryptography",
+            "--hidden-import",
+            "cryptography.fernet",
         ]
     )
 
@@ -479,6 +503,17 @@ def build_server(cuda=False, rocm=False):
     dist_dir = str(backend_dir / "dist")
     build_dir = str(backend_dir / "build")
 
+    # Clean stale build artifact so old builds cannot be mistaken for fresh ones
+    target_dist = Path(dist_dir) / binary_name
+    target_exe = target_dist / f"{binary_name}.exe" if pack_mode == "--onedir" else Path(dist_dir) / f"{binary_name}.exe"
+    if pack_mode == "--onedir" and target_dist.exists():
+        import shutil
+        logger.info("Cleaning stale output directory: %s", target_dist)
+        shutil.rmtree(target_dist)
+    elif target_exe.exists():
+        logger.info("Cleaning stale output executable: %s", target_exe)
+        target_exe.unlink()
+
     args.extend(
         [
             "--distpath",
@@ -499,7 +534,7 @@ def build_server(cuda=False, rocm=False):
     # GPU libraries into the CPU binary.
     restore_torch = None
     try:
-        if not cuda and not rocm and platform.system() == "Windows":
+        if not cuda and not rocm and platform.system() == "Windows" and not skip_torch_swap:
             import subprocess
 
             cuda_result = subprocess.run(
@@ -677,8 +712,10 @@ def build_server(cuda=False, rocm=False):
                 check=True,
             )
 
+    if not target_exe.exists() or target_exe.stat().st_size == 0:
+        raise RuntimeError(f"Build failed: output binary was not created at {target_exe}")
 
-    logger.info("Binary built in %s", backend_dir / "dist" / binary_name)
+    logger.info("Binary built successfully in %s (%d bytes)", target_exe, target_exe.stat().st_size)
 
 
 def build_shim():
@@ -689,6 +726,13 @@ def build_shim():
     torch, no ML deps, just httpx + asyncio.
     """
     backend_dir = Path(__file__).parent
+    dist_dir = str(backend_dir / "dist")
+    build_dir = str(backend_dir / "build")
+
+    target_exe = Path(dist_dir) / "rheo-mcp.exe" if platform.system() == "Windows" else Path(dist_dir) / "rheo-mcp"
+    if target_exe.exists():
+        logger.info("Cleaning stale output executable: %s", target_exe)
+        target_exe.unlink()
 
     args = [
         "mcp_shim/__main__.py",
@@ -751,24 +795,21 @@ def build_shim():
         "fastmcp",
         "--exclude-module",
         "mcp",
+        "--distpath",
+        dist_dir,
+        "--workpath",
+        build_dir,
+        "--noconfirm",
+        "--clean",
     ]
-
-    dist_dir = str(backend_dir / "dist")
-    build_dir = str(backend_dir / "build")
-    args.extend(
-        [
-            "--distpath",
-            dist_dir,
-            "--workpath",
-            build_dir,
-            "--noconfirm",
-            "--clean",
-        ]
-    )
 
     os.chdir(backend_dir)
     PyInstaller.__main__.run(args)
-    logger.info("Shim built: %s", backend_dir / "dist" / "rheo-mcp")
+
+    if not target_exe.exists() or target_exe.stat().st_size == 0:
+        raise RuntimeError(f"Build failed: output shim binary was not created at {target_exe}")
+
+    logger.info("Shim built successfully: %s (%d bytes)", target_exe, target_exe.stat().st_size)
 
 
 if __name__ == "__main__":
@@ -788,9 +829,14 @@ if __name__ == "__main__":
         action="store_true",
         help="Build the rheo-mcp stdio shim binary instead of the server",
     )
+    parser.add_argument(
+        "--skip-torch-swap",
+        action="store_true",
+        help="Skip downloading/swapping PyTorch wheels during Windows CPU build",
+    )
     cli_args = parser.parse_args()
     if cli_args.shim:
         build_shim()
     else:
-        build_server(cuda=cli_args.cuda, rocm=cli_args.rocm)
+        build_server(cuda=cli_args.cuda, rocm=cli_args.rocm, skip_torch_swap=cli_args.skip_torch_swap)
 
