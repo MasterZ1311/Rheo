@@ -121,6 +121,11 @@ class ApiClient {
     return this.request<{ engine: string; voices: PresetVoice[] }>(`/profiles/presets/${engine}`);
   }
 
+  getPresetVoicePreviewUrl(engine: string, voiceId: string, text?: string): string {
+    const params = text ? `?text=${encodeURIComponent(text)}` : '';
+    return `${this.getBaseUrl()}/profiles/presets/${engine}/${voiceId}/preview${params}`;
+  }
+
   async updateProfile(profileId: string, data: VoiceProfileCreate): Promise<VoiceProfileResponse> {
     return this.request<VoiceProfileResponse>(`/profiles/${profileId}`, {
       method: 'PUT',

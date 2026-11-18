@@ -5,7 +5,7 @@ export type Theme = 'light' | 'dark' | 'system';
 
 function resolveTheme(theme: Theme): 'light' | 'dark' {
   if (theme !== 'system') return theme;
-  if (typeof window === 'undefined') return 'dark';
+  if (typeof window === 'undefined' || !window.matchMedia) return 'dark';
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
 
@@ -32,6 +32,11 @@ interface UIStore {
   // Sidebar
   sidebarOpen: boolean;
   setSidebarOpen: (open: boolean) => void;
+  toggleSidebar: () => void;
+
+  // Command Palette
+  commandPaletteOpen: boolean;
+  setCommandPaletteOpen: (open: boolean) => void;
 
   // Modals
   profileDialogOpen: boolean;
@@ -93,8 +98,12 @@ export interface DashboardTask {
 export const useUIStore = create<UIStore>()(
   persist(
     (set) => ({
-      sidebarOpen: true,
+      sidebarOpen: false,
       setSidebarOpen: (open) => set({ sidebarOpen: open }),
+      toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
+
+      commandPaletteOpen: false,
+      setCommandPaletteOpen: (open) => set({ commandPaletteOpen: open }),
 
       profileDialogOpen: false,
       setProfileDialogOpen: (open) => set({ profileDialogOpen: open }),
@@ -159,6 +168,7 @@ export const useUIStore = create<UIStore>()(
     {
       name: 'rheo-ui',
       partialize: (state) => ({
+        sidebarOpen: state.sidebarOpen,
         selectedProfileId: state.selectedProfileId,
         theme: state.theme,
         tourCompleted: state.tourCompleted,

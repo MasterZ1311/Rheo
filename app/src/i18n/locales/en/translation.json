@@ -248,7 +248,18 @@
     "builtin": {
       "hint": "Choose a pre-built voice. These don't require an audio sample.",
       "badge": "Built-in Voice",
-      "note": "This profile uses a built-in voice. The voice cannot be changed after creation."
+      "note": "This profile uses a built-in voice. The voice cannot be changed after creation.",
+      "previewHint": "Click speaker icon to listen",
+      "previewLabel": "Preview greeting",
+      "sampleLabel": "Sample greeting",
+      "previewSample": "Preview greeting",
+      "stopPreview": "Stop preview",
+      "listen": "Listen",
+      "stop": "Stop",
+      "playing": "Playing...",
+      "generating": "Generating...",
+      "previewErrorTitle": "Voice preview unavailable",
+      "previewErrorDesc": "Could not synthesize preview audio for this voice model."
     },
     "sampleTabs": {
       "upload": "Upload",

@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQuery } from '@tanstack/react-query';
-import { Edit2, Mic, Monitor, Music, Upload, X } from 'lucide-react';
+import { Edit2, Loader2, Mic, Monitor, Music, Play, Upload, Volume2, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -52,6 +52,7 @@ import {
 import { useSystemAudioCapture } from '@/lib/hooks/useSystemAudioCapture';
 import { useTranscription } from '@/lib/hooks/useTranscription';
 import { convertToWav, formatAudioDuration, getAudioDuration } from '@/lib/utils/audio';
+import { cn } from '@/lib/utils/cn';
 import { usePlatform } from '@/platform/PlatformContext';
 import { useServerStore } from '@/stores/serverStore';
 import { type ProfileFormDraft, useUIStore } from '@/stores/uiStore';
@@ -161,6 +162,86 @@ export function ProfileForm() {
   const [profileEffectsChain, setProfileEffectsChain] = useState<EffectConfig[]>([]);
   const [effectsDirty, setEffectsDirty] = useState(false);
   const [defaultEngine, setDefaultEngine] = useState<string>('');
+
+  // Built-in preset voice preview state
+  const [previewingVoiceId, setPreviewingVoiceId] = useState<string | null>(null);
+  const [previewLoadingVoiceId, setPreviewLoadingVoiceId] = useState<string | null>(null);
+  const previewAudioRef = useRef<HTMLAudioElement | null>(null);
+
+  const stopPresetPreview = () => {
+    if (previewAudioRef.current) {
+      previewAudioRef.current.pause();
+      previewAudioRef.current = null;
+    }
+    setPreviewingVoiceId(null);
+    setPreviewLoadingVoiceId(null);
+  };
+
+  useEffect(() => {
+    return () => {
+      stopPresetPreview();
+    };
+  }, []);
+
+  useEffect(() => {
+    stopPresetPreview();
+  }, [selectedPresetEngine, voiceSource]);
+
+  const handlePreviewVoice = (e: React.MouseEvent, voice: PresetVoice) => {
+    e.stopPropagation();
+
+    if (previewingVoiceId === voice.voice_id) {
+      stopPresetPreview();
+      return;
+    }
+
+    stopPresetPreview();
+    if (isCreating) {
+      setSelectedPresetVoiceId(voice.voice_id);
+      if (voice.language) {
+        form.setValue('language', voice.language as LanguageCode);
+      }
+    }
+    setPreviewLoadingVoiceId(voice.voice_id);
+
+    const targetEngine = isCreating
+      ? selectedPresetEngine
+      : (editingProfile?.preset_engine ?? selectedPresetEngine);
+    const previewUrl = apiClient.getPresetVoicePreviewUrl(targetEngine, voice.voice_id);
+    const audio = new Audio(previewUrl);
+    previewAudioRef.current = audio;
+
+    audio.oncanplay = () => {
+      setPreviewLoadingVoiceId(null);
+      setPreviewingVoiceId(voice.voice_id);
+    };
+
+    audio.onended = () => {
+      setPreviewingVoiceId(null);
+      previewAudioRef.current = null;
+    };
+
+    audio.onerror = () => {
+      setPreviewLoadingVoiceId(null);
+      setPreviewingVoiceId(null);
+      previewAudioRef.current = null;
+      toast({
+        title: t('profileForm.builtin.previewErrorTitle', 'Voice preview unavailable'),
+        description: t(
+          'profileForm.builtin.previewErrorDesc',
+          'Could not synthesize preview audio for this voice model.',
+        ),
+        variant: 'destructive',
+      });
+    };
+
+    audio.play().catch((err) => {
+      console.warn('Playback interrupted:', err);
+      setPreviewLoadingVoiceId(null);
+      setPreviewingVoiceId(null);
+      previewAudioRef.current = null;
+    });
+  };
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(makeProfileSchema(t)),
@@ -286,6 +367,18 @@ export function ProfileForm() {
         (!isCreating && editingProfile?.voice_type === 'preset')),
   });
   const presetVoices = presetVoicesData?.voices ?? [];
+  const selectedPresetVoice =
+    presetVoices.find((v: PresetVoice) => v.voice_id === selectedPresetVoiceId) ??
+    presetVoices[0];
+
+  useEffect(() => {
+    if (presetVoices.length > 0 && !selectedPresetVoiceId) {
+      setSelectedPresetVoiceId(presetVoices[0].voice_id);
+      if (presetVoices[0].language) {
+        form.setValue('language', presetVoices[0].language as LanguageCode);
+      }
+    }
+  }, [presetVoices, selectedPresetVoiceId, form]);
   const isSampleBasedProfile = isCreating
     ? voiceSource === 'clone'
     : editingProfile?.voice_type !== 'preset';
@@ -740,6 +833,7 @@ export function ProfileForm() {
       }
 
       // Clear draft and reset form on success
+      stopPresetPreview();
       setProfileFormDraft(null);
       form.reset();
       setEditingProfileId(null);
@@ -787,6 +881,7 @@ export function ProfileForm() {
 
     setOpen(newOpen);
     if (!newOpen) {
+      stopPresetPreview();
       setEditingProfileId(null);
       // Don't reset form here - let the effect handle it based on draft state
       if (isRecording) {
@@ -904,36 +999,118 @@ export function ProfileForm() {
 
                           {/* Voice picker */}
                           <FormItem>
-                            <FormLabel>{t('profileForm.fields.voice')}</FormLabel>
-                            <div className="grid grid-cols-2 gap-1.5 max-h-[340px] overflow-y-auto pr-1">
-                              {presetVoices.map((voice: PresetVoice) => (
-                                <button
-                                  key={voice.voice_id}
-                                  type="button"
-                                  onClick={() => {
-                                    setSelectedPresetVoiceId(voice.voice_id);
-                                    // Auto-set language from voice
-                                    if (voice.language) {
-                                      form.setValue('language', voice.language as LanguageCode);
-                                    }
-                                  }}
-                                  className={`text-left px-3 py-2 rounded-md border text-sm transition-colors ${
-                                    selectedPresetVoiceId === voice.voice_id
-                                      ? 'border-accent bg-accent/10 text-accent-foreground'
-                                      : 'border-border hover:bg-muted'
-                                  }`}
-                                >
-                                  <div className="font-medium">{voice.name}</div>
-                                  <div className="flex gap-1.5 mt-0.5">
-                                    <Badge variant="outline" className="text-[10px] h-4 px-1">
-                                      {voice.gender}
-                                    </Badge>
-                                    <Badge variant="outline" className="text-[10px] h-4 px-1">
-                                      {voice.language}
-                                    </Badge>
+                            <div className="flex items-center justify-between pb-1">
+                              <FormLabel>{t('profileForm.fields.voice')}</FormLabel>
+                              {selectedPresetVoice && (
+                                <span className="text-xs text-muted-foreground font-normal">
+                                  {presetVoices.length} {t('common.available', 'available')}
+                                </span>
+                              )}
+                            </div>
+
+                            {/* Sample greeting preview banner */}
+                            {selectedPresetVoice && (
+                              <div className="rounded-lg border border-border/80 bg-muted/40 p-3 mb-2 flex items-center justify-between gap-3">
+                                <div className="min-w-0 flex-1">
+                                  <div className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+                                    {t('profileForm.builtin.sampleLabel', 'Sample greeting')}
                                   </div>
-                                </button>
-                              ))}
+                                  <div className="text-xs text-foreground font-medium italic truncate mt-0.5">
+                                    &ldquo;Hi, I am {selectedPresetVoice.name}, how may I help you today?&rdquo;
+                                  </div>
+                                </div>
+                                <Button
+                                  type="button"
+                                  size="sm"
+                                  variant={previewingVoiceId === selectedPresetVoice.voice_id ? 'secondary' : 'outline'}
+                                  className="h-8 text-xs shrink-0 gap-1.5 px-3 font-medium cursor-pointer"
+                                  onClick={(e) => handlePreviewVoice(e, selectedPresetVoice)}
+                                >
+                                  {previewLoadingVoiceId === selectedPresetVoice.voice_id ? (
+                                    <>
+                                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                      <span>{t('profileForm.builtin.generating', 'Generating...')}</span>
+                                    </>
+                                  ) : previewingVoiceId === selectedPresetVoice.voice_id ? (
+                                    <>
+                                      <Volume2 className="h-3.5 w-3.5 text-accent animate-pulse" />
+                                      <span>{t('profileForm.builtin.stopPreview', 'Stop')}</span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Play className="h-3.5 w-3.5 fill-current" />
+                                      <span>{t('profileForm.builtin.listen', 'Listen')}</span>
+                                    </>
+                                  )}
+                                </Button>
+                              </div>
+                            )}
+
+                            <div className="grid grid-cols-2 gap-1.5 max-h-[300px] overflow-y-auto pr-1">
+                              {presetVoices.map((voice: PresetVoice) => {
+                                const isSelected = selectedPresetVoiceId === voice.voice_id;
+                                const isPlaying = previewingVoiceId === voice.voice_id;
+                                const isLoading = previewLoadingVoiceId === voice.voice_id;
+
+                                return (
+                                  <div
+                                    key={voice.voice_id}
+                                    role="button"
+                                    tabIndex={0}
+                                    onClick={() => {
+                                      setSelectedPresetVoiceId(voice.voice_id);
+                                      // Auto-set language from voice
+                                      if (voice.language) {
+                                        form.setValue('language', voice.language as LanguageCode);
+                                      }
+                                    }}
+                                    onKeyDown={(e) => {
+                                      if (e.key === 'Enter' || e.key === ' ') {
+                                        setSelectedPresetVoiceId(voice.voice_id);
+                                      }
+                                    }}
+                                    className={cn(
+                                      'group text-left px-3 py-2 rounded-md border text-sm transition-all flex items-center justify-between cursor-pointer select-none',
+                                      isSelected
+                                        ? 'border-accent bg-accent/10 text-foreground ring-1 ring-accent/30 shadow-xs'
+                                        : 'border-border bg-card/60 hover:bg-muted text-card-foreground',
+                                    )}
+                                  >
+                                    <div className="min-w-0 pr-1">
+                                      <div className="font-medium truncate">{voice.name}</div>
+                                      <div className="flex gap-1.5 mt-0.5">
+                                        <Badge variant="outline" className="text-[10px] h-4 px-1 uppercase tracking-wider font-mono">
+                                          {voice.gender}
+                                        </Badge>
+                                        <Badge variant="outline" className="text-[10px] h-4 px-1 uppercase tracking-wider font-mono">
+                                          {voice.language}
+                                        </Badge>
+                                      </div>
+                                    </div>
+                                    <button
+                                      type="button"
+                                      onClick={(e) => handlePreviewVoice(e, voice)}
+                                      className={cn(
+                                        'h-7 w-7 rounded-full flex items-center justify-center shrink-0 ml-1.5 cursor-pointer transition-all',
+                                        isPlaying
+                                          ? 'bg-accent text-accent-foreground shadow-sm'
+                                          : isLoading
+                                            ? 'bg-muted text-muted-foreground'
+                                            : 'opacity-70 group-hover:opacity-100 hover:bg-accent/20 hover:text-accent-foreground',
+                                      )}
+                                      title={`Preview ${voice.name}`}
+                                    >
+                                      {isLoading ? (
+                                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                      ) : isPlaying ? (
+                                        <Volume2 className="h-3.5 w-3.5 animate-pulse" />
+                                      ) : (
+                                        <Play className="h-3.5 w-3.5 fill-current" />
+                                      )}
+                                    </button>
+                                  </div>
+                                );
+                              })}
                             </div>
                           </FormItem>
                         </div>
@@ -1068,8 +1245,46 @@ export function ProfileForm() {
                     (editingProfile.voice_type === 'preset' ? (
                       <div className="space-y-4 pt-4">
                         <div className="rounded-lg border border-border p-4 space-y-3">
-                          <div className="text-sm font-medium text-muted-foreground">
-                            {t('profileForm.builtin.badge')}
+                          <div className="flex items-center justify-between">
+                            <div className="text-sm font-medium text-muted-foreground">
+                              {t('profileForm.builtin.badge')}
+                            </div>
+                            {(() => {
+                              const targetVoice: PresetVoice =
+                                presetVoices.find(
+                                  (v: PresetVoice) => v.voice_id === editingProfile.preset_voice_id,
+                                ) ?? {
+                                  voice_id: editingProfile.preset_voice_id ?? '',
+                                  name: editingProfile.preset_voice_id ?? 'Voice',
+                                  gender: 'female',
+                                  language: editingProfile.language ?? 'en',
+                                };
+                              const isPlaying = previewingVoiceId === targetVoice.voice_id;
+                              const isLoading = previewLoadingVoiceId === targetVoice.voice_id;
+
+                              return (
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="sm"
+                                  className="h-7 text-xs gap-1.5 cursor-pointer"
+                                  onClick={(e) => handlePreviewVoice(e, targetVoice)}
+                                >
+                                  {isLoading ? (
+                                    <Loader2 className="h-3.5 w-3.5 animate-spin text-accent" />
+                                  ) : isPlaying ? (
+                                    <Volume2 className="h-3.5 w-3.5 text-accent animate-pulse" />
+                                  ) : (
+                                    <Play className="h-3.5 w-3.5 fill-current" />
+                                  )}
+                                  <span>
+                                    {isPlaying
+                                      ? t('profileForm.builtin.stopPreview', 'Stop preview')
+                                      : t('profileForm.builtin.listen', 'Preview')}
+                                  </span>
+                                </Button>
+                              );
+                            })()}
                           </div>
                           <div className="flex items-center gap-3">
                             <div className="text-lg font-semibold">

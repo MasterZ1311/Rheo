@@ -116,6 +116,106 @@ async def list_preset_voices(engine: str):
         }
     return {"engine": engine, "voices": []}
 
+
+GREETING_TEMPLATES = {
+    "en": "Hi, I am {name}, how may I help you today?",
+    "es": "Hola, soy {name}, ¿cómo puedo ayudarte hoy?",
+    "fr": "Bonjour, je suis {name}, comment puis-je vous aider aujourd'hui ?",
+    "it": "Ciao, sono {name}, come posso aiutarti oggi?",
+    "pt": "Olá, eu sou {name}, como posso ajudar você hoje?",
+    "de": "Hallo, ich bin {name}, wie kann ich Ihnen heute helfen?",
+    "ja": "こんにちは、{name}です。本日はどのようなご用件でしょうか？",
+    "zh": "你好，我是{name}，请问有什么可以帮助您的吗？",
+    "ko": "안녕하세요, {name}입니다. 오늘 어떤 도움이 필요하신가요?",
+    "hi": "नमस्ते, मैं {name} हूँ, आज मैं आपकी क्या मदद कर सकता हूँ?",
+}
+
+
+@router.get("/profiles/presets/{engine}/{voice_id}/preview")
+async def get_preset_voice_preview(
+    engine: str,
+    voice_id: str,
+    text: str | None = None,
+):
+    """Generate or serve a cached voice preview for a built-in preset voice.
+
+    Speaks: 'Hi, I am {name}, how may I help you today?' (or native equivalent).
+    """
+    if engine not in ("kokoro", "qwen_custom_voice"):
+        raise HTTPException(
+            status_code=400,
+            detail=f"Engine '{engine}' does not support preset voice previews.",
+        )
+
+    voice_name = voice_id
+    voice_lang = "en"
+
+    if engine == "kokoro":
+        from ..backends.kokoro_backend import KOKORO_VOICES
+
+        match = next((v for v in KOKORO_VOICES if v[0] == voice_id), None)
+        if not match:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Preset voice '{voice_id}' not found for Kokoro.",
+            )
+        _, voice_name, _, voice_lang = match
+    elif engine == "qwen_custom_voice":
+        from ..backends.qwen_custom_voice_backend import QWEN_CUSTOM_VOICES
+
+        match = next((v for v in QWEN_CUSTOM_VOICES if v[0] == voice_id), None)
+        if not match:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Preset voice '{voice_id}' not found for Qwen CustomVoice.",
+            )
+        _, display_name, _, voice_lang, _ = match
+        voice_name = display_name
+
+    if text and text.strip():
+        preview_text = text.strip()
+    else:
+        template = GREETING_TEMPLATES.get(voice_lang, GREETING_TEMPLATES["en"])
+        preview_text = template.format(name=voice_name)
+
+    import hashlib
+
+    text_hash = hashlib.md5(preview_text.encode("utf-8")).hexdigest()[:8]
+    preview_dir = config.get_data_dir() / "previews"
+    preview_dir.mkdir(parents=True, exist_ok=True)
+    cache_file = preview_dir / f"{engine}_{voice_id}_{text_hash}.wav"
+
+    if cache_file.is_file() and cache_file.stat().st_size > 100:
+        return FileResponse(cache_file, media_type="audio/wav")
+
+    try:
+        import soundfile as sf
+        from ..backends import get_tts_backend_for_engine
+
+        backend = get_tts_backend_for_engine(engine)
+        prompt = {
+            "voice_type": "preset",
+            "preset_engine": engine,
+            "preset_voice_id": voice_id,
+            "kokoro_voice": voice_id,
+        }
+        audio_array, sample_rate = await backend.generate(
+            text=preview_text,
+            voice_prompt=prompt,
+            language=voice_lang
+            if voice_lang in ("en", "es", "fr", "it", "pt", "ja", "zh", "ko", "de", "hi")
+            else "en",
+        )
+        sf.write(str(cache_file), audio_array, sample_rate, format="WAV")
+        return FileResponse(cache_file, media_type="audio/wav")
+    except Exception as e:
+        logger.error(f"Failed to generate preview for {engine}/{voice_id}: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=500,
+            detail=f"Voice preview generation failed: {str(e)}",
+        )
+
+
 @router.get("/profiles/{profile_id}", response_model=models.VoiceProfileResponse)
 async def get_profile(
     profile_id: str,

@@ -8,6 +8,7 @@ import { TOP_SAFE_AREA_PADDING } from '@/lib/constants/ui';
 import { cn } from '@/lib/utils/cn';
 import { useStoryStore } from '@/stores/storyStore';
 import { useStory } from '@/lib/hooks/useStories';
+import { useUIStore } from '@/stores/uiStore';
 import { OnboardingTour } from '@/components/Onboarding/OnboardingTour';
 import { UserNameModal } from '@/components/Onboarding/UserNameModal';
 
@@ -22,6 +23,7 @@ export function AppFrame({ children }: AppFrameProps) {
 
   const selectedStoryId = useStoryStore((state) => state.selectedStoryId);
   const { data: story } = useStory(selectedStoryId);
+  const sidebarOpen = useUIStore((state) => state.sidebarOpen);
 
   // Show track editor when on stories route with a selected story that has items
   const showTrackEditor = isStoriesRoute && selectedStoryId && story && story.items.length > 0;
@@ -32,7 +34,12 @@ export function AppFrame({ children }: AppFrameProps) {
     >
       <TitleBarDragRegion />
       {!isHomeRoute && (
-        <div className="ml-16">
+        <div
+          className={cn(
+            'transition-[margin] duration-300 ease-in-out',
+            sidebarOpen ? 'ml-60' : 'ml-16',
+          )}
+        >
           <RheoStudioBar />
         </div>
       )}

@@ -21,12 +21,15 @@ import { LogsPage } from '@/components/ServerTab/LogsPage';
 import { MCPPage } from '@/components/ServerTab/MCPPage';
 import { SettingsLayout } from '@/components/ServerTab/ServerTab';
 import { Sidebar } from '@/components/Sidebar';
+import { CommandPalette } from '@/components/CommandPalette/CommandPalette';
 import { StoriesTab } from '@/components/StoriesTab/StoriesTab';
 import { Toaster } from '@/components/ui/toaster';
 import { VoicesTab } from '@/components/VoicesTab/VoicesTab';
 import { useGenerationProgress } from '@/lib/hooks/useGenerationProgress';
 import { useModelDownloadToast } from '@/lib/hooks/useModelDownloadToast';
 import { MODEL_DISPLAY_NAMES, useRestoreActiveTasks } from '@/lib/hooks/useRestoreActiveTasks';
+import { cn } from '@/lib/utils/cn';
+import { useUIStore } from '@/stores/uiStore';
 
 // Simple platform check that works in both web and Tauri
 const isMacOS = () => navigator.platform.toLowerCase().includes('mac');
@@ -39,12 +42,19 @@ function RootLayout() {
   // Subscribe to SSE for pending generations — handles completion, auto-play, and history refresh
   useGenerationProgress();
 
+  const sidebarOpen = useUIStore((s) => s.sidebarOpen);
+
   return (
     <AppFrame>
       <div className="flex flex-1 min-h-0 overflow-hidden">
         <Sidebar isMacOS={isMacOS()} />
 
-        <main className="flex-1 ml-16 overflow-hidden flex flex-col pt-2 bg-background">
+        <main
+          className={cn(
+            'flex-1 overflow-hidden flex flex-col pt-2 bg-background transition-[margin] duration-300 ease-in-out',
+            sidebarOpen ? 'ml-60' : 'ml-16',
+          )}
+        >
           <div className="container mx-auto px-6 max-w-[1800px] h-full overflow-hidden flex flex-col">
             <Outlet />
           </div>
@@ -63,6 +73,7 @@ function RootLayout() {
         );
       })}
 
+      <CommandPalette />
       <Toaster />
     </AppFrame>
   );
