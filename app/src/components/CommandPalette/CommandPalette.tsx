@@ -118,6 +118,14 @@ export function CommandPalette() {
         onSelect: () => runAction(() => navigate({ to: '/captures' })),
       },
       {
+        id: 'nav-dictation-settings',
+        title: 'Global Hotkey & Dictation Settings',
+        subtitle: 'Configure Voice-to-Text Shortcuts, Auto-Paste & STT',
+        category: 'Navigation',
+        icon: Mic2,
+        onSelect: () => runAction(() => navigate({ to: '/settings/captures' })),
+      },
+      {
         id: 'nav-effects',
         title: 'Voice Effects Matrix',
         subtitle: 'DSP Chain, Pitch, Reverb & Parametric EQ',
