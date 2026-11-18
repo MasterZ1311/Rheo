@@ -451,7 +451,7 @@ export function CapturesTab() {
       />
 
       {/* Left: capture list card */}
-      <div className="w-[340px] shrink-0 bg-white rounded-3xl shadow-[0_4px_24px_rgba(0,0,0,0.03)] border border-black/[0.04] overflow-hidden">
+      <div className="w-[340px] shrink-0 bg-white dark:bg-[#171A27] rounded-3xl shadow-[0_4px_24px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.3)] border border-black/[0.04] dark:border-white/[0.08] overflow-hidden">
         <ListPane>
           <ListPaneHeader>
             <ListPaneTitleRow>
@@ -534,8 +534,8 @@ export function CapturesTab() {
       </div>
 
       {/* Right: capture detail card */}
-      <div className="flex-1 flex flex-col relative overflow-hidden min-w-0 bg-white rounded-3xl shadow-[0_4px_24px_rgba(0,0,0,0.03)] border border-black/[0.04]">
-        <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-white to-transparent z-10 pointer-events-none" />
+      <div className="flex-1 flex flex-col relative overflow-hidden min-w-0 bg-white dark:bg-[#171A27] rounded-3xl shadow-[0_4px_24px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.3)] border border-black/[0.04] dark:border-white/[0.08]">
+        <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-white dark:from-[#171A27] to-transparent z-10 pointer-events-none" />
 
         {/* Top action bar */}
         <div className="absolute top-0 left-0 right-0 z-20 px-8">

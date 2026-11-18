@@ -80,18 +80,18 @@ export function MainEditor() {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full min-h-0 overflow-hidden relative py-4">
       {/* Left Column: Voice Profiles Foundry */}
-      <div className="bg-white rounded-3xl p-6 shadow-[0_4px_24px_rgba(0,0,0,0.03)] border border-black/[0.04] flex flex-col min-h-0 overflow-hidden relative">
-        <div className="flex items-center justify-between mb-4 pb-3 border-b border-black/[0.04] shrink-0">
+      <div className="bg-white dark:bg-[#171A27] rounded-3xl p-6 shadow-[0_4px_24px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.3)] border border-black/[0.04] dark:border-white/[0.08] flex flex-col min-h-0 overflow-hidden relative">
+        <div className="flex items-center justify-between mb-4 pb-3 border-b border-black/[0.04] dark:border-white/[0.06] shrink-0">
           <div>
-            <h2 className="text-base font-bold text-[#111827]">Voice Foundry</h2>
-            <p className="text-xs text-[#6B7280]">Select or customize neural voice clones</p>
+            <h2 className="text-base font-bold text-slate-900 dark:text-white">Voice Foundry</h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400">Select or customize neural voice clones</p>
           </div>
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
               size="sm"
               onClick={handleImportClick}
-              className="rounded-xl border-[#D1D5DB] text-xs font-medium text-[#374151] hover:bg-[#F3F4F6]"
+              className="rounded-xl border-slate-300 dark:border-white/[0.15] bg-transparent text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/[0.08]"
             >
               <Upload className="mr-1.5 h-3.5 w-3.5" />
               {t('main.importVoice')}
@@ -127,11 +127,11 @@ export function MainEditor() {
       </div>
 
       {/* Right Column: Generation History & Takes */}
-      <div className="bg-white rounded-3xl p-6 shadow-[0_4px_24px_rgba(0,0,0,0.03)] border border-black/[0.04] flex flex-col min-h-0 overflow-hidden relative">
-        <div className="flex items-center justify-between mb-4 pb-3 border-b border-black/[0.04] shrink-0">
+      <div className="bg-white dark:bg-[#171A27] rounded-3xl p-6 shadow-[0_4px_24px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.3)] border border-black/[0.04] dark:border-white/[0.08] flex flex-col min-h-0 overflow-hidden relative">
+        <div className="flex items-center justify-between mb-4 pb-3 border-b border-black/[0.04] dark:border-white/[0.06] shrink-0">
           <div>
-            <h2 className="text-base font-bold text-[#111827]">Generation Stream</h2>
-            <p className="text-xs text-[#6B7280]">Recent synthesized takes and versions</p>
+            <h2 className="text-base font-bold text-slate-900 dark:text-white">Generation Stream</h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400">Recent synthesized takes and versions</p>
           </div>
         </div>
         <div className="flex-1 min-h-0 overflow-hidden flex flex-col">

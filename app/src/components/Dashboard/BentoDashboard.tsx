@@ -187,16 +187,16 @@ export function BentoDashboard() {
         {/* ── ROW 1 ────────────────────────────────────────────────────────── */}
 
         {/* Card 1: Resonance Calendar (4 cols) */}
-        <div className="lg:col-span-4 bg-white rounded-3xl p-6 shadow-[0_4px_24px_rgba(0,0,0,0.03)] border border-black/[0.04] flex flex-col justify-between select-none">
+        <div className="lg:col-span-4 bg-white dark:bg-[#171A27] rounded-3xl p-6 shadow-[0_4px_24px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.3)] border border-black/[0.04] dark:border-white/[0.08] flex flex-col justify-between select-none">
           <div>
             {/* Calendar Header */}
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-sm font-bold text-[#111827]">{monthLabel}</h2>
+              <h2 className="text-sm font-bold text-slate-900 dark:text-white">{monthLabel}</h2>
               <div className="flex items-center gap-1.5">
                 <button
                   type="button"
                   onClick={handlePrevMonth}
-                  className="h-6 w-6 rounded-full bg-[#111827] hover:bg-black text-white flex items-center justify-center transition-colors cursor-pointer"
+                  className="h-6 w-6 rounded-full bg-slate-900 dark:bg-white/[0.1] hover:bg-black dark:hover:bg-white/[0.2] text-white flex items-center justify-center transition-colors cursor-pointer"
                   title="Previous month"
                 >
                   <ChevronLeft className="h-3.5 w-3.5" />
@@ -204,7 +204,7 @@ export function BentoDashboard() {
                 <button
                   type="button"
                   onClick={handleNextMonth}
-                  className="h-6 w-6 rounded-full bg-[#111827] hover:bg-black text-white flex items-center justify-center transition-colors cursor-pointer"
+                  className="h-6 w-6 rounded-full bg-slate-900 dark:bg-white/[0.1] hover:bg-black dark:hover:bg-white/[0.2] text-white flex items-center justify-center transition-colors cursor-pointer"
                   title="Next month"
                 >
                   <ChevronRight className="h-3.5 w-3.5" />
@@ -215,7 +215,7 @@ export function BentoDashboard() {
             {/* Days of Week Header */}
             <div className="grid grid-cols-7 gap-1 text-center mb-2">
               {daysOfWeek.map((day) => (
-                <span key={day} className="text-[10px] font-bold text-[#6B7280]">
+                <span key={day} className="text-[10px] font-bold text-slate-500 dark:text-slate-400">
                   {day}
                 </span>
               ))}
@@ -232,8 +232,8 @@ export function BentoDashboard() {
                     onClick={() => d.inMonth && setSelectedDay(d.num)}
                     className={cn(
                       'relative h-7 w-7 rounded-full flex flex-col items-center justify-center mx-auto transition-all cursor-pointer',
-                      !d.inMonth && 'text-[#CBD5E1] cursor-default',
-                      d.inMonth && !isSelected && 'text-[#374151] hover:bg-[#F3F4F6]',
+                      !d.inMonth && 'text-slate-300 dark:text-slate-600 cursor-default',
+                      d.inMonth && !isSelected && 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/[0.08]',
                       isSelected && 'bg-[#F97316] text-white font-bold shadow-xs',
                     )}
                   >
@@ -248,7 +248,7 @@ export function BentoDashboard() {
           </div>
 
           {/* Calendar Activity Footer */}
-          <div className="pt-3 mt-3 border-t border-black/[0.03] flex items-center justify-between text-[11px] text-[#6B7280]">
+          <div className="pt-3 mt-3 border-t border-black/[0.04] dark:border-white/[0.06] flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
             <span className="flex items-center gap-1.5">
               <span className="h-2 w-2 rounded-full bg-[#F97316]" />
               {generationCountByDay[selectedDay]
@@ -266,10 +266,10 @@ export function BentoDashboard() {
         </div>
 
         {/* Card 2: Priority Streams / Urgent Tasks (8 cols) */}
-        <div className="lg:col-span-8 bg-white rounded-3xl p-6 shadow-[0_4px_24px_rgba(0,0,0,0.03)] border border-black/[0.04] flex flex-col justify-between select-none">
+        <div className="lg:col-span-8 bg-white dark:bg-[#171A27] rounded-3xl p-6 shadow-[0_4px_24px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.3)] border border-black/[0.04] dark:border-white/[0.08] flex flex-col justify-between select-none">
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-base font-bold text-[#111827]">Priority Streams</h2>
+              <h2 className="text-base font-bold text-slate-900 dark:text-white">Priority Streams</h2>
               <button
                 type="button"
                 onClick={() => setIsAddingTask(true)}
@@ -289,7 +289,7 @@ export function BentoDashboard() {
                   placeholder="Task title (e.g. Calibrate German voice clone)..."
                   value={newTaskTitle}
                   onChange={(e) => setNewTaskTitle(e.target.value)}
-                  className="flex-1 h-9 rounded-xl bg-[#F9FAFB] border border-black/[0.08] px-3 text-xs text-[#111827] focus:outline-none focus:ring-1 focus:ring-[#F97316]"
+                  className="flex-1 h-9 rounded-xl bg-slate-50 dark:bg-white/[0.06] border border-black/[0.08] dark:border-white/[0.1] px-3 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-[#F97316]"
                 />
                 <button
                   type="submit"
@@ -303,7 +303,7 @@ export function BentoDashboard() {
                     setIsAddingTask(false);
                     setNewTaskTitle('');
                   }}
-                  className="h-9 px-3 rounded-xl bg-gray-100 text-[#4B5563] text-xs font-medium hover:bg-gray-200 transition-colors"
+                  className="h-9 px-3 rounded-xl bg-slate-100 dark:bg-white/[0.1] text-slate-600 dark:text-slate-300 text-xs font-medium hover:bg-slate-200 dark:hover:bg-white/[0.15] transition-colors"
                 >
                   Cancel
                 </button>
@@ -313,14 +313,14 @@ export function BentoDashboard() {
             {/* Task List */}
             <div className="space-y-2.5">
               {filteredTasks.length === 0 ? (
-                <div className="py-6 text-center text-xs text-[#9CA3AF]">
+                <div className="py-6 text-center text-xs text-slate-400 dark:text-slate-500">
                   {searchQuery ? 'No tasks match your search.' : 'All clear! No pending tasks.'}
                 </div>
               ) : (
                 filteredTasks.map((task) => (
                   <div
                     key={task.id}
-                    className="group flex items-center justify-between p-2 rounded-xl hover:bg-[#F9FAFB] transition-colors cursor-pointer"
+                    className="group flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-white/[0.04] transition-colors cursor-pointer"
                   >
                     <div
                       className="flex items-center gap-3.5 flex-1 min-w-0"
@@ -332,7 +332,7 @@ export function BentoDashboard() {
                           'h-5 w-5 rounded-full border flex items-center justify-center transition-all shrink-0',
                           task.completed
                             ? 'border-[#F97316] bg-[#F97316] text-white'
-                            : 'border-[#CBD5E1] group-hover:border-[#94A3B8]',
+                            : 'border-slate-300 dark:border-slate-600 group-hover:border-slate-400 dark:group-hover:border-slate-500',
                         )}
                       >
                         {task.completed && <Check className="h-3 w-3 stroke-[3]" />}
@@ -341,8 +341,8 @@ export function BentoDashboard() {
                         className={cn(
                           'text-xs md:text-sm font-medium transition-all truncate',
                           task.completed
-                            ? 'line-through text-[#9CA3AF]'
-                            : 'text-[#1F2937] group-hover:text-black',
+                            ? 'line-through text-slate-400 dark:text-slate-500'
+                            : 'text-slate-800 dark:text-slate-200 group-hover:text-black dark:group-hover:text-white',
                         )}
                       >
                         {task.title}
@@ -350,8 +350,8 @@ export function BentoDashboard() {
                     </div>
 
                     <div className="flex items-center gap-2 shrink-0 ml-2">
-                      <span className="flex items-center gap-1.5 text-xs font-semibold text-[#E11D48]">
-                        <span className="h-1.5 w-1.5 rounded-full bg-[#E11D48]" />
+                      <span className="flex items-center gap-1.5 text-xs font-semibold text-rose-600 dark:text-rose-400">
+                        <span className="h-1.5 w-1.5 rounded-full bg-rose-500" />
                         {task.tag}
                       </span>
                       <button
@@ -372,7 +372,7 @@ export function BentoDashboard() {
             </div>
           </div>
 
-          <div className="pt-4 border-t border-black/[0.03] flex items-center justify-between text-[11px] text-[#6B7280]">
+          <div className="pt-4 border-t border-black/[0.04] dark:border-white/[0.06] flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
             <span>
               {dashboardTasks?.filter((t) => t.completed).length || 0} of{' '}
               {dashboardTasks?.length || 0} tasks completed
@@ -390,18 +390,18 @@ export function BentoDashboard() {
         {/* ── ROW 2 ────────────────────────────────────────────────────────── */}
 
         {/* Card 3: Project Directory / Voices (4 cols) */}
-        <div className="lg:col-span-4 bg-white rounded-3xl p-6 shadow-[0_4px_24px_rgba(0,0,0,0.03)] border border-black/[0.04] flex flex-col justify-between select-none">
+        <div className="lg:col-span-4 bg-white dark:bg-[#171A27] rounded-3xl p-6 shadow-[0_4px_24px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.3)] border border-black/[0.04] dark:border-white/[0.08] flex flex-col justify-between select-none">
           <div>
-            <h2 className="text-base font-bold text-[#111827] mb-4">Voice Streams Directory</h2>
+            <h2 className="text-base font-bold text-slate-900 dark:text-white mb-4">Voice Streams Directory</h2>
 
             {isLoadingProfiles ? (
               <div className="space-y-3">
                 {[1, 2, 3].map((n) => (
-                  <div key={n} className="h-8 rounded-xl bg-gray-100 animate-pulse" />
+                  <div key={n} className="h-8 rounded-xl bg-slate-100 dark:bg-white/[0.05] animate-pulse" />
                 ))}
               </div>
             ) : filteredProjects.length === 0 ? (
-              <div className="py-6 text-center text-xs text-[#9CA3AF]">
+              <div className="py-6 text-center text-xs text-slate-400 dark:text-slate-500">
                 <p>No voice streams found.</p>
                 <button
                   type="button"
@@ -420,17 +420,17 @@ export function BentoDashboard() {
                       setSelectedProfileId(p.id);
                       navigate({ to: '/studio' });
                     }}
-                    className="flex items-center justify-between py-1.5 hover:bg-[#F9FAFB] px-2 rounded-xl transition-colors cursor-pointer group"
+                    className="flex items-center justify-between py-1.5 hover:bg-slate-50 dark:hover:bg-white/[0.04] px-2 rounded-xl transition-colors cursor-pointer group"
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
                       <GitFork className="h-4 w-4 text-[#F97316] shrink-0 rotate-90" />
-                      <span className="text-xs font-medium text-[#374151] group-hover:text-black truncate">
+                      <span className="text-xs font-medium text-slate-700 dark:text-slate-200 group-hover:text-black dark:group-hover:text-white truncate">
                         {p.name}
                       </span>
                     </div>
 
                     <div className="flex items-center gap-2 shrink-0">
-                      <span className="text-[10px] font-mono text-gray-400 uppercase">
+                      <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500 uppercase">
                         {p.language}
                       </span>
                       <div className="h-5 w-5 rounded-full bg-gradient-to-tr from-[#EA580C] to-[#FB923C] text-white text-[9px] font-bold flex items-center justify-center overflow-hidden">
@@ -450,7 +450,7 @@ export function BentoDashboard() {
           <button
             type="button"
             onClick={() => setProfileDialogOpen(true)}
-            className="mt-4 inline-flex items-center justify-center gap-1.5 rounded-full border border-[#D1D5DB] bg-transparent px-4 py-1.5 text-xs font-semibold text-[#374151] hover:bg-[#F3F4F6] transition-colors w-fit cursor-pointer"
+            className="mt-4 inline-flex items-center justify-center gap-1.5 rounded-full border border-slate-300 dark:border-white/[0.15] bg-transparent px-4 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/[0.06] transition-colors w-fit cursor-pointer"
           >
             <Plus className="h-3.5 w-3.5" />
             <span>Add profile</span>
@@ -458,18 +458,18 @@ export function BentoDashboard() {
         </div>
 
         {/* Card 4: Studio Notes / Generation Activity (4 cols) */}
-        <div className="lg:col-span-4 bg-white rounded-3xl p-6 shadow-[0_4px_24px_rgba(0,0,0,0.03)] border border-black/[0.04] flex flex-col justify-between select-none">
+        <div className="lg:col-span-4 bg-white dark:bg-[#171A27] rounded-3xl p-6 shadow-[0_4px_24px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.3)] border border-black/[0.04] dark:border-white/[0.08] flex flex-col justify-between select-none">
           <div>
-            <h2 className="text-base font-bold text-[#111827] mb-4">Studio Activity</h2>
+            <h2 className="text-base font-bold text-slate-900 dark:text-white mb-4">Studio Activity</h2>
 
             {isLoadingHistory ? (
               <div className="space-y-3 mb-4">
                 {[1, 2].map((n) => (
-                  <div key={n} className="h-14 rounded-2xl bg-gray-100 animate-pulse" />
+                  <div key={n} className="h-14 rounded-2xl bg-slate-100 dark:bg-white/[0.05] animate-pulse" />
                 ))}
               </div>
             ) : recentGenerations.length === 0 ? (
-              <div className="py-6 text-center text-xs text-[#9CA3AF] mb-4">
+              <div className="py-6 text-center text-xs text-slate-400 dark:text-slate-500 mb-4">
                 <p>No audio generations yet.</p>
                 <button
                   type="button"
@@ -485,22 +485,22 @@ export function BentoDashboard() {
                   <div
                     key={item.id}
                     onClick={() => navigate({ to: '/studio' })}
-                    className="flex items-center justify-between p-3 rounded-2xl bg-[#F9FAFB] hover:bg-[#F3F4F6] transition-colors cursor-pointer border border-black/[0.02] group"
+                    className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-white/[0.04] hover:bg-slate-100 dark:hover:bg-white/[0.08] transition-colors cursor-pointer border border-black/[0.02] dark:border-white/[0.04] group"
                   >
                     <div className="flex items-center gap-3 min-w-0 flex-1">
                       <div className="h-7 w-7 rounded-full bg-[#0D9488] text-white flex items-center justify-center text-xs font-bold shrink-0">
                         {item.profile_name.charAt(0).toUpperCase()}
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="text-[10px] font-bold text-[#6B7280] truncate">
+                        <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 truncate">
                           {item.profile_name}
                         </p>
-                        <p className="text-xs font-medium text-[#1F2937] truncate">
+                        <p className="text-xs font-medium text-slate-800 dark:text-slate-200 truncate">
                           {item.text || 'Audio synthesis output'}
                         </p>
                       </div>
                     </div>
-                    <ChevronRight className="h-4 w-4 text-[#9CA3AF] group-hover:text-black shrink-0 ml-1 transition-colors" />
+                    <ChevronRight className="h-4 w-4 text-slate-400 dark:text-slate-500 group-hover:text-slate-900 dark:group-hover:text-white shrink-0 ml-1 transition-colors" />
                   </div>
                 ))}
               </div>
@@ -511,59 +511,59 @@ export function BentoDashboard() {
           <div className="grid grid-cols-3 gap-2 pt-2">
             <div
               onClick={() => navigate({ to: '/studio' })}
-              className="rounded-2xl bg-[#EDE9FE] p-2.5 flex flex-col justify-between hover:opacity-90 transition-opacity cursor-pointer border border-[#DDD6FE]"
+              className="rounded-2xl bg-purple-100 dark:bg-purple-950/40 p-2.5 flex flex-col justify-between hover:opacity-90 transition-opacity cursor-pointer border border-purple-200 dark:border-purple-800/40"
             >
-              <span className="text-[9px] font-bold text-[#6D28D9]">#Research</span>
+              <span className="text-[9px] font-bold text-purple-700 dark:text-purple-300">#Research</span>
               <div className="flex items-center justify-between mt-1">
-                <span className="text-[10px] font-semibold text-[#4C1D95] leading-tight">
+                <span className="text-[10px] font-semibold text-purple-900 dark:text-purple-200 leading-tight">
                   Acoustic analysis
                 </span>
-                <ChevronRight className="h-3 w-3 text-[#6D28D9] shrink-0" />
+                <ChevronRight className="h-3 w-3 text-purple-700 dark:text-purple-300 shrink-0" />
               </div>
             </div>
 
             <div
               onClick={() => navigate({ to: '/studio' })}
-              className="rounded-2xl bg-[#D1FAE5] p-2.5 flex flex-col justify-between hover:opacity-90 transition-opacity cursor-pointer border border-[#A7F3D0]"
+              className="rounded-2xl bg-emerald-100 dark:bg-emerald-950/40 p-2.5 flex flex-col justify-between hover:opacity-90 transition-opacity cursor-pointer border border-emerald-200 dark:border-emerald-800/40"
             >
-              <span className="text-[9px] font-bold text-[#059669]">#Strategy</span>
+              <span className="text-[9px] font-bold text-emerald-700 dark:text-emerald-300">#Strategy</span>
               <div className="flex items-center justify-between mt-1">
-                <span className="text-[10px] font-semibold text-[#065F46] leading-tight">
+                <span className="text-[10px] font-semibold text-emerald-900 dark:text-emerald-200 leading-tight">
                   Voice cloning
                 </span>
-                <ChevronRight className="h-3 w-3 text-[#059669] shrink-0" />
+                <ChevronRight className="h-3 w-3 text-emerald-700 dark:text-emerald-300 shrink-0" />
               </div>
             </div>
 
             <div
               onClick={() => navigate({ to: '/studio' })}
-              className="rounded-2xl bg-[#FEF3C7] p-2.5 flex flex-col justify-between hover:opacity-90 transition-opacity cursor-pointer border border-[#FDE68A]"
+              className="rounded-2xl bg-amber-100 dark:bg-amber-950/40 p-2.5 flex flex-col justify-between hover:opacity-90 transition-opacity cursor-pointer border border-amber-200 dark:border-amber-800/40"
             >
-              <span className="text-[9px] font-bold text-[#D97706]">#Operations</span>
+              <span className="text-[9px] font-bold text-amber-700 dark:text-amber-300">#Operations</span>
               <div className="flex items-center justify-between mt-1">
-                <span className="text-[10px] font-semibold text-[#92400E] leading-tight">
+                <span className="text-[10px] font-semibold text-amber-900 dark:text-amber-200 leading-tight">
                   Dictation batch
                 </span>
-                <ChevronRight className="h-3 w-3 text-[#D97706] shrink-0" />
+                <ChevronRight className="h-3 w-3 text-amber-700 dark:text-amber-300 shrink-0" />
               </div>
             </div>
           </div>
         </div>
 
         {/* Card 5: Voice Personas / Team Directory (4 cols) */}
-        <div className="lg:col-span-4 bg-white rounded-3xl p-6 shadow-[0_4px_24px_rgba(0,0,0,0.03)] border border-black/[0.04] flex flex-col justify-between select-none">
+        <div className="lg:col-span-4 bg-white dark:bg-[#171A27] rounded-3xl p-6 shadow-[0_4px_24px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.3)] border border-black/[0.04] dark:border-white/[0.08] flex flex-col justify-between select-none">
           <div>
-            <h2 className="text-base font-bold text-[#111827] mb-4">Voice Personas</h2>
+            <h2 className="text-base font-bold text-slate-900 dark:text-white mb-4">Voice Personas</h2>
 
             {isLoadingProfiles ? (
               <div className="grid grid-cols-2 gap-3">
                 {[1, 2, 3, 4].map((n) => (
-                  <div key={n} className="h-28 rounded-2xl bg-gray-100 animate-pulse" />
+                  <div key={n} className="h-28 rounded-2xl bg-slate-100 dark:bg-white/[0.05] animate-pulse" />
                 ))}
               </div>
             ) : personaProfiles.length === 0 ? (
-              <div className="py-8 text-center text-xs text-[#9CA3AF]">
-                <Mic className="h-8 w-8 mx-auto text-gray-300 mb-2" />
+              <div className="py-8 text-center text-xs text-slate-400 dark:text-slate-500">
+                <Mic className="h-8 w-8 mx-auto text-slate-300 dark:text-slate-600 mb-2" />
                 <p>No voice profiles added yet.</p>
                 <button
                   type="button"
@@ -589,7 +589,7 @@ export function BentoDashboard() {
                         setSelectedVoiceId(per.id);
                         navigate({ to: '/voices' });
                       }}
-                      className="bg-[#F9FAFB] rounded-2xl p-3.5 flex flex-col items-center text-center border border-black/[0.02] hover:bg-[#F3F4F6] hover:scale-[1.02] transition-all cursor-pointer shadow-xs group"
+                      className="bg-slate-50 dark:bg-white/[0.04] rounded-2xl p-3.5 flex flex-col items-center text-center border border-black/[0.02] dark:border-white/[0.06] hover:bg-slate-100 dark:hover:bg-white/[0.08] hover:scale-[1.02] transition-all cursor-pointer shadow-xs group"
                     >
                       <div
                         className={cn(
@@ -611,10 +611,10 @@ export function BentoDashboard() {
                           per.name.charAt(0).toUpperCase()
                         )}
                       </div>
-                      <h3 className="text-xs font-bold text-[#111827] truncate w-full group-hover:text-black">
+                      <h3 className="text-xs font-bold text-slate-900 dark:text-white truncate w-full group-hover:text-[#F97316] transition-colors">
                         {per.name}
                       </h3>
-                      <p className="text-[10px] text-[#6B7280] truncate w-full mt-0.5 uppercase font-medium">
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate w-full mt-0.5 uppercase font-medium">
                         {per.language || 'English'}
                       </p>
                     </div>
@@ -624,7 +624,7 @@ export function BentoDashboard() {
             )}
           </div>
 
-          <div className="pt-3 border-t border-black/[0.03] text-center">
+          <div className="pt-3 border-t border-black/[0.04] dark:border-white/[0.06] text-center">
             <button
               type="button"
               onClick={() => navigate({ to: '/voices' })}

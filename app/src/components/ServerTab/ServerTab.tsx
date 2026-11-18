@@ -51,7 +51,7 @@ export function SettingsLayout() {
 
   return (
     <div className="flex flex-col h-full min-h-0 py-4">
-      <nav className="flex items-center gap-1.5 p-1.5 rounded-2xl bg-white border border-black/[0.04] shadow-[0_4px_24px_rgba(0,0,0,0.03)] shrink-0 overflow-x-auto mb-4">
+      <nav className="flex items-center gap-1.5 p-1.5 rounded-2xl bg-white dark:bg-[#171A27] border border-black/[0.04] dark:border-white/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.3)] shrink-0 overflow-x-auto mb-4">
         {tabs.map((tab) => {
           if (tab.tauriOnly && !platform.metadata.isTauri) return null;
 
@@ -69,7 +69,7 @@ export function SettingsLayout() {
                 'inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-medium transition-all whitespace-nowrap cursor-pointer',
                 isActive
                   ? 'bg-[#F97316] text-white shadow-xs font-semibold'
-                  : 'text-[#6B7280] hover:text-[#111827] hover:bg-black/[0.04]',
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-black/[0.04] dark:hover:bg-white/[0.06]',
               )}
             >
               <Icon className="h-3.5 w-3.5" />

@@ -13,10 +13,10 @@ export function SettingSection({
   children: ReactNode;
 }) {
   return (
-    <div className="bg-white rounded-3xl p-6 shadow-[0_4px_24px_rgba(0,0,0,0.03)] border border-black/[0.04] space-y-1">
-      {title && <h3 className="text-base font-bold text-[#111827]">{title}</h3>}
-      {description && <p className="text-xs text-[#6B7280]">{description}</p>}
-      <div className={`${title || description ? 'pt-3' : ''} space-y-0 divide-y divide-black/[0.04]`}>
+    <div className="bg-white dark:bg-[#171A27] rounded-3xl p-6 shadow-[0_4px_24px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.3)] border border-black/[0.04] dark:border-white/[0.08] space-y-1">
+      {title && <h3 className="text-base font-bold text-slate-900 dark:text-white">{title}</h3>}
+      {description && <p className="text-xs text-slate-500 dark:text-slate-400">{description}</p>}
+      <div className={`${title || description ? 'pt-3' : ''} space-y-0 divide-y divide-black/[0.04] dark:divide-white/[0.06]`}>
         {children}
       </div>
     </div>

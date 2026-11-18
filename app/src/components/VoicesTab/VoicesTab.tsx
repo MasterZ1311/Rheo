@@ -105,12 +105,12 @@ export function VoicesTab() {
   return (
     <div className="h-full flex gap-5 overflow-hidden py-4">
       {/* Left: Table Card */}
-      <div className="bg-white rounded-3xl p-6 shadow-[0_4px_24px_rgba(0,0,0,0.03)] border border-black/[0.04] flex-1 min-w-0 flex flex-col relative overflow-hidden">
+      <div className="bg-white dark:bg-[#171A27] rounded-3xl p-6 shadow-[0_4px_24px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.3)] border border-black/[0.04] dark:border-white/[0.08] flex-1 min-w-0 flex flex-col relative overflow-hidden">
         {/* Header */}
-        <div className="flex items-center gap-3 mb-4 pb-3 border-b border-black/[0.04] shrink-0">
+        <div className="flex items-center gap-3 mb-4 pb-3 border-b border-black/[0.04] dark:border-white/[0.06] shrink-0">
           <div>
-            <h1 className="text-base font-bold text-[#111827]">{t('voicesTab.title')}</h1>
-            <p className="text-xs text-[#6B7280]">Manage, inspect, and configure voice identities</p>
+            <h1 className="text-base font-bold text-slate-900 dark:text-white">{t('voicesTab.title')}</h1>
+            <p className="text-xs text-slate-500 dark:text-slate-400">Manage, inspect, and configure voice identities</p>
           </div>
           <div className="flex-1" />
           <div className="relative w-[240px]">
@@ -119,7 +119,7 @@ export function VoicesTab() {
               placeholder={t('voicesTab.searchPlaceholder')}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="h-9 pl-8 text-xs rounded-xl border-[#D1D5DB] focus-visible:ring-1 focus-visible:ring-[#F97316]"
+              className="h-9 pl-8 text-xs rounded-xl border-slate-300 dark:border-white/[0.12] bg-transparent text-slate-900 dark:text-white placeholder:text-slate-400 focus-visible:ring-1 focus-visible:ring-[#F97316]"
             />
           </div>
           <Button
@@ -170,7 +170,7 @@ export function VoicesTab() {
 
       {/* Right: Inspector Card */}
       {selectedVoiceId && (
-        <div className="w-[360px] shrink-0 bg-white rounded-3xl p-6 shadow-[0_4px_24px_rgba(0,0,0,0.03)] border border-black/[0.04] flex flex-col overflow-hidden">
+        <div className="w-[360px] shrink-0 bg-white dark:bg-[#171A27] rounded-3xl p-6 shadow-[0_4px_24px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.3)] border border-black/[0.04] dark:border-white/[0.08] flex flex-col overflow-hidden">
           <VoiceInspector key={selectedVoiceId} profileId={selectedVoiceId} />
         </div>
       )}
