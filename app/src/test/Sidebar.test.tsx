@@ -67,7 +67,6 @@ describe('Sidebar Component', () => {
     expect(screen.getByTitle('Voice Studio')).toBeInTheDocument();
     expect(screen.getByTitle('Voice Profiles')).toBeInTheDocument();
     expect(screen.getByTitle('Harmonics & Inference')).toBeInTheDocument();
-    expect(screen.getByTitle('New Voice Profile')).toBeInTheDocument();
     expect(screen.getByTitle('Settings')).toBeInTheDocument();
     expect(screen.getByTitle('Disconnect / Exit')).toBeInTheDocument();
   });
@@ -132,13 +131,11 @@ describe('Sidebar Component', () => {
     expect(useUIStore.getState().theme).toBe('dark');
   });
 
-  it('opens profile create dialog when new voice button is clicked', () => {
+  it('navigates to voice profiles when Voice Profiles item is clicked', () => {
     render(<Sidebar />);
 
-    const newVoiceButton = screen.getByTitle('New Voice Profile');
-    fireEvent.click(newVoiceButton);
-
-    expect(useUIStore.getState().profileDialogOpen).toBe(true);
+    const voicesLink = screen.getByTitle('Voice Profiles');
+    expect(voicesLink).toBeInTheDocument();
   });
 
   it('handles global keyboard navigation shortcuts', () => {

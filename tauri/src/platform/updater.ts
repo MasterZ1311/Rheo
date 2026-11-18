@@ -67,9 +67,12 @@ class TauriUpdater implements PlatformUpdater {
       this.notifySubscribers();
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
-      // Tauri updater throws on 404 / no published release / network errors.
-      // Treat "no update available" style errors as up-to-date, not failures.
-      const isNoUpdate = /404|not found|no update|up.to.date/i.test(message);
+      // Tauri updater throws on 404 / no published release / network errors / missing release JSON.
+      // Treat "no update available" and missing remote release JSON as up-to-date, not failures.
+      const isNoUpdate =
+        /404|not found|no update|up.to.date|could not fetch.*release json|release json/i.test(
+          message,
+        );
       this.status = {
         checking: false,
         available: false,

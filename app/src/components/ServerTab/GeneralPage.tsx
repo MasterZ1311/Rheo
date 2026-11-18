@@ -344,14 +344,15 @@ function UpdatesSection() {
             }
           />
 
-          {status.error && (
-            <SettingRow title={t('settings.general.updates.error')}>
-              <div className="flex items-center gap-2 text-sm text-destructive">
-                <AlertCircle className="h-4 w-4" />
-                {status.error}
-              </div>
-            </SettingRow>
-          )}
+          {status.error &&
+            !/release json|404|not found|up.to.date/i.test(status.error) && (
+              <SettingRow title={t('settings.general.updates.error')}>
+                <div className="flex items-center gap-2 text-sm text-destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  {status.error}
+                </div>
+              </SettingRow>
+            )}
 
           {status.available && !status.downloading && !status.readyToInstall && (
             <SettingRow

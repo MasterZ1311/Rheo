@@ -9,7 +9,6 @@ import {
   LogOut,
   Mic2,
   Moon,
-  Plus,
   Search,
   Settings,
   Sparkles,
@@ -59,7 +58,6 @@ export function Sidebar({ isMacOS }: SidebarProps) {
   const isPlayerOpen = !!usePlayerStore((s) => s.audioUrl);
   const sidebarOpen = useUIStore((s) => s.sidebarOpen);
   const toggleSidebar = useUIStore((s) => s.toggleSidebar);
-  const setProfileDialogOpen = useUIStore((s) => s.setProfileDialogOpen);
   const setCommandPaletteOpen = useUIStore((s) => s.setCommandPaletteOpen);
   const setUserNameModalOpen = useUIStore((s) => s.setUserNameModalOpen);
   const userName = useUIStore((s) => s.userName) || 'MasterZ1311';
@@ -436,41 +434,6 @@ export function Sidebar({ isMacOS }: SidebarProps) {
               </Tooltip>
             );
           })}
-
-          {/* Action Button: Create New Voice Profile */}
-          <div className="pt-2">
-            {sidebarOpen ? (
-              <button
-                type="button"
-                onClick={() => setProfileDialogOpen(true)}
-                title="New Voice Profile"
-                aria-label="New Voice Profile"
-                className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-gradient-to-r from-[#EA580C] to-[#FB923C] text-white text-xs font-semibold shadow-md hover:brightness-110 active:scale-[0.98] transition-all cursor-pointer"
-              >
-                <Plus className="h-4 w-4 shrink-0 stroke-[2.5]" />
-                <span className="truncate">New Voice Profile</span>
-              </button>
-            ) : (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button
-                    type="button"
-                    onClick={() => setProfileDialogOpen(true)}
-                    title="New Voice Profile"
-                    aria-label="New Voice Profile"
-                    className="relative w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-tr from-[#EA580C] to-[#FB923C] text-white hover:brightness-110 transition-all shadow-md group cursor-pointer mx-auto"
-                  >
-                    <Plus className="h-5 w-5 stroke-[2.5] group-hover:scale-110 transition-transform" />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent side="right">
-                  <p className="flex items-center gap-1.5">
-                    New Voice Profile <kbd className="font-mono text-[10px] bg-white/10 px-1 rounded">⌘N</kbd>
-                  </p>
-                </TooltipContent>
-              </Tooltip>
-            )}
-          </div>
         </nav>
 
         {/* Bottom Utility Stack */}

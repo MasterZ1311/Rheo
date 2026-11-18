@@ -60,7 +60,7 @@ export function UpdateStatus() {
               </div>
             )}
 
-            {status.error && (
+            {status.error && !/release json|404|not found|up.to.date/i.test(status.error) && (
               <div className="flex items-center gap-2 text-sm text-destructive">
                 <AlertCircle className="h-4 w-4" />
                 {status.error}
