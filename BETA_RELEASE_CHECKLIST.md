@@ -4,7 +4,7 @@
 **Target Version:** 0.1.0  
 **Target Architecture:** Windows 10/11 x86_64  
 **Release Branch:** `MZ-Main`  
-**Commit Hash:** `aceadca22d9cb305d214dbdb8732e49c7fe023a1`  
+**Commit Hash:** `cc4ebdcc02a6ae10374db1757d600eabe8cd037c`  
 **Release Manager:** Senior Windows Release Engineer  
 **Distribution Channel:** Controlled Private Beta (Small invite-only group)  
 **Distribution State:** **STAGED LOCALLY — NOT PUBLISHED**
@@ -17,8 +17,8 @@ The release artifacts below have been independently verified, cryptographically 
 
 | Artifact Type | Filename | Exact Byte Size | Cryptographic SHA-256 Checksum | Signature Status |
 | :--- | :--- | :---: | :--- | :---: |
-| **Enterprise Installer** | `Rheo_0.1.0_x64_en-US.msi` | 556,445,696 B | `C5E1EBEDD0D76BE74F2649002044593C0F949DD67B5F90C4F49A3909A14418FE` | `NotSigned` |
-| **Setup Executable** | `Rheo_0.1.0_x64-setup.exe` | 555,440,637 B | `EF68850903E1975DC567B4AB92D67C128F65B56205F23D10CBDEE4CD3E021429` | `NotSigned` |
+| **Enterprise Installer** | `Rheo_0.1.0_x64_en-US.msi` | 1,253,617,664 B | `F6B982768F8C78EC77B38BB1C2BC73A82B3777E061AEAB9B632F025B1814B33C` | `NotSigned` |
+| **Setup Executable** | `Rheo_0.1.0_x64-setup.exe` | 1,260,000,724 B | `5ADFA9420D56B21D1789DDEB0CD836BD7EFC75E0C5CE7007784E06CD5AC4BEDE` | `NotSigned` |
 | **Checksum Manifest** | `Rheo_0.1.0_SHA256SUMS.txt` | 170 B | SHA-256 distribution verification file | N/A |
 
 ### 1.1 Local Storage Paths
