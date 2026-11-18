@@ -1186,6 +1186,34 @@ fn open_input_monitoring_settings(app: tauri::AppHandle) -> Result<(), String> {
     }
 }
 
+/// Open the Privacy & Security → Microphone settings pane.
+/// On Windows, opens ms-settings:privacy-microphone.
+/// On macOS, opens x-apple.systempreferences:...Privacy_Microphone.
+#[command]
+fn open_microphone_settings(_app: tauri::AppHandle) -> Result<(), String> {
+    #[cfg(target_os = "windows")]
+    {
+        use std::process::Command;
+        Command::new("cmd")
+            .args(["/c", "start", "ms-settings:privacy-microphone"])
+            .spawn()
+            .map_err(|e| format!("Failed to open Windows microphone settings: {e}"))?;
+        Ok(())
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let url = "x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone";
+        _app.shell()
+            .open(url, None)
+            .map_err(|e| format!("Failed to open Microphone settings: {e}"))?;
+        Ok(())
+    }
+    #[cfg(not(any(target_os = "windows", target_os = "macos")))]
+    {
+        Err("Microphone settings pane is not supported on this platform".into())
+    }
+}
+
 /// Deliver `text` into the UI that had focus when the chord fired.
 ///
 /// Pipeline: activate the captured PID → settle → save the user's
@@ -1527,6 +1555,7 @@ pub fn run() {
             check_input_monitoring_permission,
             open_accessibility_settings,
             open_input_monitoring_settings,
+            open_microphone_settings,
             paste_final_text,
             enable_hotkey,
             disable_hotkey,

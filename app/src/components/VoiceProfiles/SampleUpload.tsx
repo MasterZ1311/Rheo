@@ -70,6 +70,8 @@ export function SampleUpload({ profileId, open, onOpenChange }: SampleUploadProp
     isRecording,
     duration,
     error: recordingError,
+    stream: recordingStream,
+    clearError: clearRecordingError,
     startRecording,
     stopRecording,
     cancelRecording,
@@ -285,6 +287,9 @@ export function SampleUpload({ profileId, open, onOpenChange }: SampleUploadProp
                       onPlayPause={handlePlayPause}
                       isPlaying={isPlaying}
                       isTranscribing={transcribe.isPending}
+                      stream={recordingStream}
+                      error={recordingError}
+                      onClearError={clearRecordingError}
                     />
                   )}
                 />

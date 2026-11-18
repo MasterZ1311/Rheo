@@ -1,10 +1,12 @@
-import { Mic, Pause, Play, Square } from 'lucide-react';
-import { memo, useEffect, useState } from 'react';
+import { invoke } from '@tauri-apps/api/core';
+import { AlertCircle, ExternalLink, Mic, Pause, Play, RefreshCw, Square } from 'lucide-react';
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Visualizer } from 'react-sound-visualizer';
 import { Button } from '@/components/ui/button';
 import { FormControl, FormItem, FormMessage } from '@/components/ui/form';
 import { formatAudioDuration } from '@/lib/utils/audio';
+import { usePlatform } from '@/platform/PlatformContext';
 
 const MemoizedWaveform = memo(function MemoizedWaveform({
   audioStream,
@@ -34,6 +36,9 @@ interface AudioSampleRecordingProps {
   isPlaying: boolean;
   isTranscribing?: boolean;
   showWaveform?: boolean;
+  stream?: MediaStream | null;
+  error?: string | null;
+  onClearError?: () => void;
 }
 
 export function AudioSampleRecording({
@@ -48,35 +53,23 @@ export function AudioSampleRecording({
   isPlaying,
   isTranscribing = false,
   showWaveform = true,
+  stream = null,
+  error = null,
+  onClearError,
 }: AudioSampleRecordingProps) {
   const { t } = useTranslation();
-  const [audioStream, setAudioStream] = useState<MediaStream | null>(null);
+  const platform = usePlatform();
+  const isTauri = platform.metadata.isTauri;
 
-  // Request microphone access when component mounts
-  useEffect(() => {
-    if (!showWaveform) return;
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
-
-    let stream: MediaStream | null = null;
-
-    navigator.mediaDevices
-      .getUserMedia({ audio: true, video: false })
-      .then((s) => {
-        stream = s;
-        setAudioStream(s);
-      })
-      .catch((err) => {
-        console.warn('Could not access microphone for visualization:', err);
-      });
-
-    return () => {
-      if (stream) {
-        stream.getTracks().forEach((track) => {
-          track.stop();
-        });
+  const handleOpenMicrophoneSettings = async () => {
+    if (isTauri) {
+      try {
+        await invoke('open_microphone_settings');
+      } catch (err) {
+        console.warn('Failed to open microphone settings via Tauri:', err);
       }
-    };
-  }, [showWaveform]);
+    }
+  };
 
   return (
     <FormItem>
@@ -84,25 +77,67 @@ export function AudioSampleRecording({
         <div className="space-y-4">
           {!isRecording && !file && (
             <div className="relative flex flex-col items-center justify-center gap-4 p-4 border-2 border-dashed rounded-lg min-h-[180px] overflow-hidden">
-              {showWaveform && audioStream && <MemoizedWaveform audioStream={audioStream} />}
-              <Button
-                type="button"
-                onClick={onStart}
-                size="lg"
-                className="relative z-10 flex items-center gap-2"
-              >
-                <Mic className="h-5 w-5" />
-                {t('audioSample.startRecording')}
-              </Button>
-              <p className="relative z-10 text-sm text-muted-foreground text-center">
-                {t('audioSample.recordHint')}
-              </p>
+              {showWaveform && stream && <MemoizedWaveform audioStream={stream} />}
+
+              {error ? (
+                <div className="relative z-10 w-full rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-xs space-y-3">
+                  <div className="flex items-center gap-2 font-semibold text-destructive text-sm">
+                    <AlertCircle className="h-4 w-4 shrink-0" />
+                    <span>{t('audioSample.permissionErrorTitle', 'Microphone Access Denied')}</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    {error}
+                  </p>
+                  <div className="flex flex-wrap items-center gap-2 pt-1">
+                    {isTauri && (
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        className="h-7 text-xs gap-1.5 cursor-pointer border-destructive/30 hover:bg-destructive/15"
+                        onClick={handleOpenMicrophoneSettings}
+                      >
+                        <ExternalLink className="h-3 w-3" />
+                        <span>{t('audioSample.openSettings', 'Open Microphone Settings')}</span>
+                      </Button>
+                    )}
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="secondary"
+                      className="h-7 text-xs gap-1.5 cursor-pointer"
+                      onClick={() => {
+                        onClearError?.();
+                        onStart();
+                      }}
+                    >
+                      <RefreshCw className="h-3 w-3" />
+                      <span>{t('audioSample.retry', 'Try Again')}</span>
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <Button
+                    type="button"
+                    onClick={onStart}
+                    size="lg"
+                    className="relative z-10 flex items-center gap-2 cursor-pointer"
+                  >
+                    <Mic className="h-5 w-5" />
+                    {t('audioSample.startRecording')}
+                  </Button>
+                  <p className="relative z-10 text-sm text-muted-foreground text-center">
+                    {t('audioSample.recordHint')}
+                  </p>
+                </>
+              )}
             </div>
           )}
 
           {isRecording && (
             <div className="relative flex flex-col items-center justify-center gap-4 p-4 border-2 border-accent rounded-lg bg-accent/5 min-h-[180px] overflow-hidden">
-              {showWaveform && audioStream && <MemoizedWaveform audioStream={audioStream} />}
+              {showWaveform && stream && <MemoizedWaveform audioStream={stream} />}
               <div className="relative z-10 flex items-center gap-4">
                 <div className="flex items-center gap-2">
                   <div className="h-3 w-3 rounded-full bg-accent animate-pulse" />
@@ -114,7 +149,7 @@ export function AudioSampleRecording({
               <Button
                 type="button"
                 onClick={onStop}
-                className="relative z-10 flex items-center gap-2 bg-accent text-accent-foreground hover:bg-accent/90"
+                className="relative z-10 flex items-center gap-2 bg-accent text-accent-foreground hover:bg-accent/90 cursor-pointer"
               >
                 <Square className="h-4 w-4" />
                 {t('audioSample.stopRecording')}
@@ -149,7 +184,7 @@ export function AudioSampleRecording({
                   variant="outline"
                   onClick={onTranscribe}
                   disabled={isTranscribing}
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-2 cursor-pointer"
                 >
                   <Mic className="h-4 w-4" />
                   {isTranscribing ? t('audioSample.transcribing') : t('audioSample.transcribe')}
@@ -158,7 +193,7 @@ export function AudioSampleRecording({
                   type="button"
                   variant="outline"
                   onClick={onCancel}
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-2 cursor-pointer"
                 >
                   {t('audioSample.recordAgain')}
                 </Button>

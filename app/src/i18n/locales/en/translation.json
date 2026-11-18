@@ -366,7 +366,10 @@
     "systemHint": "Capture audio from your system. Maximum duration: 30 seconds.",
     "stopCapture": "Stop Capture",
     "captureComplete": "Capture complete",
-    "captureAgain": "Capture Again"
+    "captureAgain": "Capture Again",
+    "permissionErrorTitle": "Microphone Access Denied",
+    "openSettings": "Open Microphone Settings",
+    "retry": "Try Again"
   },
   "sampleList": {
     "loading": "Loading samples…",

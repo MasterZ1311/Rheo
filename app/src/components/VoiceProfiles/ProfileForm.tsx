@@ -307,6 +307,8 @@ export function ProfileForm() {
     isRecording,
     duration,
     error: recordingError,
+    stream: recordingStream,
+    clearError: clearRecordingError,
     startRecording,
     stopRecording,
     cancelRecording,
@@ -1189,6 +1191,9 @@ export function ProfileForm() {
                                     onPlayPause={handlePlayPause}
                                     isPlaying={isPlaying}
                                     isTranscribing={transcribe.isPending}
+                                    stream={recordingStream}
+                                    error={recordingError}
+                                    onClearError={clearRecordingError}
                                   />
                                 )}
                               />

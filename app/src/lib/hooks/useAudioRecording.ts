@@ -15,12 +15,17 @@ export function useAudioRecording({
   const [isRecording, setIsRecording] = useState(false);
   const [duration, setDuration] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [stream, setStream] = useState<MediaStream | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const streamRef = useRef<MediaStream | null>(null);
   const timerRef = useRef<number | null>(null);
   const startTimeRef = useRef<number | null>(null);
   const cancelledRef = useRef<boolean>(false);
+
+  const clearError = useCallback(() => {
+    setError(null);
+  }, []);
 
   const startRecording = useCallback(async () => {
     try {
@@ -58,16 +63,26 @@ export function useAudioRecording({
         }
       }
 
-      // Request microphone access
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: {
-          echoCancellation: true,
-          noiseSuppression: true,
-          autoGainControl: true,
-        },
-      });
+      // Request microphone access with fallback
+      let audioStream: MediaStream;
+      try {
+        audioStream = await navigator.mediaDevices.getUserMedia({
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true,
+          },
+        });
+      } catch (constraintErr) {
+        console.warn(
+          'Constrained getUserMedia failed, falling back to unconstrained audio: true',
+          constraintErr,
+        );
+        audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      }
 
-      streamRef.current = stream;
+      streamRef.current = audioStream;
+      setStream(audioStream);
 
       // Create MediaRecorder with preferred MIME type
       const options: MediaRecorderOptions = {
@@ -79,7 +94,7 @@ export function useAudioRecording({
         delete options.mimeType;
       }
 
-      const mediaRecorder = new MediaRecorder(stream, options);
+      const mediaRecorder = new MediaRecorder(audioStream, options);
       mediaRecorderRef.current = mediaRecorder;
 
       mediaRecorder.ondataavailable = (event) => {
@@ -104,6 +119,7 @@ export function useAudioRecording({
           track.stop();
         });
         streamRef.current = null;
+        setStream(null);
 
         // Don't fire completion callback if the recording was cancelled
         if (wasCancelled) return;
@@ -155,14 +171,47 @@ export function useAudioRecording({
         }
       }, 100);
     } catch (err) {
-      const errorMessage =
-        err instanceof Error
-          ? err.message
-          : 'Failed to access microphone. Please check permissions.';
-      setError(errorMessage);
+      console.error('Failed to start audio recording:', err);
+      let userFriendlyMessage = 'Failed to access microphone. Please check permissions.';
+
+      if (err instanceof DOMException || err instanceof Error) {
+        const errName = err.name || '';
+        const errMsg = err.message || '';
+
+        if (
+          errName === 'NotAllowedError' ||
+          errName === 'PermissionDeniedError' ||
+          errMsg.toLowerCase().includes('permission') ||
+          errMsg.toLowerCase().includes('denied')
+        ) {
+          userFriendlyMessage =
+            'Microphone access denied. If on Windows, open Settings > Privacy & security > Microphone, turn ON "Microphone access" and ensure "Let desktop apps access your microphone" is enabled. If in a browser, click the site settings/lock icon in your address bar and set Microphone to "Allow".';
+        } else if (
+          errName === 'NotFoundError' ||
+          errName === 'DevicesNotFoundError' ||
+          errMsg.toLowerCase().includes('not found')
+        ) {
+          userFriendlyMessage =
+            'No microphone detected. Please connect or enable a microphone and try again.';
+        } else if (
+          errName === 'NotReadableError' ||
+          errName === 'TrackStartError'
+        ) {
+          userFriendlyMessage =
+            'Microphone is currently in use or locked by another application. Please close other apps using the microphone and try again.';
+        } else if (errName === 'OverconstrainedError') {
+          userFriendlyMessage =
+            'Microphone does not support the requested audio configuration. Please check your default input device.';
+        } else {
+          userFriendlyMessage = errMsg || userFriendlyMessage;
+        }
+      }
+
+      setError(userFriendlyMessage);
       setIsRecording(false);
+      setStream(null);
     }
-  }, [maxDurationSeconds, onRecordingComplete]);
+  }, [maxDurationSeconds, onRecordingComplete, platform.metadata.isTauri]);
 
   const stopRecording = useCallback(() => {
     if (mediaRecorderRef.current && isRecording) {
@@ -190,6 +239,7 @@ export function useAudioRecording({
       track.stop();
     });
     streamRef.current = null;
+    setStream(null);
 
     if (timerRef.current !== null) {
       clearInterval(timerRef.current);
@@ -206,6 +256,8 @@ export function useAudioRecording({
       streamRef.current?.getTracks().forEach((track) => {
         track.stop();
       });
+      streamRef.current = null;
+      setStream(null);
     };
   }, []);
 
@@ -213,6 +265,8 @@ export function useAudioRecording({
     isRecording,
     duration,
     error,
+    stream,
+    clearError,
     startRecording,
     stopRecording,
     cancelRecording,
