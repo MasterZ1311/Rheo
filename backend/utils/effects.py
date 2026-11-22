@@ -22,17 +22,22 @@ from __future__ import annotations
 import numpy as np
 from typing import Any, Dict, List, Optional
 
-from pedalboard import (
-    Pedalboard,
-    Chorus,
-    Reverb,
-    Compressor,
-    Gain,
-    HighpassFilter,
-    LowpassFilter,
-    Delay,
-    PitchShift,
-)
+try:
+    from pedalboard import (
+        Pedalboard,
+        Chorus,
+        Reverb,
+        Compressor,
+        Gain,
+        HighpassFilter,
+        LowpassFilter,
+        Delay,
+        PitchShift,
+    )
+    HAS_PEDALBOARD = True
+except ImportError:
+    HAS_PEDALBOARD = False
+    Pedalboard = Chorus = Reverb = Compressor = Gain = HighpassFilter = LowpassFilter = Delay = PitchShift = None
 
 
 # Each param definition: (default, min, max, description)
@@ -315,11 +320,14 @@ def validate_effects_chain(effects_chain: List[Dict[str, Any]]) -> Optional[str]
     return None
 
 
-def build_pedalboard(effects_chain: List[Dict[str, Any]]) -> Pedalboard:
+def build_pedalboard(effects_chain: List[Dict[str, Any]]) -> Any:
     """Build a Pedalboard instance from an effects chain config.
 
     Skips effects where ``enabled`` is ``False``.
     """
+    if not HAS_PEDALBOARD or Pedalboard is None:
+        raise RuntimeError("pedalboard is required for audio effects processing. Install it with: pip install pedalboard")
+
     plugins = []
     for effect in effects_chain:
         if not effect.get("enabled", True):

@@ -505,8 +505,21 @@ function Invoke-Install {
 
             $srcBinaries = Join-Path $scriptRoot "tauri\src-tauri\binaries"
             if (Test-Path $srcBinaries) {
-                Copy-Item -Path "$srcBinaries\*" -Destination $binariesDir -Force
-                Copy-Item -Path "$srcBinaries\*" -Destination $InstallDir -Force
+                Copy-Item -Path "$srcBinaries\*" -Destination $binariesDir -Recurse -Force
+                Copy-Item -Path "$srcBinaries\*" -Destination $InstallDir -Recurse -Force
+
+                # Tauri's sidecar mechanism resolves binaries WITHOUT the target-triple suffix.
+                # The official NSIS installer renames them (e.g. rheo-server-x86_64-pc-windows-msvc.exe
+                # → rheo-server.exe). We must do the same so sidecar("rheo-server") can find the file.
+                $triplePattern = "-x86_64-pc-windows-msvc.exe"
+                foreach ($f in Get-ChildItem $InstallDir -Filter "*$triplePattern") {
+                    $shortName = $f.Name -replace [regex]::Escape($triplePattern), ".exe"
+                    $shortDst  = Join-Path $InstallDir $shortName
+                    if (-not (Test-Path $shortDst)) {
+                        Copy-Item -Path $f.FullName -Destination $shortDst -Force
+                        Write-Log "Created Tauri sidecar alias: $shortName" "INFO"
+                    }
+                }
             }
 
             $backendDist = Join-Path $scriptRoot "backend\dist"

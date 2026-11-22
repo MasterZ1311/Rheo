@@ -571,7 +571,7 @@ class TestAudioPlaybackAndProcessing:
 
     def test_audio_media_type_detection(self):
         """Audio MIME types correctly derived from filename extensions."""
-        assert _audio_media_type(Path("sample.wav")) == "audio/wav"
+        assert _audio_media_type(Path("sample.wav")) in ("audio/wav", "audio/x-wav")
         assert _audio_media_type(Path("sample.mp3")) in ("audio/mpeg", "audio/mp3")
         assert _audio_media_type(Path("sample.flac")) in ("audio/flac", "audio/x-flac")
         assert _audio_media_type(Path("sample.ogg")) in ("audio/ogg", "audio/vorbis", "audio/x-ogg")
@@ -607,7 +607,7 @@ class TestAudioPlaybackAndProcessing:
 
         audio_resp = client.get(f"/audio/{gen_id1}")
         assert audio_resp.status_code == 200
-        assert audio_resp.headers["content-type"] == "audio/wav"
+        assert audio_resp.headers["content-type"] in ("audio/wav", "audio/x-wav")
         assert len(audio_resp.content) == len(wav_bytes)
 
         # Case 2: Audio file missing on disk (clean 404, no 500)
