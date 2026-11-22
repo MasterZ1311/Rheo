@@ -79,6 +79,12 @@ def resolve_storage_path(path: str | Path | None) -> Path | None:
     if path is None:
         return None
 
+    # Normalize backslashes for cross-platform traversal protection (e.g. on POSIX where \ is not a separator)
+    if isinstance(path, str):
+        path = path.replace("\\", "/")
+    elif isinstance(path, Path):
+        path = Path(str(path).replace("\\", "/"))
+
     stored_path = Path(path)
     # Empty paths (e.g. failed generations) must not resolve to the data
     # dir itself, which exists and would defeat the callers' 404 guards.
